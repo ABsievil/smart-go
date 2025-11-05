@@ -13,8 +13,8 @@ import { DATABASE_CONNECTION_NAME } from 'src/common/database/constants/database
                     schema: UserSchema,
                 },
             ],
-            DATABASE_CONNECTION_NAME
-    ),
+            DATABASE_CONNECTION_NAME,
+        ),
     ],
     providers: [UserRepository],
     exports: [UserRepository],
