@@ -1,5 +1,5 @@
 import { Model, PopulateOptions, Document } from 'mongoose';
-import { DBEntityBase } from './entities/database.entity';
+import { DBEntityBase } from '@common/database/repositories/entities/database.entity';
 
 export type IDatabaseDocument<T> = T & Document;
 

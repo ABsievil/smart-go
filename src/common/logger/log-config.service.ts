@@ -4,7 +4,7 @@ import { Params } from 'nestjs-pino';
 import {
     LOG_EXCLUDED_ROUTES,
     LOG_SENSITIVE_FIELDS,
-} from 'src/common/logger/log.constants';
+} from '@common/logger/log.constants';
 
 @Injectable()
 export class LogConfigService {

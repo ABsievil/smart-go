@@ -1,30 +1,40 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
-    "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
-  },
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": [
-      "node_modules",
-      "dist",
-      "coverage",
-      "logs",
-      "data",
-      "src/metadata.ts"
-  ]
+    "compilerOptions": {
+        "module": "commonjs",
+        "declaration": true,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "target": "ES2021",
+        "sourceMap": true,
+        "outDir": "./dist",
+        "baseUrl": "./",
+        "paths": {
+            "@app/*": ["src/app/*"],
+            "@common/*": ["src/common/*"],
+            "@modules/*": ["src/modules/*"],
+            "@configs/*": ["src/configs/*"],
+            "@src/*": ["src/*"]
+        },
+        "incremental": true,
+        "skipLibCheck": true,
+        "strictNullChecks": false,
+        "noImplicitAny": false,
+        "strictBindCallApply": false,
+        "forceConsistentCasingInFileNames": false,
+        "noFallthroughCasesInSwitch": false
+    },
+    "ts-node": {
+        "require": ["tsconfig-paths/register"]
+    },
+    "include": ["src/**/*", "test/**/*"],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "coverage",
+        "logs",
+        "data",
+        "src/metadata.ts"
+    ]
 }

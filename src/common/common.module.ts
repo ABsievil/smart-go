@@ -1,12 +1,12 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import databaseConfig from './configs/database.config';
+import databaseConfig from '@common/configs/database.config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { DB_CONNECTION_NAME } from './database/constants/database.constant';
+import { DB_CONNECTION_NAME } from '@common/database/constants/database.constant';
 import { set } from 'mongoose';
 import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
-import { LogConfigModule } from 'src/common/logger/log-config.module';
-import { LogConfigService } from 'src/common/logger/log-config.service';
+import { LogConfigModule } from '@common/logger/log-config.module';
+import { LogConfigService } from '@common/logger/log-config.service';
 
 @Global()
 @Module({

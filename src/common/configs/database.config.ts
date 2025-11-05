@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
-import { DB_CONNECTION_NAME } from '../database/constants/database.constant';
+import { DB_CONNECTION_NAME } from '@common/database/constants/database.constant';
 
 export default registerAs(
     'database',

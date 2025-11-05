@@ -1,4 +1,4 @@
-import { DB_CONNECTION_NAME } from '../constants/database.constant';
+import { DB_CONNECTION_NAME } from '@common/database/constants/database.constant';
 import { InjectModel } from '@nestjs/mongoose';
 
 export function InjectDatabaseModel(
