@@ -1,1 +1,1 @@
-export const DATABASE_CONNECTION_NAME = 'PrimaryConnectionDatabase';
+export const DB_CONNECTION_NAME = 'DefaultConnectionDatabase';

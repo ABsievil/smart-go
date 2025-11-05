@@ -1,10 +1,10 @@
-import { Model, PopulateOptions } from "mongoose";
-import { DatabaseEntityBase } from "./entities/database.entity";
+import { Model, PopulateOptions, Document } from 'mongoose';
+import { DBEntityBase } from './entities/database.entity';
 
 export type IDatabaseDocument<T> = T & Document;
 
-export class DatabaseRepositoryBase<
-    Entity extends DatabaseEntityBase,
+export class DBRepositoryBase<
+    Entity extends DBEntityBase,
     EntityDocument extends IDatabaseDocument<Entity>,
 > {
     protected readonly _repository: Model<Entity>;
@@ -12,7 +12,7 @@ export class DatabaseRepositoryBase<
 
     constructor(
         repository: Model<Entity>,
-        options?: PopulateOptions | (string | PopulateOptions)[]
+        options?: PopulateOptions | (string | PopulateOptions)[],
     ) {
         this._repository = repository;
         this._join = options;

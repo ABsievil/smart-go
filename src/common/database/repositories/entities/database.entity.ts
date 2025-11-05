@@ -1,10 +1,10 @@
-import { v4 as uuidV4 } from 'uuid';
-import {Prop} from '@nestjs/mongoose';
+import { Prop } from '@nestjs/mongoose';
+import { randomUUID } from 'crypto';
 
-export class DatabaseEntityBase {
+export class DBEntityBase {
     @Prop({
         type: String,
-        default: uuidV4,
+        default: () => randomUUID(),
     })
     _id: string;
 

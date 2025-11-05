@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { DBEntityBase } from 'src/common/database/repositories/entities/database.entity';
+import { IDatabaseDocument } from 'src/common/database/repositories/database.repository';
 
-export type UserDocument = HydratedDocument<UserEntity>;
-
-@Schema({ timestamps: true })
-export class UserEntity {
+@Schema({ collection: 'users', timestamps: true })
+export class UserEntity extends DBEntityBase {
     @Prop({ required: true })
     email: string;
 
@@ -12,4 +12,5 @@ export class UserEntity {
     name: string;
 }
 
+export type UserDoc = IDatabaseDocument<UserEntity>;
 export const UserSchema = SchemaFactory.createForClass(UserEntity);
