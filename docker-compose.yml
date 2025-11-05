@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+    api:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: smart-go-api:local
+        container_name: smart-go-api
+        restart: unless-stopped
+        environment:
+            - NODE_ENV=development
+            - APP_HOST=0.0.0.0
+            - APP_PORT=8000
+            - API_VERSION=1
+            - APP_GLOBAL_PREFIX=api
+            - DATABASE_URI=mongodb://mongo:27017/smart-go
+        ports:
+            - '8000:8000'
+        depends_on:
+            - mongo
+
+    mongo:
+        image: mongo:7
+        container_name: smart-go-mongo
+        restart: unless-stopped
+        ports:
+            - '27017:27017'
+        volumes:
+            - mongo_data:/data/db
+
+volumes:
+    mongo_data:
