@@ -3,6 +3,7 @@ import { VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from '@app/app.module';
 import { Logger } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -24,7 +25,16 @@ async function bootstrap() {
         defaultVersion: apiVersion,
     });
 
-    logger.log(`Server is running on ${host}:${port}`);
+    const swaggerConfig = new DocumentBuilder()
+        .setTitle('Smart Go API')
+        .setDescription('API documentation')
+        .setVersion(apiVersion)
+        .addBearerAuth()
+        .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup(`${globalPrefix}/docs`, app, document);
+
+    logger.debug(`Server is running on ${host}:${port}`);
 
     await app.listen(port, host);
 }
