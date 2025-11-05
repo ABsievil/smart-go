@@ -31,11 +31,32 @@ export class LogConfigService {
                           target: 'pino-pretty',
                           options: {
                               colorize: true,
-                              singleLine: true,
-                              translateTime: 'SYS:standard',
-                              ignore: 'pid,hostname',
+                              levelFirst: true,
+                              singleLine: false,
+                              translateTime: 'HH:MM:ss.l',
+                              messageFormat:
+                                  '{levelLabel} {time} {context} {msg} {req.method} {req.url} {res.statusCode} (+{responseTime} ms)',
+                              ignore: 'pid,hostname,req.params,req.query',
                           },
                       },
+                formatters: {
+                    log: (object: Record<string, any>) => {
+                        const now = new Date();
+                        const labels = {
+                            name: this.configService.get<string>('app.name'),
+                            env: this.configService.get<string>('app.env'),
+                            version:
+                                this.configService.get<string>('app.version'),
+                        };
+
+                        return {
+                            ...object,
+                            timestamp: now.valueOf(),
+                            iso: now.toISOString(),
+                            labels,
+                        };
+                    },
+                },
                 base: undefined,
                 messageKey: 'msg',
                 timestamp: false,

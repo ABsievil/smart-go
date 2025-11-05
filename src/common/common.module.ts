@@ -38,7 +38,6 @@ import { LogConfigService } from '@common/logger/log-config.service';
                     dbName,
                     ...timeoutOptions,
                     connectionFactory: (connection) => {
-                        if (debug) set('debug', true);
                         return connection;
                     },
                 };

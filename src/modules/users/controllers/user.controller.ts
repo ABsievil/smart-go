@@ -3,13 +3,13 @@ import { PinoLogger } from 'nestjs-pino';
 
 @Controller('users')
 export class UserController {
-    constructor(private readonly logger: PinoLogger) {
-        this.logger.setContext(UserController.name);
+    constructor(private readonly pinoLogger: PinoLogger) {
+        this.pinoLogger.setContext(UserController.name);
     }
 
     @Get()
     getUsers() {
-        this.logger.info({ action: 'getUsers' }, 'Fetching users');
+        this.pinoLogger.info({ action: 'getUsers' }, 'Fetching users');
         return 'Hello World';
     }
 }
