@@ -1,4 +1,9 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    IsNumberString,
+} from 'class-validator';
 
 export class EnvironmentVariablesDto {
     // Server
@@ -23,4 +28,30 @@ export class EnvironmentVariablesDto {
     @IsOptional()
     @IsString()
     APP_VERSION?: string;
+
+    // API
+    @IsOptional()
+    @IsString()
+    API_VERSION?: string;
+
+    @IsOptional()
+    @IsString()
+    APP_GLOBAL_PREFIX?: string;
+
+    @IsOptional()
+    @IsString()
+    APP_HOST?: string;
+
+    @IsOptional()
+    @IsNumberString()
+    APP_PORT?: string;
+
+    // Locale & Time
+    @IsOptional()
+    @IsString()
+    APP_TIMEZONE?: string; // e.g., UTC, Asia/Ho_Chi_Minh
+
+    @IsOptional()
+    @IsString()
+    APP_LANGUAGE?: string;
 }

@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import databaseConfig from '@common/configs/database.config';
+import appConfig from '@common/configs/app.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DB_CONNECTION_NAME } from '@common/database/constants/database.constant';
 import { set } from 'mongoose';
@@ -14,7 +15,7 @@ import { LogConfigService } from '@common/logger/log-config.service';
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath: '.env',
-            load: [databaseConfig],
+            load: [databaseConfig, appConfig],
         }),
         PinoLoggerModule.forRootAsync({
             imports: [LogConfigModule],
