@@ -22,6 +22,8 @@ RUN yarn install --frozen-lockfile --production && yarn cache clean || true
 
 # Copy compiled app
 COPY --from=builder /app/dist ./dist
+# Copy languages directory (if not already in dist)
+COPY --from=builder /app/src/languages ./dist/languages
 
 # Expose app port
 EXPOSE 8000

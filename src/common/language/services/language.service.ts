@@ -23,7 +23,42 @@ export class LanguageService implements OnModuleInit {
     }
 
     private loadLanguages() {
-        const languagesDir = path.join(process.cwd(), 'src', 'languages');
+        // Try to find languages directory relative to the compiled file location
+        // In production, it will be in dist/languages
+        // In development, it will be in src/languages
+        let languagesDir: string;
+
+        // Check if we're in production (dist folder exists)
+        const distLanguagesPath = path.join(process.cwd(), 'dist', 'languages');
+        const srcLanguagesPath = path.join(process.cwd(), 'src', 'languages');
+
+        if (fs.existsSync(distLanguagesPath)) {
+            languagesDir = distLanguagesPath;
+        } else if (fs.existsSync(srcLanguagesPath)) {
+            languagesDir = srcLanguagesPath;
+        } else {
+            // Fallback: try to find from __dirname (compiled file location)
+            const compiledFileDir = __dirname;
+            const possiblePaths = [
+                path.join(compiledFileDir, '..', '..', '..', 'languages'),
+                path.join(compiledFileDir, '..', '..', '..', '..', 'languages'),
+                path.join(process.cwd(), 'languages'),
+            ];
+
+            for (const possiblePath of possiblePaths) {
+                if (fs.existsSync(possiblePath)) {
+                    languagesDir = possiblePath;
+                    break;
+                }
+            }
+
+            if (!languagesDir) {
+                throw new Error(
+                    `Languages directory not found. Tried: ${possiblePaths.join(', ')}`,
+                );
+            }
+        }
+
         const languageDirs = fs.readdirSync(languagesDir, {
             withFileTypes: true,
         });

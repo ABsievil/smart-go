@@ -6,6 +6,12 @@
         "deleteOutDir": true,
         "builder": "swc",
         "typeCheck": true,
-        "webpack": false
+        "webpack": false,
+        "assets": [
+            {
+                "include": "languages/**/*",
+                "outDir": "./dist"
+            }
+        ]
     }
 }
