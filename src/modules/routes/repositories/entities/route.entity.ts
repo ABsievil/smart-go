@@ -6,10 +6,10 @@ import { TransportType, RouteStatus } from '@modules/routes/enums/route.enum';
 @Schema({ collection: 'routes', timestamps: true })
 export class RouteEntity extends DBEntityBase {
     @Prop({ required: true, unique: true })
-    routeNumber: string;
+    routeCode: string;
 
-    @Prop({ required: true })
-    routeName: string;
+    @Prop({ required: true, type: [String] })
+    routeName: string[];
 
     @Prop({
         required: true,
@@ -50,12 +50,34 @@ export class RouteEntity extends DBEntityBase {
     })
     status: RouteStatus;
 
+    @Prop({ required: false, type: Number })
+    distance?: number;
+
+    @Prop({
+        type: {
+            from: { type: String, required: false },
+            to: { type: String, required: false },
+        },
+        required: false,
+        _id: false,
+    })
+    operatingTime?: {
+        from: string;
+        to: string;
+    };
+
+    @Prop({ required: false, type: Number })
+    tripTime?: number;
+
+    @Prop({ required: false, type: Number })
+    frequencyOfEachTrip?: number;
+
     @Prop({
         type: Map,
-        of: Number,
+        of: String,
         default: {},
     })
-    stationIds: Map<string, number>;
+    stationIds: Map<string, string>;
 }
 
 export type RouteDoc = IDatabaseDocument<RouteEntity>;
