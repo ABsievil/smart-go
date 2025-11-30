@@ -1,0 +1,16 @@
+{
+    "success": {
+        "create": "Tạo tuyến đường thành công",
+        "findAll": "Lấy danh sách tuyến đường thành công",
+        "findOne": "Lấy thông tin tuyến đường thành công",
+        "update": "Cập nhật tuyến đường thành công",
+        "remove": "Xóa tuyến đường thành công"
+    },
+    "error": {
+        "create": "Không thể tạo tuyến đường",
+        "findAll": "Không thể lấy danh sách tuyến đường",
+        "findOne": "Không tìm thấy tuyến đường",
+        "update": "Không thể cập nhật tuyến đường",
+        "remove": "Không thể xóa tuyến đường"
+    }
+}

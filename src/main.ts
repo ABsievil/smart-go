@@ -4,6 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { AppModule } from '@app/app.module';
 import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { LanguageResponseInterceptor } from '@common/language/interceptors/language-response.interceptor';
+import { LanguageExceptionFilter } from '@common/language/filters/language-exception.filter';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -25,6 +27,12 @@ async function bootstrap() {
         defaultVersion: apiVersion,
     });
 
+    // Register global language response interceptor
+    app.useGlobalInterceptors(app.get(LanguageResponseInterceptor));
+
+    // Register global language exception filter
+    app.useGlobalFilters(app.get(LanguageExceptionFilter));
+
     const swaggerConfig = new DocumentBuilder()
         .setTitle('Smart Go API')
         .setDescription('API documentation')
@@ -32,7 +40,7 @@ async function bootstrap() {
         .addBearerAuth()
         .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup(`${globalPrefix}/docs`, app, document);
+    SwaggerModule.setup(`${globalPrefix}-docs`, app, document);
 
     logger.debug(`Server is running on ${host}:${port}`);
 

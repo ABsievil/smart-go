@@ -1,0 +1,16 @@
+{
+    "success": {
+        "create": "Station created successfully",
+        "findAll": "Stations retrieved successfully",
+        "findOne": "Station retrieved successfully",
+        "update": "Station updated successfully",
+        "remove": "Station deleted successfully"
+    },
+    "error": {
+        "create": "Failed to create station",
+        "findAll": "Failed to retrieve stations",
+        "findOne": "Station not found",
+        "update": "Failed to update station",
+        "remove": "Failed to delete station"
+    }
+}

@@ -1,0 +1,16 @@
+{
+    "success": {
+        "create": "Tạo trạm dừng thành công",
+        "findAll": "Lấy danh sách trạm dừng thành công",
+        "findOne": "Lấy thông tin trạm dừng thành công",
+        "update": "Cập nhật trạm dừng thành công",
+        "remove": "Xóa trạm dừng thành công"
+    },
+    "error": {
+        "create": "Không thể tạo trạm dừng",
+        "findAll": "Không thể lấy danh sách trạm dừng",
+        "findOne": "Không tìm thấy trạm dừng",
+        "update": "Không thể cập nhật trạm dừng",
+        "remove": "Không thể xóa trạm dừng"
+    }
+}

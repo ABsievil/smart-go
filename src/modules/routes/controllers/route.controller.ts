@@ -15,6 +15,7 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { PinoLogger } from 'nestjs-pino';
 import { RouteService } from '@modules/routes/services/route.service';
+import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { RouteCreateRequestDto } from '@modules/routes/dtos/request/route-create.request.dto';
 import { RouteUpdateRequestDto } from '@modules/routes/dtos/request/route-update.request.dto';
 import { RouteGetResponseDto } from '@modules/routes/dtos/response/route-get.response.dto';
@@ -31,6 +32,10 @@ export class RouteController {
     }
 
     @Post()
+    @LanguageResponse({
+        module: 'routes',
+        successKey: 'create',
+    })
     @ApiOperation({ summary: 'Create a new route' })
     @ApiResponse({
         status: 201,
@@ -50,6 +55,10 @@ export class RouteController {
     }
 
     @Get()
+    @LanguageResponse({
+        module: 'routes',
+        successKey: 'findAll',
+    })
     @ApiOperation({ summary: 'Get all routes' })
     @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
     @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
@@ -82,6 +91,10 @@ export class RouteController {
     }
 
     @Get(':id')
+    @LanguageResponse({
+        module: 'routes',
+        successKey: 'findOne',
+    })
     @ApiOperation({ summary: 'Get route by ID' })
     @ApiResponse({
         status: 200,
@@ -96,6 +109,10 @@ export class RouteController {
     }
 
     @Put(':id')
+    @LanguageResponse({
+        module: 'routes',
+        successKey: 'update',
+    })
     @ApiOperation({ summary: 'Update route by ID' })
     @ApiResponse({
         status: 200,
@@ -116,6 +133,10 @@ export class RouteController {
     }
 
     @Delete(':id')
+    @LanguageResponse({
+        module: 'routes',
+        successKey: 'remove',
+    })
     @ApiOperation({ summary: 'Delete route by ID' })
     @ApiResponse({ status: 200, description: 'Route deleted successfully' })
     @ApiResponse({ status: 404, description: 'Route not found' })

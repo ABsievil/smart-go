@@ -15,6 +15,7 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { PinoLogger } from 'nestjs-pino';
 import { StationService } from '@modules/stations/services/station.service';
+import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { StationCreateRequestDto } from '@modules/stations/dtos/request/station-create.request.dto';
 import { StationUpdateRequestDto } from '@modules/stations/dtos/request/station-update.request.dto';
 import { StationGetResponseDto } from '@modules/stations/dtos/response/station-get.response.dto';
@@ -31,6 +32,10 @@ export class StationController {
     }
 
     @Post()
+    @LanguageResponse({
+        module: 'stations',
+        successKey: 'create',
+    })
     @ApiOperation({ summary: 'Create a new station' })
     @ApiResponse({
         status: 201,
@@ -50,6 +55,10 @@ export class StationController {
     }
 
     @Get()
+    @LanguageResponse({
+        module: 'stations',
+        successKey: 'findAll',
+    })
     @ApiOperation({ summary: 'Get all stations' })
     @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
     @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
@@ -82,6 +91,10 @@ export class StationController {
     }
 
     @Get(':id')
+    @LanguageResponse({
+        module: 'stations',
+        successKey: 'findOne',
+    })
     @ApiOperation({ summary: 'Get station by ID' })
     @ApiResponse({
         status: 200,
@@ -99,6 +112,10 @@ export class StationController {
     }
 
     @Put(':id')
+    @LanguageResponse({
+        module: 'stations',
+        successKey: 'update',
+    })
     @ApiOperation({ summary: 'Update station by ID' })
     @ApiResponse({
         status: 200,
@@ -119,6 +136,10 @@ export class StationController {
     }
 
     @Delete(':id')
+    @LanguageResponse({
+        module: 'stations',
+        successKey: 'remove',
+    })
     @ApiOperation({ summary: 'Delete station by ID' })
     @ApiResponse({ status: 200, description: 'Station deleted successfully' })
     @ApiResponse({ status: 404, description: 'Station not found' })

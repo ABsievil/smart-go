@@ -1,0 +1,16 @@
+{
+    "success": {
+        "create": "Route created successfully",
+        "findAll": "Routes retrieved successfully",
+        "findOne": "Route retrieved successfully",
+        "update": "Route updated successfully",
+        "remove": "Route deleted successfully"
+    },
+    "error": {
+        "create": "Failed to create route",
+        "findAll": "Failed to retrieve routes",
+        "findOne": "Route not found",
+        "update": "Failed to update route",
+        "remove": "Failed to delete route"
+    }
+}

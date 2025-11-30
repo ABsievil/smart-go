@@ -8,10 +8,12 @@ import { set } from 'mongoose';
 import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
 import { LogConfigModule } from '@common/logger/log-config.module';
 import { LogConfigService } from '@common/logger/log-config.service';
+import { LanguageModule } from '@common/language/language.module';
 
 @Global()
 @Module({
     imports: [
+        LanguageModule,
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath: '.env',
