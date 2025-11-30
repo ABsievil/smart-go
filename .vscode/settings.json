@@ -26,6 +26,9 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
+  // Cấu hình suggest
+  "editor.suggest.showStatusBar": true,
+  "workbench.statusBar.visible": true,
 
   // Prettier settings
   "prettier.requireConfig": true,
