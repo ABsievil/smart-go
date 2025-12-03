@@ -1,6 +1,5 @@
 import {
     IsString,
-    IsArray,
     IsEnum,
     IsNumber,
     IsBoolean,
@@ -28,10 +27,9 @@ export class RouteCreateRequestDto {
     @IsString()
     routeCode: string;
 
-    @ApiProperty({ description: 'Route name', example: ['Route 1', 'Tuyến 1'] })
-    @IsArray()
-    @IsString({ each: true })
-    routeName: string[];
+    @ApiProperty({ description: 'Route name', example: 'Route 1 - Tuyến 1' })
+    @IsString()
+    routeName: string;
 
     @ApiProperty({ description: 'Transport type', enum: TransportType })
     @IsEnum(TransportType)

@@ -12,7 +12,7 @@ import {
     LANGUAGE_RESPONSE_KEY,
     LanguageResponseOptions,
 } from '../decorators/language-response.decorator';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 export interface LanguageResponse<T> {
     message?: string;
@@ -28,10 +28,13 @@ export class LanguageResponseInterceptor implements NestInterceptor {
     ) {}
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-        const request = context.switchToHttp().getRequest<Request>();
-        const language = this.getLanguageFromRequest(request);
+        const httpContext = context.switchToHttp();
+        const request = httpContext.getRequest<Request>();
+        const response = httpContext.getResponse<Response>();
 
+        const language = this.getLanguageFromRequest(request);
         const handler = context.getHandler();
+
         const options = this.reflector.get<LanguageResponseOptions>(
             LANGUAGE_RESPONSE_KEY,
             handler,
@@ -41,38 +44,48 @@ export class LanguageResponseInterceptor implements NestInterceptor {
         (request as any).__handler = handler;
         (request as any).__languageOptions = options;
 
+        if (!options) {
+            return next.handle();
+        }
+
         return next.handle().pipe(
             map((data) => {
-                if (!options) {
+                // If handler returns null/undefined, keep original behaviour
+                if (data === null || data === undefined) {
                     return data;
                 }
 
-                // Add success message if data exists (successful response)
-                if (data !== null && data !== undefined) {
-                    const successMessage =
-                        this.languageService.getSuccessMessage(
-                            options.module,
-                            options.successKey,
-                            language,
-                        );
+                const successMessage = this.languageService.getSuccessMessage(
+                    options.module,
+                    options.successKey,
+                    language,
+                );
 
-                    // If data is an object (including arrays), add message property
-                    if (typeof data === 'object') {
-                        // Preserve existing structure and add message
-                        return {
-                            ...data,
-                            message: successMessage,
-                        };
-                    }
+                const statusCode = response.statusCode;
 
-                    // If data is a primitive, wrap it
+                const isListResponse =
+                    typeof data === 'object' &&
+                    data !== null &&
+                    'data' in data &&
+                    'total' in data &&
+                    'page' in data &&
+                    'limit' in data;
+
+                if (isListResponse) {
+                    // Flatten list response to avoid data.data
                     return {
-                        data,
+                        statusCode,
                         message: successMessage,
+                        ...(data as Record<string, any>),
                     };
                 }
 
-                return data;
+                // Default: wrap single-item or primitive response
+                return {
+                    statusCode,
+                    message: successMessage,
+                    data,
+                };
             }),
         );
     }

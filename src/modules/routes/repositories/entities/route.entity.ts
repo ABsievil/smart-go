@@ -8,8 +8,8 @@ export class RouteEntity extends DBEntityBase {
     @Prop({ required: true, unique: true })
     routeCode: string;
 
-    @Prop({ required: true, type: [String] })
-    routeName: string[];
+    @Prop({ required: true, type: String })
+    routeName: string;
 
     @Prop({
         required: true,
@@ -18,17 +18,17 @@ export class RouteEntity extends DBEntityBase {
     })
     transportType: TransportType;
 
-    @Prop({ required: true })
-    startPoint: string;
+    @Prop({ required: false })
+    startPoint?: string;
 
-    @Prop({ required: true })
-    endPoint: string;
+    @Prop({ required: false })
+    endPoint?: string;
 
-    @Prop({ required: true, type: String })
-    operatingHoursStart: string;
+    @Prop({ required: false, type: String })
+    operatingHoursStart?: string;
 
-    @Prop({ required: true, type: String })
-    operatingHoursEnd: string;
+    @Prop({ required: false, type: String })
+    operatingHoursEnd?: string;
 
     @Prop({ required: true, type: Number })
     frequency: number;
