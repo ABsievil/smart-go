@@ -31,24 +31,24 @@ export class StationController {
         this.pinoLogger.setContext(StationController.name);
     }
 
-    @Post()
-    @LanguageResponse({
-        module: 'stations',
-        successKey: 'create',
-    })
-    @ApiOperation({ summary: 'Create a new station' })
-    @ApiResponse({
-        status: 201,
-        description: 'Station created successfully',
-        type: StationGetResponseDto,
-    })
-    @HttpCode(HttpStatus.CREATED)
-    async create(
-        @Body() createDto: StationCreateRequestDto,
-    ): Promise<StationGetResponseDto> {
-        const station = await this.stationService.create(createDto);
-        return this.stationService.mapGet(station);
-    }
+    // @Post()
+    // @LanguageResponse({
+    //     module: 'stations',
+    //     successKey: 'create',
+    // })
+    // @ApiOperation({ summary: 'Create a new station' })
+    // @ApiResponse({
+    //     status: 201,
+    //     description: 'Station created successfully',
+    //     type: StationGetResponseDto,
+    // })
+    // @HttpCode(HttpStatus.CREATED)
+    // async create(
+    //     @Body() createDto: StationCreateRequestDto,
+    // ): Promise<StationGetResponseDto> {
+    //     const station = await this.stationService.create(createDto);
+    //     return this.stationService.mapGet(station);
+    // }
 
     @Get()
     @LanguageResponse({
@@ -99,36 +99,36 @@ export class StationController {
         return this.stationService.mapGet(station);
     }
 
-    @Put(':id')
-    @LanguageResponse({
-        module: 'stations',
-        successKey: 'update',
-    })
-    @ApiOperation({ summary: 'Update station by ID' })
-    @ApiResponse({
-        status: 200,
-        description: 'Station updated successfully',
-        type: StationGetResponseDto,
-    })
-    @ApiResponse({ status: 404, description: 'Station not found' })
-    async update(
-        @Param('id') id: string,
-        @Body() updateDto: StationUpdateRequestDto,
-    ): Promise<StationGetResponseDto> {
-        const station = await this.stationService.update(id, updateDto);
-        return this.stationService.mapGet(station);
-    }
+    // @Put(':id')
+    // @LanguageResponse({
+    //     module: 'stations',
+    //     successKey: 'update',
+    // })
+    // @ApiOperation({ summary: 'Update station by ID' })
+    // @ApiResponse({
+    //     status: 200,
+    //     description: 'Station updated successfully',
+    //     type: StationGetResponseDto,
+    // })
+    // @ApiResponse({ status: 404, description: 'Station not found' })
+    // async update(
+    //     @Param('id') id: string,
+    //     @Body() updateDto: StationUpdateRequestDto,
+    // ): Promise<StationGetResponseDto> {
+    //     const station = await this.stationService.update(id, updateDto);
+    //     return this.stationService.mapGet(station);
+    // }
 
-    @Delete(':id')
-    @LanguageResponse({
-        module: 'stations',
-        successKey: 'remove',
-    })
-    @ApiOperation({ summary: 'Delete station by ID' })
-    @ApiResponse({ status: 200, description: 'Station deleted successfully' })
-    @ApiResponse({ status: 404, description: 'Station not found' })
-    @HttpCode(HttpStatus.OK)
-    async remove(@Param('id') id: string): Promise<void> {
-        return this.stationService.remove(id);
-    }
+    // @Delete(':id')
+    // @LanguageResponse({
+    //     module: 'stations',
+    //     successKey: 'remove',
+    // })
+    // @ApiOperation({ summary: 'Delete station by ID' })
+    // @ApiResponse({ status: 200, description: 'Station deleted successfully' })
+    // @ApiResponse({ status: 404, description: 'Station not found' })
+    // @HttpCode(HttpStatus.OK)
+    // async remove(@Param('id') id: string): Promise<void> {
+    //     return this.stationService.remove(id);
+    // }
 }
