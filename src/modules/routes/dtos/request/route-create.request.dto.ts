@@ -23,18 +23,6 @@ class OperatingTimeDto {
     to?: string;
 }
 
-class FrequencyRangeDto {
-    @ApiPropertyOptional({ description: 'Frequency from (minutes)' })
-    @IsOptional()
-    @IsNumber()
-    from?: number;
-
-    @ApiPropertyOptional({ description: 'Frequency to (minutes)' })
-    @IsOptional()
-    @IsNumber()
-    to?: number;
-}
-
 export class RouteCreateRequestDto {
     @ApiProperty({ description: 'Route code', example: 'R001' })
     @IsString()
@@ -48,35 +36,6 @@ export class RouteCreateRequestDto {
     @IsEnum(TransportType)
     transportType: TransportType;
 
-    @ApiProperty({ description: 'Start point' })
-    @IsString()
-    startPoint: string;
-
-    @ApiProperty({ description: 'End point' })
-    @IsString()
-    endPoint: string;
-
-    @ApiProperty({ description: 'Frequency in minutes', example: 15 })
-    @IsNumber()
-    frequency: number;
-
-    @ApiProperty({ description: 'Base fare', example: 10000 })
-    @IsNumber()
-    baseFare: number;
-
-    @ApiProperty({ description: 'Total distance in km', example: 25.5 })
-    @IsNumber()
-    totalDistance: number;
-
-    @ApiPropertyOptional({ description: 'Distance', example: 25.5 })
-    @IsOptional()
-    @IsNumber()
-    distance?: number;
-
-    @ApiProperty({ description: 'Is wheelchair accessible', example: false })
-    @IsBoolean()
-    isWheelchairAccessible: boolean;
-
     @ApiPropertyOptional({
         description: 'Status',
         enum: RouteStatus,
@@ -86,50 +45,95 @@ export class RouteCreateRequestDto {
     @IsEnum(RouteStatus)
     status?: RouteStatus;
 
-    @ApiPropertyOptional({ description: 'Operating time' })
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => OperatingTimeDto)
-    operatingTime?: OperatingTimeDto;
-
-    @ApiPropertyOptional({ description: 'Trip time in minutes' })
-    @IsOptional()
-    @IsNumber()
-    tripTime?: number;
-
-    @ApiPropertyOptional({
-        description: 'Frequency of each trip (minutes range)',
-        type: FrequencyRangeDto,
-    })
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => FrequencyRangeDto)
-    frequencyOfEachTrip?: FrequencyRangeDto;
-
     @ApiPropertyOptional({ description: 'Operator name' })
     @IsOptional()
     @IsString()
     operatorName?: string;
 
     @ApiPropertyOptional({
-        description: 'Payment methods',
+        description: 'Phone number',
+        example: '028.3776.3777',
+    })
+    @IsOptional()
+    @IsString()
+    phoneNumber?: string;
+
+    @ApiPropertyOptional({ description: 'Vehicle type', example: '50 chỗ' })
+    @IsOptional()
+    @IsString()
+    vehicleType?: string;
+
+    @ApiPropertyOptional({ description: 'Start point' })
+    @IsOptional()
+    @IsString()
+    startPoint?: string;
+
+    @ApiPropertyOptional({ description: 'End point' })
+    @IsOptional()
+    @IsString()
+    endPoint?: string;
+
+    @ApiPropertyOptional({ description: 'Frequency', example: '15 - 18 phút' })
+    @IsOptional()
+    @IsString()
+    frequency?: string;
+
+    @ApiPropertyOptional({
+        description: 'Base fare',
         type: [String],
-        example: ['Tiền mặt', 'Thẻ ngân hàng'],
+        example: [
+            'Vé lượt trợ giá: 5,000 VNĐ',
+            'Vé lượt trợ giá HSSV: 3,000 VNĐ',
+        ],
     })
     @IsOptional()
     @IsArray()
     @IsString({ each: true })
-    paymentMethods?: string[];
+    baseFare?: string[];
 
-    @ApiPropertyOptional({ description: 'Additional note' })
+    @ApiPropertyOptional({ description: 'Total distance in km', example: 8.59 })
     @IsOptional()
-    @IsString()
-    note?: string;
+    @IsNumber()
+    totalDistance?: number;
 
     @ApiPropertyOptional({
-        description: 'Station IDs map',
-        example: { station1: 'distance1' },
+        description: 'Is wheelchair accessible',
+        example: false,
     })
     @IsOptional()
-    stationIds?: Record<string, string>;
+    @IsBoolean()
+    isWheelchairAccessible?: boolean;
+
+    @ApiPropertyOptional({ description: 'Operating time' })
+    @IsOptional()
+    @ValidateNested()
+    @Type(() => OperatingTimeDto)
+    operatingTime?: OperatingTimeDto;
+
+    @ApiPropertyOptional({ description: 'Trip time', example: '35 phút' })
+    @IsOptional()
+    @IsString()
+    tripTime?: string;
+
+    @ApiPropertyOptional({
+        description: 'Number of trips',
+        example: '120 chuyến/ngày',
+    })
+    @IsOptional()
+    @IsString()
+    numTrips?: string;
+
+    @ApiPropertyOptional({
+        description: 'Route forward station codes map',
+        example: { ST001: '0.5 km', ST002: '1.2 km' },
+    })
+    @IsOptional()
+    routeForwardCodes?: Record<string, string>;
+
+    @ApiPropertyOptional({
+        description: 'Route backward station codes map',
+        example: { ST001: '0.5 km', ST002: '1.2 km' },
+    })
+    @IsOptional()
+    routeBackwardCodes?: Record<string, string>;
 }

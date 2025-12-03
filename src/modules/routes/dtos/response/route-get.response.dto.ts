@@ -13,16 +13,6 @@ class OperatingTimeResponseDto {
     to?: string;
 }
 
-class FrequencyRangeResponseDto {
-    @ApiPropertyOptional({ description: 'Frequency from (minutes)' })
-    @Expose()
-    from?: number;
-
-    @ApiPropertyOptional({ description: 'Frequency to (minutes)' })
-    @Expose()
-    to?: number;
-}
-
 export class RouteGetResponseDto extends BaseResponseDto {
     @ApiProperty({ description: 'Route code' })
     @Expose()
@@ -36,74 +26,74 @@ export class RouteGetResponseDto extends BaseResponseDto {
     @Expose()
     transportType: TransportType;
 
-    @ApiProperty({ description: 'Start point' })
-    @Expose()
-    startPoint: string;
-
-    @ApiProperty({ description: 'End point' })
-    @Expose()
-    endPoint: string;
-
-    @ApiProperty({ description: 'Frequency in minutes' })
-    @Expose()
-    frequency: number;
-
-    @ApiProperty({ description: 'Base fare' })
-    @Expose()
-    baseFare: number;
-
-    @ApiProperty({ description: 'Total distance in km' })
-    @Expose()
-    totalDistance: number;
-
-    @ApiPropertyOptional({ description: 'Distance' })
-    @Expose()
-    distance?: number;
-
-    @ApiProperty({ description: 'Is wheelchair accessible' })
-    @Expose()
-    isWheelchairAccessible: boolean;
-
     @ApiProperty({ description: 'Status', enum: RouteStatus })
     @Expose()
     status: RouteStatus;
-
-    @ApiPropertyOptional({ description: 'Operating time' })
-    @Expose()
-    operatingTime?: OperatingTimeResponseDto;
-
-    @ApiPropertyOptional({ description: 'Trip time in minutes' })
-    @Expose()
-    tripTime?: number;
-
-    @ApiPropertyOptional({
-        description: 'Frequency of each trip (minutes range)',
-        type: FrequencyRangeResponseDto,
-    })
-    @Expose()
-    frequencyOfEachTrip?: FrequencyRangeResponseDto;
-
-    @ApiPropertyOptional({
-        description: 'Station IDs map',
-        type: 'object',
-        additionalProperties: { type: 'string' },
-    })
-    @Expose()
-    stationIds?: Record<string, string>;
 
     @ApiPropertyOptional({ description: 'Operator name' })
     @Expose()
     operatorName?: string;
 
+    @ApiPropertyOptional({ description: 'Phone number' })
+    @Expose()
+    phoneNumber?: string;
+
+    @ApiPropertyOptional({ description: 'Vehicle type' })
+    @Expose()
+    vehicleType?: string;
+
+    @ApiPropertyOptional({ description: 'Start point' })
+    @Expose()
+    startPoint?: string;
+
+    @ApiPropertyOptional({ description: 'End point' })
+    @Expose()
+    endPoint?: string;
+
+    @ApiPropertyOptional({ description: 'Frequency' })
+    @Expose()
+    frequency?: string;
+
     @ApiPropertyOptional({
-        description: 'Payment methods',
+        description: 'Base fare',
         type: [String],
-        example: ['Tiền mặt', 'Thẻ ngân hàng'],
     })
     @Expose()
-    paymentMethods?: string[];
+    baseFare?: string[];
 
-    @ApiPropertyOptional({ description: 'Additional note' })
+    @ApiPropertyOptional({ description: 'Total distance in km' })
     @Expose()
-    note?: string;
+    totalDistance?: number;
+
+    @ApiPropertyOptional({ description: 'Is wheelchair accessible' })
+    @Expose()
+    isWheelchairAccessible?: boolean;
+
+    @ApiPropertyOptional({ description: 'Operating time' })
+    @Expose()
+    operatingTime?: OperatingTimeResponseDto;
+
+    @ApiPropertyOptional({ description: 'Trip time' })
+    @Expose()
+    tripTime?: string;
+
+    @ApiPropertyOptional({ description: 'Number of trips' })
+    @Expose()
+    numTrips?: string;
+
+    @ApiPropertyOptional({
+        description: 'Route forward station codes map',
+        type: 'object',
+        additionalProperties: { type: 'string' },
+    })
+    @Expose()
+    routeForwardCodes?: Record<string, string>;
+
+    @ApiPropertyOptional({
+        description: 'Route backward station codes map',
+        type: 'object',
+        additionalProperties: { type: 'string' },
+    })
+    @Expose()
+    routeBackwardCodes?: Record<string, string>;
 }

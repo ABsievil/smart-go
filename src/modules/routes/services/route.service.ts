@@ -17,9 +17,14 @@ export class RouteService {
     mapGet(route: RouteDoc | RouteEntity): RouteGetResponseDto {
         const raw = route instanceof Document ? route.toObject() : { ...route };
 
-        // Convert Map to plain object for stationIds
-        if (raw.stationIds instanceof Map) {
-            raw.stationIds = Object.fromEntries(raw.stationIds);
+        // Convert Map to plain object for routeForwardCodes
+        if (raw.routeForwardCodes instanceof Map) {
+            raw.routeForwardCodes = Object.fromEntries(raw.routeForwardCodes);
+        }
+
+        // Convert Map to plain object for routeBackwardCodes
+        if (raw.routeBackwardCodes instanceof Map) {
+            raw.routeBackwardCodes = Object.fromEntries(raw.routeBackwardCodes);
         }
 
         return plainToInstance(RouteGetResponseDto, raw, {
@@ -33,9 +38,18 @@ export class RouteService {
             routes.map((e: RouteDoc | RouteEntity) => {
                 const raw = e instanceof Document ? e.toObject() : { ...e };
 
-                // Convert Map to plain object for stationIds
-                if (raw.stationIds instanceof Map) {
-                    raw.stationIds = Object.fromEntries(raw.stationIds);
+                // Convert Map to plain object for routeForwardCodes
+                if (raw.routeForwardCodes instanceof Map) {
+                    raw.routeForwardCodes = Object.fromEntries(
+                        raw.routeForwardCodes,
+                    );
+                }
+
+                // Convert Map to plain object for routeBackwardCodes
+                if (raw.routeBackwardCodes instanceof Map) {
+                    raw.routeBackwardCodes = Object.fromEntries(
+                        raw.routeBackwardCodes,
+                    );
                 }
 
                 return raw;
@@ -47,16 +61,28 @@ export class RouteService {
     }
 
     async create(createDto: RouteCreateRequestDto): Promise<RouteDoc> {
+        const {
+            operatingTime,
+            routeForwardCodes,
+            routeBackwardCodes,
+            ...restDto
+        } = createDto;
+
         const routeData: Partial<RouteEntity> = {
-            ...createDto,
-            stationIds: createDto.stationIds
-                ? new Map(Object.entries(createDto.stationIds))
-                : new Map(),
-            operatingTime: createDto.operatingTime
+            ...restDto,
+            status: createDto.status || undefined,
+            operatingTime: operatingTime
                 ? {
-                      from: createDto.operatingTime.from || '',
-                      to: createDto.operatingTime.to || '',
+                      from: operatingTime.from || '',
+                      to: operatingTime.to || '',
                   }
+                : undefined,
+            // Convert plain objects to Maps for routeForwardCodes and routeBackwardCodes
+            routeForwardCodes: routeForwardCodes
+                ? new Map(Object.entries(routeForwardCodes))
+                : undefined,
+            routeBackwardCodes: routeBackwardCodes
+                ? new Map(Object.entries(routeBackwardCodes))
                 : undefined,
         };
 
@@ -109,20 +135,34 @@ export class RouteService {
         id: string,
         updateDto: RouteUpdateRequestDto,
     ): Promise<RouteDoc> {
-        const { operatingTime, stationIds, ...restDto } = updateDto;
+        const {
+            operatingTime,
+            routeForwardCodes,
+            routeBackwardCodes,
+            ...restDto
+        } = updateDto;
+
         const updateData: Partial<RouteEntity> = {
             ...restDto,
         };
-
-        if (stationIds) {
-            updateData.stationIds = new Map(Object.entries(stationIds));
-        }
 
         if (operatingTime) {
             updateData.operatingTime = {
                 from: operatingTime.from || '',
                 to: operatingTime.to || '',
             };
+        }
+
+        if (routeForwardCodes !== undefined) {
+            updateData.routeForwardCodes = new Map(
+                Object.entries(routeForwardCodes),
+            );
+        }
+
+        if (routeBackwardCodes !== undefined) {
+            updateData.routeBackwardCodes = new Map(
+                Object.entries(routeBackwardCodes),
+            );
         }
 
         const updatedRoute = await this.routeRepository.update<RouteDoc>(
