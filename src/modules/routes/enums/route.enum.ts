@@ -5,6 +5,6 @@ export enum RouteStatus {
 }
 
 export enum TransportType {
-    BUS = 'BUS',
-    METRO = 'METRO',
+    PHO_THONG_CO_TRO_GIA = 'Phổ thông - Có trợ giá',
+    PHO_THONG_KHONG_TRO_GIA = 'Phổ thông - Không trợ giá',
 }

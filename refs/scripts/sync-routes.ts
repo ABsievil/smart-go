@@ -86,34 +86,30 @@ function normalizeWhitespace(value: string | undefined): string {
     return value.replace(/\s+/g, ' ').trim();
 }
 
-function parsePaymentMethods(value: string | undefined): string[] {
-    if (!value) return [];
-    const cleaned = normalizeWhitespace(value);
-    if (!cleaned) return [];
+/**
+ * Parse routeForwardIds và routeBackwardIds từ chuỗi (ví dụ: "BX 06 - Q1 031 - Q1 020")
+ * và chuyển thành Map<string, string> với key là stationCode và value là distanceFromPrevious
+ * Lưu ý: CSV không có thông tin distance, nên value sẽ là empty string ""
+ */
+function parseStationCodesToMap(
+    stationCodesString: string | undefined,
+): Map<string, string> {
+    const map = new Map<string, string>();
+    if (!stationCodesString) return map;
 
-    // Các phương thức thanh toán phổ biến trong file GTCC
-    const KNOWN_METHODS = [
-        'Tiền mặt',
-        'Thẻ ngân hàng',
-        'Ví điện tử',
-        'FutaPay',
-    ];
+    const codes = stationCodesString
+        .split('-')
+        .map((code) => code.trim())
+        .filter(Boolean);
 
-    const methods: string[] = [];
+    // Map<stationCode, distanceFromPrevious>
+    // Key = stationCode (field số 1)
+    // Value = distanceFromPrevious (field số 2) - để empty string vì CSV không có thông tin này
+    codes.forEach((code) => {
+        map.set(code, ''); // distanceFromPrevious không có trong CSV, để empty string
+    });
 
-    for (const method of KNOWN_METHODS) {
-        if (cleaned.includes(method)) {
-            methods.push(method);
-        }
-    }
-
-    // Nếu không khớp phương thức nào trong danh sách trên,
-    // fallback: trả về nguyên chuỗi như một phần tử.
-    if (methods.length === 0) {
-        methods.push(cleaned);
-    }
-
-    return methods;
+    return map;
 }
 
 function extractStartEndPoints(
@@ -132,6 +128,48 @@ function extractStartEndPoints(
     return {
         startPoint: startLines[0] || normalizeWhitespace(startRaw || ''),
         endPoint: endLines[0] || normalizeWhitespace(endRaw || ''),
+    };
+}
+
+/**
+ * Parse operator string thành operatorName và phoneNumber
+ * Ví dụ: "Công ty TNHH..., ĐT: 028.3776.3777" -> { operatorName: "Công ty TNHH...", phoneNumber: "028.3776.3777" }
+ */
+function parseOperator(operatorRaw: string | undefined): {
+    operatorName?: string;
+    phoneNumber?: string;
+} {
+    if (!operatorRaw) {
+        return {};
+    }
+
+    const cleaned = normalizeWhitespace(operatorRaw);
+    if (!cleaned) {
+        return {};
+    }
+
+    // Pattern để tìm số điện thoại: "ĐT:" hoặc "ĐT :" hoặc "ĐT" theo sau là số
+    // Các pattern phổ biến: "ĐT: 028.3776.3777", "ĐT: 1900638494", "ĐT : 028.3776.3777"
+    const phonePattern = /ĐT\s*:\s*([\d.\-\s]+)/i;
+    const match = cleaned.match(phonePattern);
+
+    if (match && match[1]) {
+        const phoneNumber = normalizeWhitespace(match[1]);
+        // Lấy phần trước "ĐT:" làm operatorName
+        const operatorName = cleaned
+            .substring(0, match.index)
+            .replace(/,\s*$/, '') // Bỏ dấu phẩy cuối nếu có
+            .trim();
+
+        return {
+            operatorName: operatorName || undefined,
+            phoneNumber: phoneNumber || undefined,
+        };
+    }
+
+    // Nếu không tìm thấy pattern "ĐT:", trả về toàn bộ làm operatorName
+    return {
+        operatorName: cleaned,
     };
 }
 
@@ -160,44 +198,80 @@ async function readCsvFile(filePath: string): Promise<CsvRow[]> {
     });
 }
 
-async function buildRouteStationMap(
-    checkpointPath: string,
-): Promise<Map<string, string[]>> {
-    const map = new Map<string, string[]>();
-
-    if (!fs.existsSync(checkpointPath)) {
-        return map;
+/**
+ * Parse baseFare từ chuỗi (ví dụ: "- Vé lượt trợ giá: 5,000 VNĐ - Vé lượt trợ giá HSSV: 3,000 VNĐ")
+ */
+function parseBaseFare(baseFareRaw: string | undefined): string[] {
+    if (!baseFareRaw) {
+        return ['Vé lượt: 7,000 VNĐ']; // Giá trị mặc định
     }
 
-    const rows = await readCsvFile(checkpointPath);
-    if (rows.length === 0) return map;
-
-    // Bỏ header
-    const dataRows = rows.slice(1);
-
-    for (const row of dataRows) {
-        const [rawStopCode, _stopName, _address, rawRoutes] = row;
-        const stopCode = String(rawStopCode || '').trim();
-        if (!stopCode) continue;
-
-        if (!rawRoutes) continue;
-
-        const routeCodes = rawRoutes
-            .split(',')
-            .map((r) => normalizeRouteCode(r))
-            .filter(Boolean);
-
-        for (const routeCode of routeCodes) {
-            const key = routeCode;
-            const existing = map.get(key) ?? [];
-            if (!existing.includes(stopCode)) {
-                existing.push(stopCode);
-            }
-            map.set(key, existing);
-        }
+    const cleaned = normalizeWhitespace(baseFareRaw);
+    if (!cleaned) {
+        return ['Vé lượt: 7,000 VNĐ'];
     }
 
-    return map;
+    // Tách theo dấu "-" và lọc các phần tử rỗng
+    const fares = cleaned
+        .split('-')
+        .map((f) => normalizeWhitespace(f))
+        .filter(Boolean);
+
+    return fares.length > 0 ? fares : ['Vé lượt: 7,000 VNĐ'];
+}
+
+/**
+ * Map transportType từ CSV sang enum
+ */
+function mapTransportType(transportTypeRaw: string | undefined): TransportType {
+    if (!transportTypeRaw) {
+        return TransportType.PHO_THONG_CO_TRO_GIA; // Default
+    }
+
+    const cleaned = normalizeWhitespace(transportTypeRaw);
+
+    // So sánh chính xác với enum values
+    if (cleaned === TransportType.PHO_THONG_CO_TRO_GIA) {
+        return TransportType.PHO_THONG_CO_TRO_GIA;
+    }
+    if (cleaned === TransportType.PHO_THONG_KHONG_TRO_GIA) {
+        return TransportType.PHO_THONG_KHONG_TRO_GIA;
+    }
+
+    // Fallback: kiểm tra bằng contains
+    const lower = cleaned.toLowerCase();
+    if (lower.includes('phổ thông') && lower.includes('không trợ giá')) {
+        return TransportType.PHO_THONG_KHONG_TRO_GIA;
+    }
+
+    return TransportType.PHO_THONG_CO_TRO_GIA; // Default
+}
+
+/**
+ * Parse routeName để extract startPoint và endPoint
+ * Ví dụ: "Bến Thành - Bến xe buýt Chợ Lớn" -> startPoint: "Bến Thành", endPoint: "Bến xe buýt Chợ Lớn"
+ */
+function parseRouteName(routeName: string | undefined): {
+    startPoint?: string;
+    endPoint?: string;
+} {
+    if (!routeName) {
+        return {};
+    }
+
+    const cleaned = normalizeWhitespace(routeName);
+    const parts = cleaned.split('-').map((p) => normalizeWhitespace(p));
+
+    if (parts.length >= 2) {
+        return {
+            startPoint: parts[0],
+            endPoint: parts.slice(1).join(' - '), // Join lại nếu có nhiều dấu "-"
+        };
+    }
+
+    return {
+        startPoint: cleaned,
+    };
 }
 
 async function syncRoutes(): Promise<void> {
@@ -211,7 +285,7 @@ async function syncRoutes(): Promise<void> {
         const csvPath = path.join(
             process.cwd(),
             'refs',
-            'Dữ liệu GTCC TPHCM.cleaned.csv',
+            'routes_full_with_stops.csv',
         );
 
         // eslint-disable-next-line no-console
@@ -234,32 +308,28 @@ async function syncRoutes(): Promise<void> {
         // eslint-disable-next-line no-console
         console.log(`Total routes to process: ${dataRows.length}`);
 
-        // Build map routeCode -> list of station codes from checkpoint file
-        const checkpointPath = path.join(
-            process.cwd(),
-            'refs',
-            'checkpoint_4500.csv',
-        );
-        const routeStationMap = await buildRouteStationMap(checkpointPath);
-
         let successCount = 0;
         let errorCount = 0;
 
         for (const row of dataRows) {
+            // CSV columns: _id,routeCode,routeName,operator,transportType,totalDistance,vehicleType,operatingTime,baseFare,numTrips,tripTime,frequency,routeForward,routeForwardIds,routeBackward,routeBackwardIds
             const [
-                rawRouteCode, // 0 - Số tuyến
-                startRaw, // 1 - Tên tuyến (đầu bến)
-                _arrow, // 2 - "↔"
-                endRaw, // 3 - Tên tuyến (cuối bến)
-                _stationsRaw, // 4 - Trạm (lộ trình chi tiết) - chưa mapping sang stationIds
-                distanceRaw, // 5 - Cự ly
-                operatingRaw, // 6 - Thời gian hoạt động (vd: "05:00 - 20:15")
-                tripTimeRaw, // 7 - Thời gian chuyến (vd: "35 phút" hoặc "60 – 65 phút")
-                frequencyEachTripRaw, // 8 - Tuần suất mỗi chuyến (vd: "15 – 18 phút")
-                _vehicleTypeRaw, // 9 - Loại xe
-                operatorRaw, // 10 - Đơn vị đảm nhiệm
-                paymentRaw, // 11 - Hình thức thanh toán
-                noteRaw, // 12 - Ghi chú
+                _id,
+                rawRouteCode,
+                routeNameRaw,
+                operatorRaw,
+                transportTypeRaw,
+                totalDistanceRaw,
+                vehicleTypeRaw,
+                operatingTimeRaw,
+                baseFareRaw,
+                numTripsRaw,
+                tripTimeRaw,
+                frequencyRaw,
+                _routeForward,
+                routeForwardIdsRaw,
+                _routeBackward,
+                routeBackwardIdsRaw,
             ] = row;
 
             const routeCode = normalizeRouteCode(rawRouteCode);
@@ -269,67 +339,65 @@ async function syncRoutes(): Promise<void> {
             }
 
             try {
-                const { startPoint, endPoint } = extractStartEndPoints(
-                    startRaw,
-                    endRaw,
-                );
+                // Parse routeName để extract startPoint và endPoint
+                const { startPoint, endPoint } = parseRouteName(routeNameRaw);
 
-                const distance = parseDistanceKm(distanceRaw);
-                const operating = parseTimeRange(operatingRaw);
-                const tripTime = parseFirstNumber(tripTimeRaw);
-                const frequencyRange = parseNumberRange(frequencyEachTripRaw);
+                // Parse các field từ CSV
+                const totalDistance = parseDistanceKm(totalDistanceRaw);
+                const operating = parseTimeRange(operatingTimeRaw);
+                const tripTime = tripTimeRaw
+                    ? normalizeWhitespace(tripTimeRaw)
+                    : undefined;
+                const frequency = frequencyRaw
+                    ? normalizeWhitespace(frequencyRaw)
+                    : undefined;
+                const vehicleType = vehicleTypeRaw
+                    ? normalizeWhitespace(vehicleTypeRaw)
+                    : undefined;
+                const numTrips = numTripsRaw
+                    ? normalizeWhitespace(numTripsRaw)
+                    : undefined;
 
-                const totalDistance = distance;
+                // Parse baseFare
+                const baseFare = parseBaseFare(baseFareRaw);
 
-                // frequency: khoảng cách thời gian giữa các chuyến (phút)
-                // ưu tiên lấy khoảng "from" của tần suất, fallback sang "to" hoặc tripTime
-                const frequency =
-                    frequencyRange.from || frequencyRange.to || tripTime || 0;
+                // Parse operator thành operatorName và phoneNumber
+                const { operatorName, phoneNumber } =
+                    parseOperator(operatorRaw);
 
-                const stationCodesForRoute =
-                    routeStationMap.get(routeCode) ?? [];
+                // Map transportType
+                const transportType = mapTransportType(transportTypeRaw);
 
-                /**
-                 * stationIds có dạng:
-                 *   Object<stationId, distanceFromPrevious>
-                 *
-                 * Hiện tại chưa có dữ liệu khoảng cách giữa các trạm,
-                 * nên tạm thời hardcode distanceFromPrevious = null cho từng station.
-                 */
-                const stationIdsMap = new Map<string, string | null>();
-                stationCodesForRoute.forEach((code) => {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    stationIdsMap.set(code, null as any);
-                });
+                // Parse routeForwardIds và routeBackwardIds
+                const routeForwardCodes = routeForwardIdsRaw
+                    ? parseStationCodesToMap(routeForwardIdsRaw)
+                    : new Map<string, string>();
+                const routeBackwardCodes = routeBackwardIdsRaw
+                    ? parseStationCodesToMap(routeBackwardIdsRaw)
+                    : new Map<string, string>();
 
                 const routeData: Partial<RouteEntity> = {
                     routeCode,
-                    routeName: normalizeWhitespace(
-                        `${startPoint} ↔ ${endPoint}`,
-                    ),
-                    transportType: TransportType.BUS,
+                    routeName: normalizeWhitespace(routeNameRaw || ''),
+                    transportType,
                     startPoint,
                     endPoint,
                     frequency,
-                    baseFare: 7000,
+                    baseFare,
                     totalDistance,
+                    vehicleType,
                     isWheelchairAccessible: false,
                     status: RouteStatus.ACTIVE,
                     operatingTime: {
                         from: operating.from || '',
                         to: operating.to || '',
                     },
-                    tripTime: tripTime || undefined,
-                    // lưu tần suất mỗi chuyến (phút) dưới dạng khoảng from/to
-                    frequencyOfEachTrip:
-                        frequencyRange.from || frequencyRange.to
-                            ? frequencyRange
-                            : undefined,
-                    // Mongoose hỗ trợ Map, sẽ cast giá trị null về kiểu phù hợp
-                    stationIds: stationIdsMap as unknown as Map<string, string>,
-                    operatorName: normalizeWhitespace(operatorRaw),
-                    paymentMethods: parsePaymentMethods(paymentRaw),
-                    note: normalizeWhitespace(noteRaw),
+                    tripTime,
+                    numTrips,
+                    routeForwardCodes,
+                    routeBackwardCodes,
+                    operatorName,
+                    phoneNumber,
                 };
 
                 const existing = await routeRepository.find<RouteEntity>(

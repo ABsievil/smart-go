@@ -47,15 +47,26 @@ export class RouteService {
     }
 
     async create(createDto: RouteCreateRequestDto): Promise<RouteDoc> {
+        const { operatingTime, frequency, baseFare, tripTime, ...restDto } =
+            createDto;
+
         const routeData: Partial<RouteEntity> = {
-            ...createDto,
-            stationIds: createDto.stationIds
-                ? new Map(Object.entries(createDto.stationIds))
-                : new Map(),
-            operatingTime: createDto.operatingTime
+            ...restDto,
+            // frequency trong entity là string (ví dụ "15 phút")
+            frequency: frequency !== undefined ? `${frequency}` : '',
+            // baseFare trong entity là string[]
+            baseFare:
+                baseFare !== undefined
+                    ? [`Vé lượt: ${baseFare.toLocaleString('vi-VN')} VNĐ`]
+                    : [],
+            totalDistance: createDto.totalDistance,
+            isWheelchairAccessible: createDto.isWheelchairAccessible,
+            status: createDto.status,
+            tripTime: tripTime !== undefined ? `${tripTime}` : undefined,
+            operatingTime: operatingTime
                 ? {
-                      from: createDto.operatingTime.from || '',
-                      to: createDto.operatingTime.to || '',
+                      from: operatingTime.from || '',
+                      to: operatingTime.to || '',
                   }
                 : undefined,
         };
@@ -109,13 +120,24 @@ export class RouteService {
         id: string,
         updateDto: RouteUpdateRequestDto,
     ): Promise<RouteDoc> {
-        const { operatingTime, stationIds, ...restDto } = updateDto;
+        const { operatingTime, frequency, baseFare, tripTime, ...restDto } =
+            updateDto;
         const updateData: Partial<RouteEntity> = {
             ...restDto,
         };
 
-        if (stationIds) {
-            updateData.stationIds = new Map(Object.entries(stationIds));
+        if (frequency !== undefined) {
+            updateData.frequency = `${frequency}`;
+        }
+
+        if (baseFare !== undefined) {
+            updateData.baseFare = [
+                `Vé lượt: ${baseFare.toLocaleString('vi-VN')} VNĐ`,
+            ];
+        }
+
+        if (tripTime !== undefined) {
+            updateData.tripTime = `${tripTime}`;
         }
 
         if (operatingTime) {
