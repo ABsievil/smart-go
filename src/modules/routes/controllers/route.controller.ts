@@ -22,6 +22,8 @@ import { RouteUpdateRequestDto } from '@modules/routes/dtos/request/route-update
 import { RouteGetResponseDto } from '@modules/routes/dtos/response/route-get.response.dto';
 import { RouteListResponseDto } from '@modules/routes/dtos/response/route-list.response.dto';
 
+type RouteDirection = 'forward' | 'backward' | 'both';
+
 @ApiTags('Routes')
 @Controller('routes')
 export class RouteController {
@@ -31,6 +33,43 @@ export class RouteController {
         private readonly pinoLogger: PinoLogger,
     ) {
         this.pinoLogger.setContext(RouteController.name);
+    }
+
+    /**
+     * @description Extract station codes from route codes (Map or object)
+     */
+    private processStationCodes(codes: any, stationCodeSet: Set<string>): void {
+        if (!codes) return;
+
+        if (codes instanceof Map) {
+            for (const key of codes.keys()) {
+                stationCodeSet.add(String(key));
+            }
+        } else if (typeof codes === 'object') {
+            for (const key of Object.keys(codes)) {
+                stationCodeSet.add(String(key));
+            }
+        }
+    }
+
+    /**
+     * @description Extract station codes from route based on direction
+     */
+    private extractStationCodesFromRoute(
+        route: any,
+        direction: RouteDirection,
+        stationCodeSet: Set<string>,
+    ): void {
+        const routeForwardCodes = route?.routeForwardCodes;
+        const routeBackwardCodes = route?.routeBackwardCodes;
+
+        if (direction === 'forward' || direction === 'both') {
+            this.processStationCodes(routeForwardCodes, stationCodeSet);
+        }
+
+        if (direction === 'backward' || direction === 'both') {
+            this.processStationCodes(routeBackwardCodes, stationCodeSet);
+        }
     }
 
     @Post()
@@ -60,6 +99,14 @@ export class RouteController {
     @ApiOperation({ summary: 'Get all routes' })
     @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
     @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+    @ApiQuery({
+        name: 'direction',
+        required: false,
+        enum: ['forward', 'backward', 'both'],
+        example: 'both',
+        description:
+            'Direction to get station codes: forward (lượt đi), backward (lượt về), or both',
+    })
     @ApiResponse({
         status: 200,
         description: 'List of routes',
@@ -68,30 +115,21 @@ export class RouteController {
     async findAll(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+        @Query('direction', new DefaultValuePipe('both'))
+        direction: RouteDirection,
         @Query() query: Record<string, any>,
     ): Promise<any> {
-        const { page: _, limit: __, ...filter } = query;
+        const { page: _, limit: __, direction: ___, ...filter } = query;
         const { data, total } = await this.routeService.findAll(
             filter,
             page,
             limit,
         );
 
-        // Lấy danh sách tất cả stationCode từ stationIds của các route
+        // Lấy danh sách stationCode từ routeForwardCodes hoặc routeBackwardCodes dựa trên direction
         const stationCodeSet = new Set<string>();
         for (const route of data) {
-            const stationIds = (route as any).stationIds;
-            if (!stationIds) continue;
-
-            if (stationIds instanceof Map) {
-                for (const key of stationIds.keys()) {
-                    stationCodeSet.add(String(key));
-                }
-            } else if (typeof stationIds === 'object') {
-                for (const key of Object.keys(stationIds)) {
-                    stationCodeSet.add(String(key));
-                }
-            }
+            this.extractStationCodesFromRoute(route, direction, stationCodeSet);
         }
 
         const allStationCodes = Array.from(stationCodeSet);
@@ -112,29 +150,30 @@ export class RouteController {
         successKey: 'findOne',
     })
     @ApiOperation({ summary: 'Get route by ID' })
+    @ApiQuery({
+        name: 'direction',
+        required: false,
+        enum: ['forward', 'backward', 'both'],
+        example: 'both',
+        description:
+            'Direction to get station codes: forward (lượt đi), backward (lượt về), or both',
+    })
     @ApiResponse({
         status: 200,
         description: 'Route found',
         type: RouteGetResponseDto,
     })
     @ApiResponse({ status: 404, description: 'Route not found' })
-    async findOne(@Param('id') id: string): Promise<any> {
+    async findOne(
+        @Param('id') id: string,
+        @Query('direction', new DefaultValuePipe('both'))
+        direction: RouteDirection,
+    ): Promise<any> {
         const route = await this.routeService.findOne(id);
 
-        // Lấy danh sách stationCode từ stationIds của route
+        // Lấy danh sách stationCode từ routeForwardCodes hoặc routeBackwardCodes dựa trên direction
         const stationCodeSet = new Set<string>();
-        const stationIds = (route as any).stationIds;
-        if (stationIds) {
-            if (stationIds instanceof Map) {
-                for (const key of stationIds.keys()) {
-                    stationCodeSet.add(String(key));
-                }
-            } else if (typeof stationIds === 'object') {
-                for (const key of Object.keys(stationIds)) {
-                    stationCodeSet.add(String(key));
-                }
-            }
-        }
+        this.extractStationCodesFromRoute(route, direction, stationCodeSet);
 
         const allStationCodes = Array.from(stationCodeSet);
         const stations = await this.stationService.findByCodes(allStationCodes);

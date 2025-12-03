@@ -6,6 +6,7 @@ import { Logger } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LanguageResponseInterceptor } from '@common/language/interceptors/language-response.interceptor';
 import { LanguageExceptionFilter } from '@common/language/filters/language-exception.filter';
+import { Response } from 'express';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -40,7 +41,17 @@ async function bootstrap() {
         .addBearerAuth()
         .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup(`${globalPrefix}-docs`, app, document);
+    const swaggerPath = `${globalPrefix}-docs`;
+    SwaggerModule.setup(swaggerPath, app, document, {
+        swaggerOptions: {
+            persistAuthorization: true,
+        },
+    });
+
+    // Redirect root path to Swagger docs
+    app.getHttpAdapter().get('/', (req: any, res: Response) => {
+        res.redirect(`/${swaggerPath}`);
+    });
 
     logger.debug(`Server is running on ${host}:${port}`);
 
