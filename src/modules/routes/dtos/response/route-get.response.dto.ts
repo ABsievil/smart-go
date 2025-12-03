@@ -18,9 +18,9 @@ export class RouteGetResponseDto extends BaseResponseDto {
     @Expose()
     routeCode: string;
 
-    @ApiProperty({ description: 'Route name', type: [String] })
+    @ApiProperty({ description: 'Route name', type: String })
     @Expose()
-    routeName: string[];
+    routeName: string;
 
     @ApiProperty({ description: 'Transport type', enum: TransportType })
     @Expose()
