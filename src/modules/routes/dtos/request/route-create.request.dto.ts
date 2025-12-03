@@ -5,6 +5,7 @@ import {
     IsBoolean,
     IsOptional,
     ValidateNested,
+    IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -20,6 +21,18 @@ class OperatingTimeDto {
     @IsOptional()
     @IsString()
     to?: string;
+}
+
+class FrequencyRangeDto {
+    @ApiPropertyOptional({ description: 'Frequency from (minutes)' })
+    @IsOptional()
+    @IsNumber()
+    from?: number;
+
+    @ApiPropertyOptional({ description: 'Frequency to (minutes)' })
+    @IsOptional()
+    @IsNumber()
+    to?: number;
 }
 
 export class RouteCreateRequestDto {
@@ -42,14 +55,6 @@ export class RouteCreateRequestDto {
     @ApiProperty({ description: 'End point' })
     @IsString()
     endPoint: string;
-
-    @ApiProperty({ description: 'Operating hours start', example: '06:00' })
-    @IsString()
-    operatingHoursStart: string;
-
-    @ApiProperty({ description: 'Operating hours end', example: '22:00' })
-    @IsString()
-    operatingHoursEnd: string;
 
     @ApiProperty({ description: 'Frequency in minutes', example: 15 })
     @IsNumber()
@@ -92,10 +97,34 @@ export class RouteCreateRequestDto {
     @IsNumber()
     tripTime?: number;
 
-    @ApiPropertyOptional({ description: 'Frequency of each trip' })
+    @ApiPropertyOptional({
+        description: 'Frequency of each trip (minutes range)',
+        type: FrequencyRangeDto,
+    })
     @IsOptional()
-    @IsNumber()
-    frequencyOfEachTrip?: number;
+    @ValidateNested()
+    @Type(() => FrequencyRangeDto)
+    frequencyOfEachTrip?: FrequencyRangeDto;
+
+    @ApiPropertyOptional({ description: 'Operator name' })
+    @IsOptional()
+    @IsString()
+    operatorName?: string;
+
+    @ApiPropertyOptional({
+        description: 'Payment methods',
+        type: [String],
+        example: ['Tiền mặt', 'Thẻ ngân hàng'],
+    })
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    paymentMethods?: string[];
+
+    @ApiPropertyOptional({ description: 'Additional note' })
+    @IsOptional()
+    @IsString()
+    note?: string;
 
     @ApiPropertyOptional({
         description: 'Station IDs map',

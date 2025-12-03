@@ -13,6 +13,16 @@ class OperatingTimeResponseDto {
     to?: string;
 }
 
+class FrequencyRangeResponseDto {
+    @ApiPropertyOptional({ description: 'Frequency from (minutes)' })
+    @Expose()
+    from?: number;
+
+    @ApiPropertyOptional({ description: 'Frequency to (minutes)' })
+    @Expose()
+    to?: number;
+}
+
 export class RouteGetResponseDto extends BaseResponseDto {
     @ApiProperty({ description: 'Route code' })
     @Expose()
@@ -33,14 +43,6 @@ export class RouteGetResponseDto extends BaseResponseDto {
     @ApiProperty({ description: 'End point' })
     @Expose()
     endPoint: string;
-
-    @ApiProperty({ description: 'Operating hours start' })
-    @Expose()
-    operatingHoursStart: string;
-
-    @ApiProperty({ description: 'Operating hours end' })
-    @Expose()
-    operatingHoursEnd: string;
 
     @ApiProperty({ description: 'Frequency in minutes' })
     @Expose()
@@ -74,9 +76,12 @@ export class RouteGetResponseDto extends BaseResponseDto {
     @Expose()
     tripTime?: number;
 
-    @ApiPropertyOptional({ description: 'Frequency of each trip' })
+    @ApiPropertyOptional({
+        description: 'Frequency of each trip (minutes range)',
+        type: FrequencyRangeResponseDto,
+    })
     @Expose()
-    frequencyOfEachTrip?: number;
+    frequencyOfEachTrip?: FrequencyRangeResponseDto;
 
     @ApiPropertyOptional({
         description: 'Station IDs map',
@@ -85,4 +90,20 @@ export class RouteGetResponseDto extends BaseResponseDto {
     })
     @Expose()
     stationIds?: Record<string, string>;
+
+    @ApiPropertyOptional({ description: 'Operator name' })
+    @Expose()
+    operatorName?: string;
+
+    @ApiPropertyOptional({
+        description: 'Payment methods',
+        type: [String],
+        example: ['Tiền mặt', 'Thẻ ngân hàng'],
+    })
+    @Expose()
+    paymentMethods?: string[];
+
+    @ApiPropertyOptional({ description: 'Additional note' })
+    @Expose()
+    note?: string;
 }

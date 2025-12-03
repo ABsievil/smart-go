@@ -54,7 +54,11 @@ async function syncStations(): Promise<void> {
     try {
         const stationRepository = app.get<StationRepository>(StationRepository);
 
-        const csvPath = path.join(process.cwd(), 'refs', 'checkpoint_4500.csv');
+        // Đọc dữ liệu trạm từ file Stop_HCM.csv (đã được cập nhật / tổng hợp)
+        const csvPath = path.join(process.cwd(), 'refs', 'Stop_HCM.csv');
+
+        // eslint-disable-next-line no-console
+        console.log(`Starting station sync from CSV: ${csvPath}`);
 
         if (!fs.existsSync(csvPath)) {
             throw new Error(`CSV file not found at path: ${csvPath}`);
@@ -69,6 +73,9 @@ async function syncStations(): Promise<void> {
         // Bỏ header
         const dataRows = rows.slice(1);
 
+        // eslint-disable-next-line no-console
+        console.log(`Total stations to process: ${dataRows.length}`);
+
         let successCount = 0;
         let errorCount = 0;
 
@@ -77,6 +84,9 @@ async function syncStations(): Promise<void> {
                 rawStopCode, // 0 - stop_code
                 rawStopName, // 1 - stop_name
                 rawAddress, // 2 - address
+                ,
+                // 3 - routes (bỏ qua)
+                rawUrl, // 4 - url
             ] = row;
 
             const stationCode = String(rawStopCode || '').trim();
@@ -89,11 +99,13 @@ async function syncStations(): Promise<void> {
                     rawStopName || stationCode,
                 );
                 const address = normalizeWhitespace(rawAddress || stationName);
+                const url = normalizeWhitespace(rawUrl || '');
 
                 const stationData: Partial<StationEntity> = {
                     stationCode,
                     stationName,
                     address,
+                    url: url || undefined,
                     stationType: StationType.BUS_STOP,
                     hasShelter: false,
                     hasWheelchair: false,
@@ -117,6 +129,15 @@ async function syncStations(): Promise<void> {
                 }
 
                 successCount += 1;
+
+                if ((successCount + errorCount) % 200 === 0) {
+                    // eslint-disable-next-line no-console
+                    console.log(
+                        `Processed ${successCount + errorCount}/${
+                            dataRows.length
+                        } stations...`,
+                    );
+                }
             } catch (err) {
                 errorCount += 1;
                 // eslint-disable-next-line no-console

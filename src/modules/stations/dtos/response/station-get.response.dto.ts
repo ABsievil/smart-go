@@ -19,6 +19,10 @@ export class StationGetResponseDto extends BaseResponseDto {
     @Expose()
     address: string;
 
+    @ApiPropertyOptional({ description: 'Station URL' })
+    @Expose()
+    url?: string;
+
     @ApiProperty({ description: 'Station type', enum: StationType })
     @Expose()
     stationType: StationType;

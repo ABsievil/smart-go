@@ -24,12 +24,6 @@ export class RouteEntity extends DBEntityBase {
     @Prop({ required: false })
     endPoint?: string;
 
-    @Prop({ required: false, type: String })
-    operatingHoursStart?: string;
-
-    @Prop({ required: false, type: String })
-    operatingHoursEnd?: string;
-
     @Prop({ required: true, type: Number })
     frequency: number;
 
@@ -69,8 +63,27 @@ export class RouteEntity extends DBEntityBase {
     @Prop({ required: false, type: Number })
     tripTime?: number;
 
-    @Prop({ required: false, type: Number })
-    frequencyOfEachTrip?: number;
+    @Prop({
+        type: {
+            from: { type: Number, required: false },
+            to: { type: Number, required: false },
+        },
+        required: false,
+        _id: false,
+    })
+    frequencyOfEachTrip?: {
+        from?: number;
+        to?: number;
+    };
+
+    @Prop({ required: false })
+    operatorName?: string;
+
+    @Prop({ required: false, type: [String], default: [] })
+    paymentMethods?: string[];
+
+    @Prop({ required: false })
+    note?: string;
 
     @Prop({
         type: Map,
