@@ -59,9 +59,61 @@ function parseFirstNumber(value: string | undefined): number {
     return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function parseNumberRange(value: string | undefined): {
+    from: number;
+    to: number;
+} {
+    if (!value) return { from: 0, to: 0 };
+    const matches = value.match(/(\d+([.,]\d+)?)/g);
+    if (!matches || matches.length === 0) {
+        return { from: 0, to: 0 };
+    }
+
+    const parseNum = (s: string): number => {
+        const normalized = s.replace(',', '.');
+        const n = parseFloat(normalized);
+        return Number.isFinite(n) ? n : 0;
+    };
+
+    const from = parseNum(matches[0]);
+    const to = matches[1] ? parseNum(matches[1]) : from;
+
+    return { from, to };
+}
+
 function normalizeWhitespace(value: string | undefined): string {
     if (!value) return '';
     return value.replace(/\s+/g, ' ').trim();
+}
+
+function parsePaymentMethods(value: string | undefined): string[] {
+    if (!value) return [];
+    const cleaned = normalizeWhitespace(value);
+    if (!cleaned) return [];
+
+    // Các phương thức thanh toán phổ biến trong file GTCC
+    const KNOWN_METHODS = [
+        'Tiền mặt',
+        'Thẻ ngân hàng',
+        'Ví điện tử',
+        'FutaPay',
+    ];
+
+    const methods: string[] = [];
+
+    for (const method of KNOWN_METHODS) {
+        if (cleaned.includes(method)) {
+            methods.push(method);
+        }
+    }
+
+    // Nếu không khớp phương thức nào trong danh sách trên,
+    // fallback: trả về nguyên chuỗi như một phần tử.
+    if (methods.length === 0) {
+        methods.push(cleaned);
+    }
+
+    return methods;
 }
 
 function extractStartEndPoints(
@@ -162,6 +214,9 @@ async function syncRoutes(): Promise<void> {
             'Dữ liệu GTCC TPHCM.cleaned.csv',
         );
 
+        // eslint-disable-next-line no-console
+        console.log(`Starting route sync from CSV: ${csvPath}`);
+
         if (!fs.existsSync(csvPath)) {
             throw new Error(`CSV file not found at path: ${csvPath}`);
         }
@@ -175,6 +230,9 @@ async function syncRoutes(): Promise<void> {
 
         // Bỏ dòng header đầu tiên
         const dataRows = rows.slice(1);
+
+        // eslint-disable-next-line no-console
+        console.log(`Total routes to process: ${dataRows.length}`);
 
         // Build map routeCode -> list of station codes from checkpoint file
         const checkpointPath = path.join(
@@ -199,9 +257,9 @@ async function syncRoutes(): Promise<void> {
                 tripTimeRaw, // 7 - Thời gian chuyến (vd: "35 phút" hoặc "60 – 65 phút")
                 frequencyEachTripRaw, // 8 - Tuần suất mỗi chuyến (vd: "15 – 18 phút")
                 _vehicleTypeRaw, // 9 - Loại xe
-                _operatorRaw, // 10 - Đơn vị đảm nhiệm
-                _paymentRaw, // 11 - Hình thức thanh toán
-                _noteRaw, // 12 - Ghi chú
+                operatorRaw, // 10 - Đơn vị đảm nhiệm
+                paymentRaw, // 11 - Hình thức thanh toán
+                noteRaw, // 12 - Ghi chú
             ] = row;
 
             const routeCode = normalizeRouteCode(rawRouteCode);
@@ -219,12 +277,14 @@ async function syncRoutes(): Promise<void> {
                 const distance = parseDistanceKm(distanceRaw);
                 const operating = parseTimeRange(operatingRaw);
                 const tripTime = parseFirstNumber(tripTimeRaw);
-                const frequencyOfEachTrip =
-                    parseFirstNumber(frequencyEachTripRaw);
+                const frequencyRange = parseNumberRange(frequencyEachTripRaw);
 
                 const totalDistance = distance;
 
-                const frequency = frequencyOfEachTrip || tripTime || 0;
+                // frequency: khoảng cách thời gian giữa các chuyến (phút)
+                // ưu tiên lấy khoảng "from" của tần suất, fallback sang "to" hoặc tripTime
+                const frequency =
+                    frequencyRange.from || frequencyRange.to || tripTime || 0;
 
                 const stationCodesForRoute =
                     routeStationMap.get(routeCode) ?? [];
@@ -250,8 +310,6 @@ async function syncRoutes(): Promise<void> {
                     transportType: TransportType.BUS,
                     startPoint,
                     endPoint,
-                    operatingHoursStart: operating.from || '',
-                    operatingHoursEnd: operating.to || '',
                     frequency,
                     baseFare: 7000,
                     totalDistance,
@@ -262,9 +320,16 @@ async function syncRoutes(): Promise<void> {
                         to: operating.to || '',
                     },
                     tripTime: tripTime || undefined,
-                    frequencyOfEachTrip: frequencyOfEachTrip || undefined,
+                    // lưu tần suất mỗi chuyến (phút) dưới dạng khoảng from/to
+                    frequencyOfEachTrip:
+                        frequencyRange.from || frequencyRange.to
+                            ? frequencyRange
+                            : undefined,
                     // Mongoose hỗ trợ Map, sẽ cast giá trị null về kiểu phù hợp
                     stationIds: stationIdsMap as unknown as Map<string, string>,
+                    operatorName: normalizeWhitespace(operatorRaw),
+                    paymentMethods: parsePaymentMethods(paymentRaw),
+                    note: normalizeWhitespace(noteRaw),
                 };
 
                 const existing = await routeRepository.find<RouteEntity>(
@@ -282,6 +347,15 @@ async function syncRoutes(): Promise<void> {
                 }
 
                 successCount += 1;
+
+                if ((successCount + errorCount) % 50 === 0) {
+                    // eslint-disable-next-line no-console
+                    console.log(
+                        `Processed ${successCount + errorCount}/${
+                            dataRows.length
+                        } routes...`,
+                    );
+                }
             } catch (err) {
                 errorCount += 1;
                 // eslint-disable-next-line no-console

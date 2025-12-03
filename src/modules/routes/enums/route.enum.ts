@@ -1,6 +1,6 @@
 export enum RouteStatus {
-    ACTIVE = 'ACTIVE',
     INACTIVE = 'INACTIVE',
+    ACTIVE = 'ACTIVE',
     MAINTENANCE = 'MAINTENANCE',
 }
 

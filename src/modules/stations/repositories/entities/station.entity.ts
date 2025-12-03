@@ -15,6 +15,9 @@ export class StationEntity extends DBEntityBase {
     @Prop({ required: true })
     address: string;
 
+    @Prop({ required: false })
+    url?: string;
+
     @Prop({
         required: true,
         type: String,

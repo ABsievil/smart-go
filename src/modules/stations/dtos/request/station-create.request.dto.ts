@@ -18,6 +18,11 @@ export class StationCreateRequestDto {
     @IsString()
     address: string;
 
+    @ApiPropertyOptional({ description: 'Station URL' })
+    @IsOptional()
+    @IsString()
+    url?: string;
+
     @ApiProperty({ description: 'Station type', enum: StationType })
     @IsEnum(StationType)
     stationType: StationType;
