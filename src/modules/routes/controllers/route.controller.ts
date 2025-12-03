@@ -72,24 +72,24 @@ export class RouteController {
         }
     }
 
-    @Post()
-    @LanguageResponse({
-        module: 'routes',
-        successKey: 'create',
-    })
-    @ApiOperation({ summary: 'Create a new route' })
-    @ApiResponse({
-        status: 201,
-        description: 'Route created successfully',
-        type: RouteGetResponseDto,
-    })
-    @HttpCode(HttpStatus.CREATED)
-    async create(
-        @Body() createDto: RouteCreateRequestDto,
-    ): Promise<RouteGetResponseDto> {
-        const route = await this.routeService.create(createDto);
-        return this.routeService.mapGet(route);
-    }
+    // @Post()
+    // @LanguageResponse({
+    //     module: 'routes',
+    //     successKey: 'create',
+    // })
+    // @ApiOperation({ summary: 'Create a new route' })
+    // @ApiResponse({
+    //     status: 201,
+    //     description: 'Route created successfully',
+    //     type: RouteGetResponseDto,
+    // })
+    // @HttpCode(HttpStatus.CREATED)
+    // async create(
+    //     @Body() createDto: RouteCreateRequestDto,
+    // ): Promise<RouteGetResponseDto> {
+    //     const route = await this.routeService.create(createDto);
+    //     return this.routeService.mapGet(route);
+    // }
 
     @Get()
     @LanguageResponse({
@@ -184,36 +184,36 @@ export class RouteController {
         };
     }
 
-    @Put(':id')
-    @LanguageResponse({
-        module: 'routes',
-        successKey: 'update',
-    })
-    @ApiOperation({ summary: 'Update route by ID' })
-    @ApiResponse({
-        status: 200,
-        description: 'Route updated successfully',
-        type: RouteGetResponseDto,
-    })
-    @ApiResponse({ status: 404, description: 'Route not found' })
-    async update(
-        @Param('id') id: string,
-        @Body() updateDto: RouteUpdateRequestDto,
-    ): Promise<RouteGetResponseDto> {
-        const route = await this.routeService.update(id, updateDto);
-        return this.routeService.mapGet(route);
-    }
+    // @Put(':id')
+    // @LanguageResponse({
+    //     module: 'routes',
+    //     successKey: 'update',
+    // })
+    // @ApiOperation({ summary: 'Update route by ID' })
+    // @ApiResponse({
+    //     status: 200,
+    //     description: 'Route updated successfully',
+    //     type: RouteGetResponseDto,
+    // })
+    // @ApiResponse({ status: 404, description: 'Route not found' })
+    // async update(
+    //     @Param('id') id: string,
+    //     @Body() updateDto: RouteUpdateRequestDto,
+    // ): Promise<RouteGetResponseDto> {
+    //     const route = await this.routeService.update(id, updateDto);
+    //     return this.routeService.mapGet(route);
+    // }
 
-    @Delete(':id')
-    @LanguageResponse({
-        module: 'routes',
-        successKey: 'remove',
-    })
-    @ApiOperation({ summary: 'Delete route by ID' })
-    @ApiResponse({ status: 200, description: 'Route deleted successfully' })
-    @ApiResponse({ status: 404, description: 'Route not found' })
-    @HttpCode(HttpStatus.OK)
-    async remove(@Param('id') id: string): Promise<void> {
-        return this.routeService.remove(id);
-    }
+    // @Delete(':id')
+    // @LanguageResponse({
+    //     module: 'routes',
+    //     successKey: 'remove',
+    // })
+    // @ApiOperation({ summary: 'Delete route by ID' })
+    // @ApiResponse({ status: 200, description: 'Route deleted successfully' })
+    // @ApiResponse({ status: 404, description: 'Route not found' })
+    // @HttpCode(HttpStatus.OK)
+    // async remove(@Param('id') id: string): Promise<void> {
+    //     return this.routeService.remove(id);
+    // }
 }
