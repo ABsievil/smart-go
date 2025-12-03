@@ -46,10 +46,6 @@ export class StationController {
     async create(
         @Body() createDto: StationCreateRequestDto,
     ): Promise<StationGetResponseDto> {
-        this.pinoLogger.info(
-            { action: 'create', data: createDto },
-            'Creating station',
-        );
         const station = await this.stationService.create(createDto);
         return this.stationService.mapGet(station);
     }
@@ -73,10 +69,6 @@ export class StationController {
         @Query() query: Record<string, any>,
     ): Promise<StationListResponseDto> {
         const { page: _, limit: __, ...filter } = query;
-        this.pinoLogger.info(
-            { action: 'findAll', page, limit, filter },
-            'Fetching stations',
-        );
         const { data, total } = await this.stationService.findAll(
             filter,
             page,
@@ -103,10 +95,6 @@ export class StationController {
     })
     @ApiResponse({ status: 404, description: 'Station not found' })
     async findOne(@Param('id') id: string): Promise<StationGetResponseDto> {
-        this.pinoLogger.info(
-            { action: 'findOne', id },
-            'Fetching station by ID',
-        );
         const station = await this.stationService.findOne(id);
         return this.stationService.mapGet(station);
     }
@@ -127,10 +115,6 @@ export class StationController {
         @Param('id') id: string,
         @Body() updateDto: StationUpdateRequestDto,
     ): Promise<StationGetResponseDto> {
-        this.pinoLogger.info(
-            { action: 'update', id, data: updateDto },
-            'Updating station',
-        );
         const station = await this.stationService.update(id, updateDto);
         return this.stationService.mapGet(station);
     }
@@ -145,7 +129,6 @@ export class StationController {
     @ApiResponse({ status: 404, description: 'Station not found' })
     @HttpCode(HttpStatus.OK)
     async remove(@Param('id') id: string): Promise<void> {
-        this.pinoLogger.info({ action: 'remove', id }, 'Deleting station');
         return this.stationService.remove(id);
     }
 }

@@ -15,6 +15,7 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { PinoLogger } from 'nestjs-pino';
 import { RouteService } from '@modules/routes/services/route.service';
+import { StationService } from '@modules/stations/services/station.service';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { RouteCreateRequestDto } from '@modules/routes/dtos/request/route-create.request.dto';
 import { RouteUpdateRequestDto } from '@modules/routes/dtos/request/route-update.request.dto';
@@ -26,6 +27,7 @@ import { RouteListResponseDto } from '@modules/routes/dtos/response/route-list.r
 export class RouteController {
     constructor(
         private readonly routeService: RouteService,
+        private readonly stationService: StationService,
         private readonly pinoLogger: PinoLogger,
     ) {
         this.pinoLogger.setContext(RouteController.name);
@@ -46,10 +48,6 @@ export class RouteController {
     async create(
         @Body() createDto: RouteCreateRequestDto,
     ): Promise<RouteGetResponseDto> {
-        this.pinoLogger.info(
-            { action: 'create', data: createDto },
-            'Creating route',
-        );
         const route = await this.routeService.create(createDto);
         return this.routeService.mapGet(route);
     }
@@ -71,22 +69,40 @@ export class RouteController {
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
         @Query() query: Record<string, any>,
-    ): Promise<RouteListResponseDto> {
+    ): Promise<any> {
         const { page: _, limit: __, ...filter } = query;
-        this.pinoLogger.info(
-            { action: 'findAll', page, limit, filter },
-            'Fetching routes',
-        );
         const { data, total } = await this.routeService.findAll(
             filter,
             page,
             limit,
         );
+
+        // Lấy danh sách tất cả stationCode từ stationIds của các route
+        const stationCodeSet = new Set<string>();
+        for (const route of data) {
+            const stationIds = (route as any).stationIds;
+            if (!stationIds) continue;
+
+            if (stationIds instanceof Map) {
+                for (const key of stationIds.keys()) {
+                    stationCodeSet.add(String(key));
+                }
+            } else if (typeof stationIds === 'object') {
+                for (const key of Object.keys(stationIds)) {
+                    stationCodeSet.add(String(key));
+                }
+            }
+        }
+
+        const allStationCodes = Array.from(stationCodeSet);
+        const stations = await this.stationService.findByCodes(allStationCodes);
+
         return {
-            data: this.routeService.mapList(data),
             total,
             page,
             limit,
+            routes: this.routeService.mapList(data),
+            stations: this.stationService.mapList(stations),
         };
     }
 
@@ -102,10 +118,31 @@ export class RouteController {
         type: RouteGetResponseDto,
     })
     @ApiResponse({ status: 404, description: 'Route not found' })
-    async findOne(@Param('id') id: string): Promise<RouteGetResponseDto> {
-        this.pinoLogger.info({ action: 'findOne', id }, 'Fetching route by ID');
+    async findOne(@Param('id') id: string): Promise<any> {
         const route = await this.routeService.findOne(id);
-        return this.routeService.mapGet(route);
+
+        // Lấy danh sách stationCode từ stationIds của route
+        const stationCodeSet = new Set<string>();
+        const stationIds = (route as any).stationIds;
+        if (stationIds) {
+            if (stationIds instanceof Map) {
+                for (const key of stationIds.keys()) {
+                    stationCodeSet.add(String(key));
+                }
+            } else if (typeof stationIds === 'object') {
+                for (const key of Object.keys(stationIds)) {
+                    stationCodeSet.add(String(key));
+                }
+            }
+        }
+
+        const allStationCodes = Array.from(stationCodeSet);
+        const stations = await this.stationService.findByCodes(allStationCodes);
+
+        return {
+            route: this.routeService.mapGet(route),
+            stations: this.stationService.mapList(stations),
+        };
     }
 
     @Put(':id')
@@ -124,10 +161,6 @@ export class RouteController {
         @Param('id') id: string,
         @Body() updateDto: RouteUpdateRequestDto,
     ): Promise<RouteGetResponseDto> {
-        this.pinoLogger.info(
-            { action: 'update', id, data: updateDto },
-            'Updating route',
-        );
         const route = await this.routeService.update(id, updateDto);
         return this.routeService.mapGet(route);
     }
@@ -142,7 +175,6 @@ export class RouteController {
     @ApiResponse({ status: 404, description: 'Route not found' })
     @HttpCode(HttpStatus.OK)
     async remove(@Param('id') id: string): Promise<void> {
-        this.pinoLogger.info({ action: 'remove', id }, 'Deleting route');
         return this.routeService.remove(id);
     }
 }

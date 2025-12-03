@@ -85,6 +85,15 @@ export class StationService {
         return stations[0];
     }
 
+    async findByCodes(stationCodes: string[]): Promise<StationEntity[]> {
+        if (!stationCodes.length) return [];
+
+        return this.stationRepository.find<StationEntity>(
+            { stationCode: { $in: stationCodes } },
+            { lean: true },
+        );
+    }
+
     async update(
         id: string,
         updateDto: StationUpdateRequestDto,
