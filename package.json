@@ -24,6 +24,8 @@
         "test:e2e": "jest --config ./test/jest-e2e.json",
         "sync-route": "ts-node -r tsconfig-paths/register refs/scripts/sync-routes.ts",
         "sync-station": "ts-node -r tsconfig-paths/register refs/scripts/sync-stations.ts",
+        "sync-station-coordinates": "ts-node -r tsconfig-paths/register refs/scripts/sync-station-coordinates.ts",
+        "geocode-stations-by-address": "ts-node -r tsconfig-paths/register refs/scripts/geocode-stations-by-address.ts",
         "clean-route-csv": "ts-node -r tsconfig-paths/register refs/scripts/clean-routes-csv.ts"
     },
     "dependencies": {

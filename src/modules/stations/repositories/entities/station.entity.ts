@@ -44,6 +44,19 @@ export class StationEntity extends DBEntityBase {
         default: StationStatus.ACTIVE,
     })
     status: StationStatus;
+
+    @Prop({
+        required: false,
+        _id: false,
+        type: {
+            latitude: { type: Number, required: false },
+            longitude: { type: Number, required: false },
+        },
+    })
+    coordinates?: {
+        latitude?: number;
+        longitude?: number;
+    };
 }
 
 export type StationDoc = IDatabaseDocument<StationEntity>;
