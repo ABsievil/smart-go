@@ -46,4 +46,14 @@ export class StationGetResponseDto extends BaseResponseDto {
     @ApiProperty({ description: 'Status', enum: StationStatus })
     @Expose()
     status: StationStatus;
+
+    @ApiPropertyOptional({
+        description: 'Coordinates',
+        example: { latitude: 10.762622, longitude: 106.660172 },
+    })
+    @Expose()
+    coordinates?: {
+        latitude?: number;
+        longitude?: number;
+    };
 }

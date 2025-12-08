@@ -1,9 +1,30 @@
-import { IsString, IsEnum, IsBoolean, IsOptional } from 'class-validator';
+import {
+    IsString,
+    IsEnum,
+    IsBoolean,
+    IsOptional,
+    IsObject,
+    IsNumber,
+    ValidateNested,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
     StationType,
     StationStatus,
 } from '@modules/stations/enums/station.enum';
+
+class CoordinatesDto {
+    @ApiPropertyOptional({ description: 'Latitude', example: 10.762622 })
+    @IsOptional()
+    @IsNumber()
+    latitude?: number;
+
+    @ApiPropertyOptional({ description: 'Longitude', example: 106.660172 })
+    @IsOptional()
+    @IsNumber()
+    longitude?: number;
+}
 
 export class StationCreateRequestDto {
     @ApiProperty({ description: 'Station name', example: 'Ben Thanh Station' })
@@ -51,4 +72,14 @@ export class StationCreateRequestDto {
     @IsOptional()
     @IsEnum(StationStatus)
     status?: StationStatus;
+
+    @ApiPropertyOptional({
+        description: 'Coordinates',
+        type: CoordinatesDto,
+    })
+    @IsOptional()
+    @IsObject()
+    @ValidateNested()
+    @Type(() => CoordinatesDto)
+    coordinates?: CoordinatesDto;
 }
