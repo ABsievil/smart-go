@@ -1,0 +1,12 @@
+{
+    "success": {
+        "findPath": "Tìm thấy đường đi tối ưu",
+        "findPathNotFound": "Không tìm thấy đường đi giữa hai trạm này"
+    },
+    "error": {
+        "findPath": "Không thể tìm đường đi",
+        "stationNotFound": "Không tìm thấy trạm",
+        "invalidRequest": "Tham số yêu cầu không hợp lệ",
+        "algorithmError": "Lỗi xảy ra khi thực thi thuật toán định tuyến"
+    }
+}
