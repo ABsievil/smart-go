@@ -1,0 +1,12 @@
+{
+    "success": {
+        "findPath": "Route found successfully",
+        "findPathNotFound": "No route found between the specified stations"
+    },
+    "error": {
+        "findPath": "Failed to find route",
+        "stationNotFound": "Station not found",
+        "invalidRequest": "Invalid request parameters",
+        "algorithmError": "Error occurred while executing routing algorithm"
+    }
+}
