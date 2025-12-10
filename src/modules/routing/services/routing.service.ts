@@ -16,9 +16,20 @@ import {
     AVERAGE_BUS_SPEED,
     COST_PER_KM,
     MINUTES_PER_HOUR,
+    CONGESTION_MULTIPLIER,
+    NORMAL_TRAFFIC_MULTIPLIER,
+    RUSH_HOUR_MORNING_START,
+    RUSH_HOUR_MORNING_END,
+    RUSH_HOUR_EVENING_START,
+    RUSH_HOUR_EVENING_END,
+    WEIGHT_CONFIG_FASTEST,
+    WEIGHT_CONFIG_CHEAPEST,
+    WEIGHT_CONFIG_SHORTEST,
+    WEIGHT_CONFIG_BALANCED,
 } from '@modules/routing/constants/routing.constants';
 import { CongestionFactors } from '@modules/routing/interfaces/congestion-factor.interface';
 import { MultiObjectiveWeights } from '@modules/routing/interfaces/multi-objective-weight.interface';
+import { StationInfo } from '@modules/routing/interfaces/routing.interface';
 
 /**
  * Service chứa thuật toán Multi-Objective A* (MOA*)
@@ -35,9 +46,15 @@ export class RoutingService {
      * Giờ cao điểm: +20% thời gian
      */
     private readonly congestionFactors: CongestionFactors = {
-        rushHourMorning: [6, 7, 8, 9], // 6-9h sáng
-        rushHourEvening: [16, 17, 18, 19], // 16-19h chiều
-        normal: 1.0, // Bình thường
+        rushHourMorning: Array.from(
+            { length: RUSH_HOUR_MORNING_END - RUSH_HOUR_MORNING_START },
+            (_, i) => RUSH_HOUR_MORNING_START + i,
+        ),
+        rushHourEvening: Array.from(
+            { length: RUSH_HOUR_EVENING_END - RUSH_HOUR_EVENING_START },
+            (_, i) => RUSH_HOUR_EVENING_START + i,
+        ),
+        normal: NORMAL_TRAFFIC_MULTIPLIER,
     };
 
     constructor(private readonly graphBuilder: GraphBuilderService) {}
@@ -66,11 +83,11 @@ export class RoutingService {
         }
 
         if (this.congestionFactors.rushHourMorning.includes(timeOfDay)) {
-            return 1.2; // +20% thời gian
+            return CONGESTION_MULTIPLIER;
         }
 
         if (this.congestionFactors.rushHourEvening.includes(timeOfDay)) {
-            return 1.2; // +20% thời gian
+            return CONGESTION_MULTIPLIER;
         }
 
         return this.congestionFactors.normal;
@@ -239,66 +256,17 @@ export class RoutingService {
         // Tính congestion factor
         const congestionFactor = congestionAware
             ? this.getCongestionFactor(timeOfDay)
-            : 1.0;
+            : NORMAL_TRAFFIC_MULTIPLIER;
 
-        // Normalize weights để tổng = 1
-        const totalWeight =
-            weights.timeWeight + weights.costWeight + weights.distanceWeight;
-        const normalizedWeights: MultiObjectiveWeights = {
-            timeWeight: totalWeight > 0 ? weights.timeWeight / totalWeight : 0,
-            costWeight: totalWeight > 0 ? weights.costWeight / totalWeight : 0,
-            distanceWeight:
-                totalWeight > 0 ? weights.distanceWeight / totalWeight : 0,
-        };
+        // Normalize weights và lấy weight configs
+        const normalizedWeights = this.normalizeWeights(weights);
+        const configsToUse = this.getWeightConfigsToUse(
+            numPaths,
+            normalizedWeights,
+        );
 
         const paths: ParetoOptimalPathDto[] = [];
         let nodesExplored = 0;
-
-        // Tìm lộ trình cho các cấu hình trọng số khác nhau để có Pareto front
-        const weightConfigs: Array<{
-            weights: MultiObjectiveWeights;
-            type: ParetoOptimalPathDto['optimizationType'];
-        }> = [
-            // Fastest
-            {
-                weights: { timeWeight: 1.0, costWeight: 0, distanceWeight: 0 },
-                type: 'fastest',
-            },
-            // Cheapest
-            {
-                weights: { timeWeight: 0, costWeight: 1.0, distanceWeight: 0 },
-                type: 'cheapest',
-            },
-            // Shortest
-            {
-                weights: { timeWeight: 0, costWeight: 0, distanceWeight: 1.0 },
-                type: 'shortest',
-            },
-            // Balanced
-            {
-                weights: {
-                    timeWeight: 0.5,
-                    costWeight: 0.3,
-                    distanceWeight: 0.2,
-                },
-                type: 'balanced',
-            },
-        ];
-
-        // Thêm cấu hình custom nếu khác với predefined
-        if (
-            normalizedWeights.timeWeight > 0 ||
-            normalizedWeights.costWeight > 0 ||
-            normalizedWeights.distanceWeight > 0
-        ) {
-            weightConfigs.push({
-                weights: normalizedWeights,
-                type: 'custom',
-            });
-        }
-
-        // Giới hạn số lượng paths theo numPaths
-        const configsToUse = weightConfigs.slice(0, numPaths);
 
         for (const config of configsToUse) {
             const path = await this.findPathWithMultiObjectiveWeights(
@@ -313,25 +281,16 @@ export class RoutingService {
             if (path) {
                 nodesExplored += path.nodesExplored || 0;
 
-                // Tính optimization score
-                const optimizationScore =
-                    config.weights.timeWeight * path.totalTime +
-                    config.weights.costWeight * path.totalCost +
-                    config.weights.distanceWeight * path.totalDistance;
+                const optimizationScore = this.calculateOptimizationScore(
+                    config.weights,
+                    path.totalTime,
+                    path.totalCost,
+                    path.totalDistance,
+                );
 
-                // Map stations để match type ParetoOptimalPathDto
-                const mappedStations = path.stations.map((station) => ({
-                    stationCode: station.stationCode,
-                    stationName: station.stationName,
-                    coordinates:
-                        station.coordinates?.latitude !== undefined &&
-                        station.coordinates?.longitude !== undefined
-                            ? {
-                                  latitude: station.coordinates.latitude,
-                                  longitude: station.coordinates.longitude,
-                              }
-                            : undefined,
-                }));
+                const mappedStations = path.stations.map((station) =>
+                    this.mapStationInfo(station),
+                );
 
                 paths.push({
                     stations: mappedStations,
@@ -620,5 +579,151 @@ export class RoutingService {
 
     mapGet(routingData: RoutingResponseData): RoutingResponseDto {
         return plainToInstance(RoutingResponseDto, routingData);
+    }
+
+    /**
+     * Normalize weights để tổng = 1
+     */
+    private normalizeWeights(
+        weights: MultiObjectiveWeights,
+    ): MultiObjectiveWeights {
+        const totalWeight =
+            weights.timeWeight + weights.costWeight + weights.distanceWeight;
+
+        if (totalWeight === 0) {
+            return { timeWeight: 0, costWeight: 0, distanceWeight: 0 };
+        }
+
+        return {
+            timeWeight: weights.timeWeight / totalWeight,
+            costWeight: weights.costWeight / totalWeight,
+            distanceWeight: weights.distanceWeight / totalWeight,
+        };
+    }
+
+    /**
+     * Lấy danh sách weight configs mặc định
+     */
+    private getDefaultWeightConfigs(): Array<{
+        weights: MultiObjectiveWeights;
+        type: ParetoOptimalPathDto['optimizationType'];
+    }> {
+        return [
+            {
+                weights: WEIGHT_CONFIG_FASTEST,
+                type: 'fastest',
+            },
+            {
+                weights: WEIGHT_CONFIG_CHEAPEST,
+                type: 'cheapest',
+            },
+            {
+                weights: WEIGHT_CONFIG_SHORTEST,
+                type: 'shortest',
+            },
+            {
+                weights: WEIGHT_CONFIG_BALANCED,
+                type: 'balanced',
+            },
+        ];
+    }
+
+    /**
+     * So sánh 2 weight configs
+     */
+    private areWeightsEqual(
+        w1: MultiObjectiveWeights,
+        w2: MultiObjectiveWeights,
+    ): boolean {
+        return (
+            w1.timeWeight === w2.timeWeight &&
+            w1.costWeight === w2.costWeight &&
+            w1.distanceWeight === w2.distanceWeight
+        );
+    }
+
+    /**
+     * Tạo custom weight config nếu khác với predefined
+     */
+    private createCustomWeightConfig(weights: MultiObjectiveWeights): {
+        weights: MultiObjectiveWeights;
+        type: ParetoOptimalPathDto['optimizationType'];
+    } | null {
+        const defaultConfigs = this.getDefaultWeightConfigs();
+
+        const isDefaultConfig = defaultConfigs.some((config) =>
+            this.areWeightsEqual(config.weights, weights),
+        );
+
+        if (isDefaultConfig) {
+            return null;
+        }
+
+        return {
+            weights,
+            type: 'custom',
+        };
+    }
+
+    /**
+     * Tạo danh sách weight configs để sử dụng
+     */
+    private getWeightConfigsToUse(
+        numPaths: number,
+        customWeights?: MultiObjectiveWeights,
+    ): Array<{
+        weights: MultiObjectiveWeights;
+        type: ParetoOptimalPathDto['optimizationType'];
+    }> {
+        const configs = this.getDefaultWeightConfigs();
+
+        if (customWeights) {
+            const normalizedCustom = this.normalizeWeights(customWeights);
+            const customConfig =
+                this.createCustomWeightConfig(normalizedCustom);
+            if (customConfig) {
+                configs.push(customConfig);
+            }
+        }
+
+        return configs.slice(0, numPaths);
+    }
+
+    /**
+     * Map station info để loại bỏ coordinates null/undefined
+     */
+    private mapStationInfo(station: StationInfo): {
+        stationCode: string;
+        stationName: string;
+        coordinates?: { latitude: number; longitude: number };
+    } {
+        return {
+            stationCode: station.stationCode,
+            stationName: station.stationName,
+            coordinates:
+                station.coordinates?.latitude !== undefined &&
+                station.coordinates?.longitude !== undefined
+                    ? {
+                          latitude: station.coordinates.latitude,
+                          longitude: station.coordinates.longitude,
+                      }
+                    : undefined,
+        };
+    }
+
+    /**
+     * Tính optimization score
+     */
+    private calculateOptimizationScore(
+        weights: MultiObjectiveWeights,
+        totalTime: number,
+        totalCost: number,
+        totalDistance: number,
+    ): number {
+        return (
+            weights.timeWeight * totalTime +
+            weights.costWeight * totalCost +
+            weights.distanceWeight * totalDistance
+        );
     }
 }

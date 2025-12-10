@@ -7,12 +7,18 @@ import {
     BadRequestException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { Logger, PinoLogger } from 'nestjs-pino';
+import { Logger } from 'nestjs-pino';
 import { RoutingService } from '@modules/routing/services/routing.service';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { RoutingRequestDto } from '@modules/routing/dtos/request/routing.request.dto';
 import { RoutingResponseDto } from '@modules/routing/dtos/response/routing.response.dto';
 import { RoutingCriteria } from '@modules/routing/enums/routing.enum';
+import {
+    WEIGHT_CONFIG_FASTEST,
+    WEIGHT_CONFIG_CHEAPEST,
+    WEIGHT_CONFIG_SHORTEST,
+    WEIGHT_CONFIG_BALANCED,
+} from '@modules/routing/constants/routing.constants';
 
 @ApiTags('Routing')
 @Controller('routing')
@@ -168,35 +174,15 @@ Sử dụng Multi-Objective A* (MOA*) để tìm 3-5 lộ trình tối ưu Paret
     } {
         switch (criteria) {
             case RoutingCriteria.TIME:
-                return {
-                    timeWeight: 1.0,
-                    costWeight: 0.0,
-                    distanceWeight: 0.0,
-                };
+                return WEIGHT_CONFIG_FASTEST;
             case RoutingCriteria.COST:
-                return {
-                    timeWeight: 0.0,
-                    costWeight: 1.0,
-                    distanceWeight: 0.0,
-                };
+                return WEIGHT_CONFIG_CHEAPEST;
             case RoutingCriteria.DISTANCE:
-                return {
-                    timeWeight: 0.0,
-                    costWeight: 0.0,
-                    distanceWeight: 1.0,
-                };
+                return WEIGHT_CONFIG_SHORTEST;
             case RoutingCriteria.BALANCED:
-                return {
-                    timeWeight: 0.5,
-                    costWeight: 0.3,
-                    distanceWeight: 0.2,
-                };
+                return WEIGHT_CONFIG_BALANCED;
             default:
-                return {
-                    timeWeight: 1.0,
-                    costWeight: 0.0,
-                    distanceWeight: 0.0,
-                };
+                return WEIGHT_CONFIG_FASTEST;
         }
     }
 }
