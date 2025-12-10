@@ -26,6 +26,9 @@
         "sync-station": "ts-node -r tsconfig-paths/register refs/scripts/sync-stations.ts",
         "sync-station-coordinates": "ts-node -r tsconfig-paths/register refs/scripts/sync-station-coordinates.ts",
         "geocode-stations-by-address": "ts-node -r tsconfig-paths/register refs/scripts/geocode-stations-by-address.ts",
+        "geocode-stations-improved": "ts-node -r tsconfig-paths/register refs/scripts/geocode-stations-improved.ts",
+        "sync-station-coordinates-from-csv": "ts-node -r tsconfig-paths/register refs/scripts/sync-station-coordinates-from-csv.ts",
+        "export-stations-missing-coordinates": "ts-node -r tsconfig-paths/register refs/scripts/export-stations-missing-coordinates.ts",
         "clean-route-csv": "ts-node -r tsconfig-paths/register refs/scripts/clean-routes-csv.ts"
     },
     "dependencies": {
