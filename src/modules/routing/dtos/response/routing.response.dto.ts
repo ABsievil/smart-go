@@ -104,7 +104,7 @@ export class ParetoOptimalPathDto {
 /**
  * Response cho Multi-Objective Routing
  */
-export class MultiObjectiveRoutingResponseDto {
+export class RoutingResponseDto {
     @ApiProperty({
         description: 'Danh sách các lộ trình tối ưu Pareto',
         type: [ParetoOptimalPathDto],

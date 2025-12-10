@@ -6,10 +6,11 @@ import { Graph, GraphNode } from '@modules/routing/interfaces/graph.interface';
 import { RoutePath } from '@modules/routing/interfaces/routing.interface';
 import { RoutingCriteria } from '@modules/routing/enums/routing.enum';
 import {
-    MultiObjectiveRoutingResponseDto,
+    RoutingResponseDto,
     ParetoOptimalPathDto,
-} from '@modules/routing/dtos/response/multi-objective-routing-response.dto';
+} from '@modules/routing/dtos/response/routing.response.dto';
 import { RoutingMetricsDto } from '@modules/routing/dtos/response/routing-metrics.dto';
+import { RoutingResponseData } from '@modules/routing/interfaces/routing-response.interface';
 import {
     GRAPH_CACHE_TTL,
     AVERAGE_BUS_SPEED,
@@ -207,7 +208,7 @@ export class RoutingService {
      * Theo báo cáo nghiên cứu: trả về 3-5 lựa chọn với trade-offs khác nhau
      * Chi phí tính toán thêm 20-30% nhưng cung cấp nhiều lựa chọn tốt
      */
-    async findPathsMultiObjective(
+    async findPaths(
         fromStationCode: string,
         toStationCode: string,
         weights: MultiObjectiveWeights,
@@ -215,7 +216,7 @@ export class RoutingService {
         maxTransfers?: number,
         timeOfDay?: number,
         congestionAware: boolean = true,
-    ): Promise<MultiObjectiveRoutingResponseDto> {
+    ): Promise<RoutingResponseData> {
         const startTime = Date.now();
         const graph = await this.getGraph();
         const cacheHit = this.graphCache !== null;
@@ -368,16 +369,16 @@ export class RoutingService {
             `MOA* found ${uniquePaths.length} Pareto-optimal paths in ${executionTime}ms, explored ${nodesExplored} nodes`,
         );
 
-        return plainToInstance(MultiObjectiveRoutingResponseDto, {
+        return {
             paths: uniquePaths,
             metrics,
             congestionApplied: congestionAware && congestionFactor !== 1.0,
             timeOfDay: timeOfDay ?? new Date().getHours(),
-        });
+        };
     }
 
     /**
-     * Helper method để tìm path với multi-objective weights cụ thể
+     *  Helper method để tìm path với multi-objective weights cụ thể
      */
     private async findPathWithMultiObjectiveWeights(
         fromStationCode: string,
@@ -582,5 +583,42 @@ export class RoutingService {
         }
 
         return unique;
+    }
+
+    /**
+     * Tìm trạm gần nhất từ tọa độ
+     */
+    async findNearestStation(
+        latitude: number,
+        longitude: number,
+    ): Promise<string | null> {
+        const graph = await this.getGraph();
+        let nearestStationCode: string | null = null;
+        let minDistance = Infinity;
+
+        for (const [stationCode, node] of graph.nodes.entries()) {
+            const coords = node.station.coordinates;
+            if (!coords?.latitude || !coords?.longitude) {
+                continue;
+            }
+
+            const distance = this.graphBuilder.calculateDistance(
+                latitude,
+                longitude,
+                coords.latitude,
+                coords.longitude,
+            );
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearestStationCode = stationCode;
+            }
+        }
+
+        return nearestStationCode;
+    }
+
+    mapGet(routingData: RoutingResponseData): RoutingResponseDto {
+        return plainToInstance(RoutingResponseDto, routingData);
     }
 }

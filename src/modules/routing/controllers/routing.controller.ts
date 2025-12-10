@@ -1,10 +1,17 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Body,
+    HttpCode,
+    HttpStatus,
+    BadRequestException,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { PinoLogger } from 'nestjs-pino';
+import { Logger, PinoLogger } from 'nestjs-pino';
 import { RoutingService } from '@modules/routing/services/routing.service';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
-import { MultiObjectiveRoutingRequestDto } from '@modules/routing/dtos/request/multi-objective-routing-request.dto';
-import { MultiObjectiveRoutingResponseDto } from '@modules/routing/dtos/response/multi-objective-routing-response.dto';
+import { RoutingRequestDto } from '@modules/routing/dtos/request/routing.request.dto';
+import { RoutingResponseDto } from '@modules/routing/dtos/response/routing.response.dto';
 import { RoutingCriteria } from '@modules/routing/enums/routing.enum';
 
 @ApiTags('Routing')
@@ -12,20 +19,22 @@ import { RoutingCriteria } from '@modules/routing/enums/routing.enum';
 export class RoutingController {
     constructor(
         private readonly routingService: RoutingService,
-        private readonly pinoLogger: PinoLogger,
-    ) {
-        this.pinoLogger.setContext(RoutingController.name);
-    }
-
-    @Post('find-paths-multi-objective')
+        private readonly logger: Logger,
+    ) {}
+    @Post('find-path')
     @LanguageResponse({
         module: 'routing',
-        successKey: 'findPathsMultiObjective',
+        successKey: 'findPath',
     })
     @ApiOperation({
         summary: 'Tìm nhiều lộ trình tối ưu Pareto (Multi-Objective A* - MOA*)',
         description: `
 Sử dụng Multi-Objective A* (MOA*) để tìm 3-5 lộ trình tối ưu Pareto với trade-offs khác nhau giữa thời gian, chi phí và khoảng cách.
+
+**Hỗ trợ 2 cách tìm kiếm:**
+1. **Theo mã trạm**: Cung cấp stationCode.from và stationCode.to
+2. **Theo tọa độ**: Cung cấp coordinates.from và coordinates.to (tự động tìm trạm gần nhất)
+3. **Mix**: Có thể mix stationCode.from với coordinates.to hoặc ngược lại
 
 **Cải tiến theo báo cáo nghiên cứu:**
 - Sử dụng RoutingCriteria để tự động map trọng số: h(n) = w1×time + w2×cost + w3×distance
@@ -43,15 +52,15 @@ Sử dụng Multi-Objective A* (MOA*) để tìm 3-5 lộ trình tối ưu Paret
     @ApiResponse({
         status: 200,
         description: 'Tìm thấy các lộ trình tối ưu Pareto',
-        type: MultiObjectiveRoutingResponseDto,
+        type: RoutingResponseDto,
     })
     @HttpCode(HttpStatus.OK)
-    async findPathsMultiObjective(
-        @Body() request: MultiObjectiveRoutingRequestDto,
-    ): Promise<MultiObjectiveRoutingResponseDto> {
+    async findPaths(
+        @Body() request: RoutingRequestDto,
+    ): Promise<RoutingResponseDto> {
         const {
-            fromStationCode,
-            toStationCode,
+            stationCode,
+            coordinates,
             criteria = RoutingCriteria.TIME,
             numPaths = 3,
             maxTransfers,
@@ -59,24 +68,94 @@ Sử dụng Multi-Objective A* (MOA*) để tìm 3-5 lộ trình tối ưu Paret
             congestionAware = true,
         } = request;
 
-        // Map RoutingCriteria thành trọng số
+        // Validate: phải có ít nhất stationCode hoặc coordinates
+        if (!stationCode && !coordinates) {
+            throw new BadRequestException(
+                'Either stationCode or coordinates must be provided',
+            );
+        }
+
+        // Validate from
+        if (!stationCode?.from && !coordinates?.from) {
+            throw new BadRequestException(
+                'Either stationCode.from or coordinates.from must be provided',
+            );
+        }
+
+        // Validate to
+        if (!stationCode?.to && !coordinates?.to) {
+            throw new BadRequestException(
+                'Either stationCode.to or coordinates.to must be provided',
+            );
+        }
+
         const weights = this.mapCriteriaToWeights(criteria);
 
-        this.pinoLogger.info(
-            `Finding ${numPaths} Pareto-optimal paths from ${fromStationCode} to ${toStationCode} ` +
-                `with criteria ${criteria} [time=${weights.timeWeight}, cost=${weights.costWeight}, distance=${weights.distanceWeight}], ` +
-                `congestionAware=${congestionAware}, timeOfDay=${timeOfDay ?? 'current'}`,
+        // Tối ưu: Xử lý song song việc tìm nearest station cho FROM và TO
+        const findFromStationPromise = stationCode?.from
+            ? Promise.resolve(stationCode.from)
+            : coordinates?.from
+              ? this.routingService
+                    .findNearestStation(
+                        coordinates.from.latitude,
+                        coordinates.from.longitude,
+                    )
+                    .then((station) => {
+                        if (!station) {
+                            throw new BadRequestException(
+                                `No station found near coordinates.from (${coordinates.from.latitude}, ${coordinates.from.longitude})`,
+                            );
+                        }
+                        return station;
+                    })
+              : Promise.reject(
+                    new BadRequestException(
+                        'Either stationCode.from or coordinates.from must be provided',
+                    ),
+                );
+
+        const findToStationPromise = stationCode?.to
+            ? Promise.resolve(stationCode.to)
+            : coordinates?.to
+              ? this.routingService
+                    .findNearestStation(
+                        coordinates.to.latitude,
+                        coordinates.to.longitude,
+                    )
+                    .then((station) => {
+                        if (!station) {
+                            throw new BadRequestException(
+                                `No station found near coordinates.to (${coordinates.to.latitude}, ${coordinates.to.longitude})`,
+                            );
+                        }
+                        return station;
+                    })
+              : Promise.reject(
+                    new BadRequestException(
+                        'Either stationCode.to or coordinates.to must be provided',
+                    ),
+                );
+
+        const [finalFromStationCode, finalToStationCode] = await Promise.all([
+            findFromStationPromise,
+            findToStationPromise,
+        ]);
+
+        this.logger.debug(
+            `Station codes resolved: from=${finalFromStationCode}, to=${finalToStationCode}`,
         );
 
-        return await this.routingService.findPathsMultiObjective(
-            fromStationCode,
-            toStationCode,
+        const routingData = await this.routingService.findPaths(
+            finalFromStationCode,
+            finalToStationCode,
             weights,
             numPaths,
             maxTransfers,
             timeOfDay,
             congestionAware,
         );
+
+        return this.routingService.mapGet(routingData);
     }
 
     /**
