@@ -1,13 +1,3 @@
-import { RoutingCriteria } from '@modules/routing/enums/routing.enum';
-
-export interface PathNode {
-    stationCode: string;
-    gScore: number; // Chi phí thực tế từ start đến node này
-    fScore: number; // Ước tính tổng chi phí (g + h)
-    cameFrom?: PathNode;
-    routeCode?: string;
-}
-
 export interface StationInfo {
     stationCode: string;
     stationName: string;
@@ -40,5 +30,3 @@ export interface RoutePath {
     totalCost: number; // VND
     segments: RouteSegment[];
 }
-
-export type RoutingCriteriaType = RoutingCriteria;

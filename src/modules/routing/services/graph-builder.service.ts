@@ -31,7 +31,7 @@ export class GraphBuilderService {
     ) {}
 
     /**
-     * Tính khoảng cách Euclidean giữa hai điểm (Haversine formula)
+     * @description Tính khoảng cách Euclidean giữa hai điểm (Haversine formula)
      */
     calculateDistance(
         lat1: number,
@@ -58,7 +58,7 @@ export class GraphBuilderService {
     }
 
     /**
-     * Xây dựng đồ thị từ tất cả routes và stations
+     * @description Xây dựng đồ thị từ tất cả routes và stations
      */
     async buildGraph(): Promise<Graph> {
         const graph: Graph = {
@@ -112,7 +112,7 @@ export class GraphBuilderService {
     }
 
     /**
-     * Xử lý route codes để tạo edges
+     * @description Xử lý route codes để tạo edges
      */
     private processRouteCodes(
         route: RouteEntity,
@@ -200,7 +200,7 @@ export class GraphBuilderService {
     }
 
     /**
-     * Tính weight dựa trên tiêu chí (distance, time, cost)
+     * @description Tính weight dựa trên tiêu chí (distance, time, cost)
      */
     calculateWeight(
         edge: GraphEdge,

@@ -1,18 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-    IsString,
-    IsOptional,
-    IsNumber,
-    Min,
-    Max,
-    IsInt,
-} from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsInt, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
+import { RoutingCriteria } from '@modules/routing/enums/routing.enum';
 
 /**
  * DTO cho Multi-Objective Routing Request
- * Hỗ trợ trọng số tùy chỉnh theo báo cáo nghiên cứu:
- * h(n) = w1×time + w2×cost + w3×distance
+ * Sử dụng RoutingCriteria để tự động map trọng số
  */
 export class MultiObjectiveRoutingRequestDto {
     @ApiProperty({
@@ -30,43 +23,15 @@ export class MultiObjectiveRoutingRequestDto {
     toStationCode: string;
 
     @ApiPropertyOptional({
-        description: 'Trọng số cho thời gian (w1) - mặc định 1.0',
-        example: 1.0,
-        minimum: 0,
-        maximum: 1,
+        description:
+            'Tiêu chí tối ưu (time, cost, distance, hoặc balanced) - mặc định TIME',
+        enum: RoutingCriteria,
+        default: RoutingCriteria.TIME,
+        required: false,
     })
+    @IsEnum(RoutingCriteria)
     @IsOptional()
-    @IsNumber()
-    @Min(0)
-    @Max(1)
-    @Type(() => Number)
-    timeWeight?: number = 1.0;
-
-    @ApiPropertyOptional({
-        description: 'Trọng số cho chi phí (w2) - mặc định 0.0',
-        example: 0.0,
-        minimum: 0,
-        maximum: 1,
-    })
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    @Max(1)
-    @Type(() => Number)
-    costWeight?: number = 0.0;
-
-    @ApiPropertyOptional({
-        description: 'Trọng số cho khoảng cách (w3) - mặc định 0.0',
-        example: 0.0,
-        minimum: 0,
-        maximum: 1,
-    })
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    @Max(1)
-    @Type(() => Number)
-    distanceWeight?: number = 0.0;
+    criteria?: RoutingCriteria = RoutingCriteria.TIME;
 
     @ApiPropertyOptional({
         description:
