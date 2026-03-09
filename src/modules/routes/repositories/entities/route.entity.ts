@@ -3,7 +3,7 @@ import { DBEntityBase } from '@common/database/repositories/entities/database.en
 import { IDatabaseDocument } from '@common/database/repositories/database.repository';
 import { TransportType, RouteStatus } from '@modules/routes/enums/route.enum';
 
-@Schema({ collection: 'routes_V2', timestamps: true })
+@Schema({ collection: 'routes_V3', timestamps: true })
 export class RouteEntity extends DBEntityBase {
     @Prop({ required: true, unique: true })
     routeCode: string;

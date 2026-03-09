@@ -4,7 +4,7 @@ import { IDatabaseDocument } from '@common/database/repositories/database.reposi
 import { StationType } from '@modules/stations/enums/station.enum';
 import { StationStatus } from '@modules/stations/enums/station.enum';
 
-@Schema({ collection: 'stations', timestamps: true })
+@Schema({ collection: 'stations_V3', timestamps: true })
 export class StationEntity extends DBEntityBase {
     @Prop({ required: true })
     stationName: string;

@@ -72,25 +72,6 @@ export class RouteController {
         }
     }
 
-    // @Post()
-    // @LanguageResponse({
-    //     module: 'routes',
-    //     successKey: 'create',
-    // })
-    // @ApiOperation({ summary: 'Create a new route' })
-    // @ApiResponse({
-    //     status: 201,
-    //     description: 'Route created successfully',
-    //     type: RouteGetResponseDto,
-    // })
-    // @HttpCode(HttpStatus.CREATED)
-    // async create(
-    //     @Body() createDto: RouteCreateRequestDto,
-    // ): Promise<RouteGetResponseDto> {
-    //     const route = await this.routeService.create(createDto);
-    //     return this.routeService.mapGet(route);
-    // }
-
     @Get()
     @LanguageResponse({
         module: 'routes',
@@ -183,6 +164,25 @@ export class RouteController {
             stations: this.stationService.mapList(stations),
         };
     }
+
+    // @Post()
+    // @LanguageResponse({
+    //     module: 'routes',
+    //     successKey: 'create',
+    // })
+    // @ApiOperation({ summary: 'Create a new route' })
+    // @ApiResponse({
+    //     status: 201,
+    //     description: 'Route created successfully',
+    //     type: RouteGetResponseDto,
+    // })
+    // @HttpCode(HttpStatus.CREATED)
+    // async create(
+    //     @Body() createDto: RouteCreateRequestDto,
+    // ): Promise<RouteGetResponseDto> {
+    //     const route = await this.routeService.create(createDto);
+    //     return this.routeService.mapGet(route);
+    // }
 
     // @Put(':id')
     // @LanguageResponse({
