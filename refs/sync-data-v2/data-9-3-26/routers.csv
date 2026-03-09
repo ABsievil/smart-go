@@ -1,0 +1,237 @@
+Key,RouteNo,RouteName,RouteVarShortName,StartStop,EndStop,Outbound,RunningTime
+1_1,1,Lượt đi: Bến Thành - BX Chợ Lớn,BX Chợ Lớn,Công Trường Mê Linh,Bến xe Chợ Lớn,TRUE,35
+1_1,1,Lượt về: BX Chợ Lớn - Bến Thành,Bến Thành,Bến xe Chợ Lớn,Công Trường Mê Linh,FALSE,30
+2_1,2,Lượt đi: Bến Thành - BX Miền Tây,BX Miền Tây,Công Trường Mê Linh,Bến xe Miền Tây,TRUE,47
+2_1,2,Lượt về: BX Miền Tây - Bến Thành,Bến Thành,Bến xe Miền Tây,Công Trường Mê Linh,FALSE,47
+3_1,3,Lượt đi: Bến Thành - Thạnh Lộc,Thạnh Lộc,TĐH xe buýt Sài Gòn,THẠNH LỘC,TRUE,55
+3_1,3,Lượt về: Thạnh Lộc - Bến Thành,Bến Thành,THẠNH LỘC,TĐH xe buýt Sài Gòn,FALSE,55
+4_1,4,Lượt đi: Công viên 23/9 - An Sương,An Sương,TĐH xe buýt Sài Gòn,Bến xe An Sương,TRUE,55
+4_1,4,Lượt về: An Sương - Công viên 23/9,Bến Thành,Bến xe An Sương,TĐH xe buýt Sài Gòn,FALSE,50
+5_1,5,Bến xe Chợ Lớn - Biên Hòa,Biên Hòa,Bến xe Chợ Lớn,Big C,TRUE,99
+5_1,5,Biên Hòa - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Big C,Bến xe Chợ Lớn,FALSE,99
+6_1,6,Lượt đi: Bến xe Chợ Lớn - Đại học Nông Lâm,Đại học Nông Lâm,Bến xe Chợ Lớn,Đại học Nông Lâm,TRUE,70
+6_1,6,Lượt về: Đại học Nông Lâm - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Đại học Nông Lâm,Bến xe Chợ Lớn,FALSE,70
+7_1,7,Lượt đi: Bến xe Chợ Lớn - Gò vấp,Gò vấp,Bến xe Chợ Lớn,BÃI HẬU CẦN SỐ 1,TRUE,58
+7_1,7,Lượt về: Gò vấp - Bến xe Chợ Lớn,Bến xe Chợ Lớn,BÃI HẬU CẦN SỐ 1,Bến xe Chợ Lớn,FALSE,58
+8_1,8,Lượt đi: Bến xe Quận 8 - Đại học Quốc Gia,Đại học Quốc Gia,Bến xe Quận 8,Đại học Quốc gia,TRUE,80
+8_1,8,Lượt về: Đại học Quốc Gia - Bến xe Quận 8,Bến xe Quận 8,Đại học Quốc gia,Bến xe Quận 8,FALSE,80
+9_1,9,Lượt đi: Bến xe Chợ Lớn - Hưng Long,Hưng Long,Bến xe Chợ Lớn,Hưng Long,TRUE,70
+9_1,9,Lượt về: Hưng Long - Bến xe Chợ Lớn,Chợ Lớn,Hưng Long,Bến xe Chợ Lớn,FALSE,70
+10_1,10,Đại học Quốc Gia - Bến xe Miền Tây,Bến xe Miền Tây,Đại học Quốc gia,Bến xe Miền Tây,TRUE,80
+10_1,10,Bến xe Miền Tây - Đại học Quốc Gia,Đại học Quốc Gia,Bến xe Miền Tây,Đại học Quốc gia,FALSE,80
+11_1,100,Lượt đi: Bến xe Củ Chi - Cầu Tân Thái,Cầu Tân Thái,Bến xe Củ Chi,Tỉnh lộ 6,TRUE,35
+11_1,100,Lượt về: Cầu Tân Thái - Bến xe Củ Chi,Bến xe Củ Chi,Tỉnh lộ 6,Bến xe Củ Chi,FALSE,35
+12_1,101,Lượt đi: Bến xe Chợ Lớn - Tân Nhựt,Chợ Tân Nhựt,Bến xe Chợ Lớn,Tân Nhựt,TRUE,40
+12_1,101,Lượt về: Tân Nhựt - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Tân Nhựt,Bến xe Chợ Lớn,FALSE,40
+13_1,102,Lượt đi: Bến Thành - Nguyễn Văn Linh - Bến xe Miền Tây,Bến xe Miền Tây,TĐH xe buýt Sài Gòn,Bến xe Miền Tây,TRUE,80
+13_1,102,Lượt về: Bến xe Miền Tây - Nguyễn Văn Linh - Bến Thành,Bến Thành,Bến xe Miền Tây,TĐH xe buýt Sài Gòn,FALSE,80
+14_1,103,Lượt đi: Bến xe Chợ Lớn - Bến xe Ngã 4 Ga,Bến xe Ngã 4 Ga,Bến xe Chợ Lớn,Bến xe Ngã tư Ga,TRUE,70
+14_1,103,Lượt về: Bến xe Ngã 4 Ga - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Bến xe Ngã tư Ga,Bến xe Chợ Lớn,FALSE,70
+15_1,104,Lượt đi: Bến xe An Sương - Đại học Nông Lâm,Đại học Nông Lâm,Bến xe An Sương,Đại học Nông Lâm,TRUE,75
+15_1,104,Lượt về: Đại học Nông Lâm - Bến xe An Sương,Bến xe An Sương,Đại học Nông Lâm,Bến xe An Sương,FALSE,75
+16_1,107,Lượt đi: Bến xe Củ Chi - Bố Heo,Bố Heo,Bến xe Củ Chi,Bố Heo,TRUE,30
+16_1,107,lượt về: Bố Heo - Bến xe Củ Chi,Bến xe Củ Chi,Bố Heo,Bến xe Củ Chi,FALSE,30
+17_1,11,Lượt đi: Bến Thành - Đầm Sen,Đầm Sen,Đầu bến Hàm Nghi,BÃI XE BUÝT ĐẦM SEN,TRUE,40
+17_1,11,Lượt về: Đầm Sen - Bến Thành,Bến Thành,BÃI XE BUÝT ĐẦM SEN,Đầu bến Hàm Nghi,FALSE,40
+18_1,110,Lượt đi: Phú Xuân - Hiệp Phước,Hiệp Phước,Phú Xuân,Hiệp Phước,TRUE,45
+18_1,110,Lượt về: Hiệp Phước - Phú Xuân,Phú Xuân,Hiệp Phước,Phú Xuân,FALSE,45
+19_1,12,Bến Thành - Thác Giang Điền,Thác Giang Điền,TĐH xe buýt Sài Gòn,Ngã 3 Tân Vạn,TRUE,99
+19_1,12,Thác Giang Điền - Bến Thành,Bến Thành,Ngã 3 Tân Vạn,TĐH xe buýt Sài Gòn,FALSE,95
+20_1,122,Lượt đi: Bến xe An Sương - Tân Quy,Tân Quy,Bến xe An Sương,Bến xe Tân Quy,TRUE,50
+20_1,122,Lượt về: Tân Quy - Bến xe An Sương,Bến xe An Sương,Bến xe Tân Quy,Bến xe An Sương,FALSE,50
+23_1,126,Lượt đi: Bến xe Củ Chi - Bình Mỹ,Bình Mỹ,Bến xe Củ Chi,Bến xe Bình Mỹ,TRUE,40
+23_1,126,Lượt về: Bình Mỹ - Bến xe Củ Chi,Bến xe Củ Chi,Bến xe Bình Mỹ,Bến xe Củ Chi,FALSE,40
+24_1,13,Bến Thành - Bến xe Củ Chi,Bến xe Củ Chi,TĐH xe buýt Sài Gòn,Bến xe Củ Chi,TRUE,75
+24_1,13,Bến xe Củ Chi - Bến Thành,Bến Thành,Bến xe Củ Chi,TĐH xe buýt Sài Gòn,FALSE,75
+25_1,139,Lượt đi: Bến xe Miền Tây - Phú Xuân,Phú Xuân,Bến xe Miền Tây,Phú Xuân,TRUE,70
+25_1,139,Lượt về: Phú Xuân - Bến xe Miền Tây,Bến xe Miền Tây,Phú Xuân,Bến xe Miền Tây,FALSE,66
+26_1,14,Lượt đi: Bến xe Miền Đông - Bến xe Miền Tây,Miền Tây,Bến xe Miền Đông,Bến xe Miền Tây,TRUE,60
+26_1,14,Lượt về: Bến xe Miền Tây - Bến xe Miền Đông,Miền Đông,Bến xe Miền Tây,Bến xe Miền Đông,FALSE,60
+27_1,140,Lượt đi: Công viên 23/9 - Phạm Thế Hiển - Ba Tơ,Ba Tơ,TĐH xe buýt Sài Gòn,Ba Tơ,TRUE,55
+27_1,140,Lượt về: Ba Tơ - Phạm Thế Hiển - Công viên 23/9,Công viên 23/9,Ba Tơ,TĐH xe buýt Sài Gòn,FALSE,55
+28_1,141,lượt đi: KDL BCR - KCX Linh Trung,KCX Linh Trung 2,KDL BCR,Khu chế xuất Linh Trung 2,TRUE,65
+28_1,141,Lượt về: KCX Linh Trung - KDL BCR,KDL BCR,Khu chế xuất Linh Trung 2,KDL BCR,FALSE,65
+29_1,144,Lượt đi: Bến xe Miền Tây - Cư xá Nhiêu Lộc,CX Nhiêu Lộc,Bến xe Miền Tây,Cư xá Nhiêu Lộc,TRUE,53
+29_1,144,Lượt về: Cư xá Nhiêu Lộc - Bến xe Miền Tây,Bến xe Miền Tây,Cư xá Nhiêu Lộc,Bến xe Miền Tây,FALSE,52
+30_1,145,Lượt đi: Bến xe Chợ Lớn - Chợ Hiệp Thành,Chợ Hiệp Thành,Bến xe Chợ Lớn,Hiệp Thành,TRUE,70
+30_1,145,Lượt về: Chợ Hiệp Thành - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Hiệp Thành,Bến xe Chợ Lớn,FALSE,70
+31_1,146,Lượt đi: Bến xe Miền Đông - Chợ Hiệp Thành,Chợ Hiệp Thành,Bến xe Miền Đông,Hiệp Thành,TRUE,60
+31_1,146,Lượt về: Chợ Hiệp Thành - Bến xe Miền Đông,Bến xe Miền Đông,Hiệp Thành,Bến xe Miền Đông,FALSE,60
+32_1,148,Lượt đi: Bến xe Miền Tây - BÃI HẬU CẦN SỐ 1,Gò Vấp,Bến xe Miền Tây,BÃI HẬU CẦN SỐ 1,TRUE,50
+32_1,148,Lượt về: BÃI HẬU CẦN SỐ 1 - Bến xe Miền Tây,Bến xe Miền Tây,BÃI HẬU CẦN SỐ 1,Bến xe Miền Tây,FALSE,57
+33_1,149,Lượt đi: Ga xe buýt Sài Gòn - Khu dân cư Bình Hưng Hòa B,Khu dân cư Bình Hưng Hòa,TĐH xe buýt Sài Gòn,Khu dân cư Bình Hưng Hòa B,TRUE,54
+33_1,149,Lượt đi: Khu dân cư Bình Hưng Hòa B - Ga xe buýt Sài Gòn,Công viên 23/9,Khu dân cư Bình Hưng Hòa B,TĐH xe buýt Sài Gòn,FALSE,60
+34_1,15,lượt đi,Đầm Sen,Đường 44,BÃI XE BUÝT ĐẦM SEN,TRUE,55
+34_1,15,lượt về Đầm Sen - Bến Phú Định,Bến Phú Định,BÃI XE BUÝT ĐẦM SEN,Đường 44,FALSE,55
+35_1,150,Lượt đi: Bến xe Chợ Lớn - Ngã 3 Tân Vạn,Ngã 3 Tân Vạn,Bến xe Chợ Lớn,Tân Vạn,TRUE,80
+35_1,150,Lượt về: Ngã 3 Tân Vạn - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Tân Vạn,Bến xe Chợ Lớn,FALSE,80
+36_1,151,Lượt đi: Bến xe Miền Tây - Bến xe An Sương,Bến xe An Sương,Bến xe Miền Tây,Bến xe An Sương,TRUE,45
+36_1,151,Lượt về: Bến xe An Sương - Bến xe Miền Tây,Bến xe Miền Tây,Bến xe An Sương,Bến xe Miền Tây,FALSE,45
+37_1,152,Lượt đi: Khu dân cư Trung Sơn - Bến Thành - Sân bay Tân Sơn Nhất,Sân bay Tân Sơn Nhất,Khu dân cư Trung Sơn,Sân bay Tân Sơn Nhất,TRUE,55
+37_1,152,Lượt về: Sân bay Tân Sơn Nhất - Bến Thành - Khu dân cư Trung Sơn,Khu dân cư Trung Sơn,Sân bay Tân Sơn Nhất,Khu dân cư Trung Sơn,FALSE,50
+38_1,16,Lượt đi: Bến xe Chợ Lớn - Bến xe Tân Phú,Bến xe Tân Phú,Bến xe Chợ Lớn,"Trạm Điều hành Tân Phú (0,55ha)",TRUE,50
+38_1,16,Lượt về: Bến xe Tân Phú - Bến xe Chợ Lớn,Bến xe Chợ Lớn,"Trạm Điều hành Tân Phú (0,55ha)",Bến xe Chợ Lớn,FALSE,50
+39_1,17,Bến Xe Chợ Lớn - ĐH Sài Gòn - KCX Tân Thuận,KCX Tân Thuận,Bến xe Chợ Lớn,Khu chế xuất Tân Thuận,TRUE,55
+39_1,17,KCX Tân Thuận - ĐH Sài Gòn - Bến Xe Chợ Lớn,Bến Xe Chợ Lớn,Khu chế xuất Tân Thuận,Bến xe Chợ Lớn,FALSE,55
+40_1,18,lượt đi: Bến Thành - Hiệp Thành,Chợ Hiệp Thành,TĐH xe buýt Sài Gòn,Hiệp Thành,TRUE,75
+40_1,18,lượt về: Hiệp Thành - Bến Thành,Bến Thành,Hiệp Thành,TĐH xe buýt Sài Gòn,FALSE,75
+41_1,19,lượt đi,Đại Học Quốc Gia,TĐH xe buýt Sài Gòn,Đại học Quốc gia,TRUE,80
+41_1,19,lượt về,Bến Thành,Đại học Quốc gia,TĐH xe buýt Sài Gòn,FALSE,80
+42_1,20,lượt đi,Nhà Bè,TĐH xe buýt Sài Gòn,Bình Khánh,TRUE,50
+42_1,20,lượt về,Bến Thành,Bình Khánh,TĐH xe buýt Sài Gòn,FALSE,50
+43_1,22,Bến Xe Quận 8 - KCN Lê Minh Xuân,KCN Lê Minh Xuân,Bến xe Quận 8,KCN LÊ MINH XUÂN,TRUE,60
+43_1,22,KCN Lê Minh Xuân - Bến Xe Quận 8,Bến Xe Quận 8,KCN LÊ MINH XUÂN,Bến xe Quận 8,FALSE,60
+44_1,23,Bến xe Chợ Lớn - Ngã 3 Giồng - Cầu Lớn,Cầu Lớn,Bến xe Chợ Lớn,Cầu Lớn,TRUE,75
+44_1,23,Cầu Lớn - Ngã 3 Giồng - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Cầu Lớn,Bến xe Chợ Lớn,FALSE,75
+45_1,24,lượt đi,Hóc Môn,Bến xe Miền Đông,Bãi xe buýt 19/5,TRUE,75
+45_1,24,lượt về,Bến Xe Miền Đông,Bãi xe buýt 19/5,Bến xe Miền Đông,FALSE,75
+46_1,25,lượt đi,Khu Dân Cư Vĩnh Lộc A,Bến xe Quận 8,KDC VĨNH LỘC A,TRUE,60
+46_1,25,lượt về,Bến Xe Quận 8,KDC VĨNH LỘC A,Bến xe Quận 8,FALSE,60
+48_1,27,lượt đi,An Sương,TĐH xe buýt Sài Gòn,Bến xe An Sương,TRUE,60
+48_1,27,lượt về,Bến Thành,Bến xe An Sương,TĐH xe buýt Sài Gòn,FALSE,60
+49_1,28,Lượt đi: Bến Thành - Chợ Xuân Thới Thượng,Chợ Xuân Thới Thượng,TĐH xe buýt Sài Gòn,Xuân Thới Thượng,TRUE,80
+49_1,28,Lượt về: Chợ Xuân Thới Thượng - Bến Thành,Bến Thành,Xuân Thới Thượng,TĐH xe buýt Sài Gòn,FALSE,80
+50_1,29,Lượt đi: Bến Phà Cát Lái - Chợ Nông Sản Thủ Đức,Chợ Nông Sản Thủ Đức,Cát Lái,Chợ nông sản Thủ Đức,TRUE,60
+50_1,29,Lượt về: Chợ Nông Sản Thủ Đức - Bến Phà Cát Lái,Bến Phà Cát Lái,Chợ nông sản Thủ Đức,Cát Lái,FALSE,60
+51_1,30,Cư xá Nhiêu Lộc - Đường nội bộ Đại học Quốc gia,Đại học Quốc tế,Cư xá Nhiêu Lộc,Đường nội bộ Đại học Quốc gia,TRUE,85
+51_1,30,Đường nội bộ Đại học Quốc gia - Cư xá Nhiêu Lộc,Chợ Tân Hương,Đường nội bộ Đại học Quốc gia,Cư xá Nhiêu Lộc,FALSE,85
+52_1,31,Lượt đi: Khu dân cư Tân Quy Đông - Khu dân cư Bình Lợi,Khu dân cư Bình Lợi,Khu dân cư Tân Quy Đông,Khu dân cư Bình Lợi,TRUE,70
+52_1,31,Lượt về: Khu dân cư Bình Lợi - Khu dân cư Tân Quy Đông,Khu dân cư Tân Quy,Khu dân cư Bình Lợi,Khu dân cư Tân Quy Đông,FALSE,70
+53_1,32,lượt đi,Bến Xe Ngã Tư Ga,Bến xe Miền Tây,Bến xe Ngã tư Ga,TRUE,75
+53_1,32,lượt về,Bến Xe Miền Tây,Bến xe Ngã tư Ga,Bến xe Miền Tây,FALSE,75
+54_1,33,Lượt đi,Đại học Quốc Gia,Bến xe An Sương,Bến Xe Buýt ÐH Quốc Gia,TRUE,44
+54_1,33,Lượt về,Bến Xe An Sương,Bến Xe Buýt ÐH Quốc Gia,Bến xe An Sương,FALSE,44
+55_1,34,Lượt đi: Bến Thành - ĐH Công nghệ SG,Đại Học Công Nghệ Sài Gòn,TĐH xe buýt Sài Gòn,Công viên Đồng Diều,TRUE,55
+55_1,34,Lượt về: ĐH Công nghệ SG - Bến Thành,Bến Thành,Công viên Đồng Diều,TĐH xe buýt Sài Gòn,FALSE,55
+56_1,35,Lượt đi: Bến xe buýt Hoàng Sa - Nguyễn Văn Hưởng,Quận 2,Bến xe buýt Hoàng Sa,Làng báo chí,TRUE,55
+56_1,35,Lượt về: Nguyễn Văn Hưởng - Bến xe buýt Hoàng Sa,Tuyến xe buýt Quận 1,Làng báo chí,Bến xe buýt Hoàng Sa,FALSE,55
+57_1,36,Lượt đi,Thới An,TĐH xe buýt Sài Gòn,Bãi xe buýt Thới An,TRUE,60
+57_1,36,Lượt về,Bến Thành,Bãi xe buýt Thới An,TĐH xe buýt Sài Gòn,FALSE,60
+58_1,37,Lượt đi: Cảng Quận 4 - Nhơn Đức,Nhơn Đức,Cảng Quận 4,Nhơn Đức,TRUE,60
+58_1,37,Lượt về: Nhơn Đức - Cảng Quận 4,Cảng Quận 4,Nhơn Đức,Cảng Quận 4,FALSE,60
+59_1,38,Lượt đi,Đầm Sen,Khu dân cư Tân Quy Đông,BÃI XE BUÝT ĐẦM SEN,TRUE,60
+59_1,38,Lượt về,KDC Tân Quy,BÃI XE BUÝT ĐẦM SEN,Khu dân cư Tân Quy Đông,FALSE,60
+60_1,39,Lượt đi,Bến Xe Miền Tây,TĐH xe buýt Sài Gòn,Bến xe Miền Tây,TRUE,45
+60_1,39,Lượt về,Bến Thành,Bến xe Miền Tây,TĐH xe buýt Sài Gòn,FALSE,45
+61_1,40,Lượt đi,Bến xe Ngã Tư Ga,Bến xe Miền Đông,Bến xe Ngã tư Ga,TRUE,35
+61_1,40,Lượt về,Bến xe Miền Đông,Bến xe Ngã tư Ga,Bến xe Miền Đông,FALSE,45
+62_1,41,Lượt đi,Bến xe An Sương,Bến xe Miền Tây,Bến xe An Sương,TRUE,60
+62_1,41,Lượt về,Bến xe Miền Tây,Bến xe An Sương,Bến xe Miền Tây,FALSE,60
+63_1,42,Chợ Cầu Muối - Chợ nông sản Thủ Đức,Chợ nông sản Thủ Đức,TĐH xe buýt Sài Gòn,Chợ nông sản Thủ Đức,TRUE,67
+63_1,42,Chợ nông sản Thủ Đức - Chợ Cầu Muối,Chợ Cầu Muối,Chợ nông sản Thủ Đức,TĐH xe buýt Sài Gòn,FALSE,56
+64_1,43,Lượt đi,Phà Cát Lái,Bến xe Miền Đông,Cát Lái,TRUE,50
+64_1,43,Lượt về,Bến xe Miền Đông,Cát Lái,Bến xe Miền Đông,FALSE,50
+65_1,44,Lượt đi: Cảng Quận 4-Bến đò Bình Quới,Bình Quới,Cảng Quận 4,Bến đò Bình Quới,TRUE,60
+65_1,44,Lượt về: Bến đò Bình Quới-Cảng Quận 4,Cảng Quận 4,Bến đò Bình Quới,Cảng Quận 4,FALSE,60
+66_1,45,Lượt đi,Bến xe Miền Đông,Bến xe Quận 8,Bến xe Miền Đông,TRUE,65
+66_1,45,Lượt về,Bến xe Quận 8,Bến xe Miền Đông,Bến xe Quận 8,FALSE,65
+67_1,46,Lượt đi,Bến Mễ Cốc,Cảng Quận 4,Mễ Cốc,TRUE,65
+67_1,46,Lượt về,Cảng Quận 4,Mễ Cốc,Cảng Quận 4,FALSE,65
+68_1,47,Lượt đi,Hưng Long,Bến xe Chợ Lớn,Hưng Long,TRUE,41
+68_1,47,Lượt về,Bến xe Chợ Lớn,Hưng Long,Bến xe Chợ Lớn,FALSE,50
+69_1,48,Lượt đi: Bến xe Tân Phú - Hiệp Thành,Chợ Hiệp Thành,"Trạm Điều hành Tân Phú (0,55ha)",Hiệp Thành,TRUE,50
+69_1,48,Lượt về: Hiệp Thành - Bến xe Tân Phú,Bến xe Tân Phú,Hiệp Thành,"Trạm Điều hành Tân Phú (0,55ha)",FALSE,50
+70_1,50,Lượt đi: ĐH Bách Khoa TP HCM - Đầu bến Đại học Bách Khoa - Cơ sở 2,Đại học Quốc gia,ĐH BÁCH KHOA TP HCM,Đầu bến Đại học Bách Khoa - Cơ sở 2,TRUE,65
+70_1,50,Lượt về: Đầu bến Đại học Bách Khoa - Cơ sở 2 - ĐH BÁCH KHOA TP HCM,Đại học Bách khoa,Đầu bến Đại học Bách Khoa - Cơ sở 2,ĐH BÁCH KHOA TP HCM,FALSE,65
+71_1,51,Lượt đi,Bình Hưng Hòa,Bến xe Miền Đông,Chợ Bình Hưng Hòa,TRUE,65
+71_1,51,Lượt về,Bến xe Miền Đông,Chợ Bình Hưng Hòa,Bến xe Miền Đông,FALSE,65
+72_1,52,Lượt đi,Đại học Quốc tế,TĐH xe buýt Sài Gòn,Đại học Quốc gia,TRUE,60
+72_1,52,Lượt về,Bến Thành,Đại học Quốc gia,TĐH xe buýt Sài Gòn,FALSE,70
+73_1,53,Lê Hồng Phong - Bến Xe Buýt ÐH Quốc Gia,Đại học Quốc gia,Lê Hồng Phong,Bến Xe Buýt ÐH Quốc Gia,TRUE,75
+73_1,53,Bến Xe Buýt ÐH Quốc Gia - Lê Hồng Phong,Lê Hồng Phong,Bến Xe Buýt ÐH Quốc Gia,Lê Hồng Phong,FALSE,75
+74_1,54,Lượt đi: Bến xe Miền Đông - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Bến xe Miền Đông,Bến xe Chợ Lớn,TRUE,50
+74_1,54,Lượt về: Bến xe Chợ Lớn - Bến xe Miền Đông,Bến xe Miền Đông,Bến xe Chợ Lớn,Bến xe Miền Đông,FALSE,55
+75_1,55,Lượt đi: Công viên phần mềm Quang Trung - Khu Công nghệ cao (Q9),Khu Công nghệ cao (Q9),Công viên phần mềm Quang Trung,Khu Công Nghệ cao,TRUE,70
+75_1,55,Lượt về: Khu Công nghệ cao (Q9) - Công viên phần mềm Quang Trung,Công viên phần mềm Quang Trung,Khu Công Nghệ cao,Công viên phần mềm Quang Trung,FALSE,70
+76_1,56,Lượt đi: Bến xe Chợ Lớn - Đại học Giao thông Vận tải,Đại học Giao thông Vận tải,Bến xe Chợ Lớn,KTX Đại học Sư phạm kỹ thuật,TRUE,70
+76_1,56,Lượt về: Đại học Giao thông Vận tải - Bến xe Chợ Lớn,Bến xe Chợ Lớn,KTX Đại học Sư phạm kỹ thuật,Bến xe Chợ Lớn,FALSE,70
+77_1,57,Lượt đi: Chợ Phước Bình - Trường THPT Hiệp Bình,Trường THPT Hiệp Bình,Trường cao đẳng nghề Suleco,Trường Hiệp Bình,TRUE,45
+77_1,57,Lượt về: Trường THPT Hiệp Bình - Chợ Phước Bình,Chợ Phước Bình,Trường Hiệp Bình,Trường cao đẳng nghề Suleco,FALSE,45
+78_1,58,lượt đi,Khu Công nghiệp Đông Nam,Bến xe Ngã tư Ga,Khu công nghiệp Đông Nam,TRUE,50
+78_1,58,lượt về,Bến xe Ngã 4 Ga,Khu công nghiệp Đông Nam,Bến xe Ngã tư Ga,FALSE,50
+79_1,59,Lượt đi,Bến xe Ngã 4 Ga,Bến xe Quận 8,Bến xe Ngã tư Ga,TRUE,80
+79_1,59,Lượt về,Bến xe Quận 8,Bến xe Ngã tư Ga,Bến xe Quận 8,FALSE,80
+80_1,60,Bến xe An Sương - KCN Lê Minh Xuân,KCN Lê Minh Xuân,Bến xe An Sương,KCN LÊ MINH XUÂN,TRUE,50
+80_1,60,KCN Lê Minh Xuân - Bến xe An Sương,Bến xe An Sương,KCN LÊ MINH XUÂN,Bến xe An Sương,FALSE,50
+81_1,60-1,BX Miền Tây - BX Biên Hòa,BX Biên Hòa,Bến xe Miền Tây,Bến xe An Sương,TRUE,120
+81_1,60-1,BX Biên Hòa - BX Miền Tây,BX Miền Tây,Bến xe An Sương,Bến xe Miền Tây,FALSE,120
+84_1,61,Lượt đi,KCN Lê Minh Xuân,Bến xe Chợ Lớn,KCN LÊ MINH XUÂN,TRUE,50
+84_1,61,Lượt về,Bến xe Chợ Lớn,KCN LÊ MINH XUÂN,Bến xe Chợ Lớn,FALSE,50
+88_1,61-6,Bến Thành - Khu Du lịch Đại Nam,Khu Du lịch Đại Nam,TĐH xe buýt Sài Gòn,Cầu Vĩnh Bình,TRUE,90
+88_1,61-6,Khu Du lịch Đại Nam - Bến Thành,Bến Thành,Cầu Vĩnh Bình,TĐH xe buýt Sài Gòn,FALSE,90
+91_1,62,Lượt đi,Thới An,Bến xe Quận 8,Bãi xe buýt Thới An,TRUE,75
+91_1,62,Lượt về,Bến xe Quận 8,Bãi xe buýt Thới An,Bến xe Quận 8,FALSE,75
+92_1,62-10,Bến xe Chợ Lớn - Thanh Vĩnh Đông,Thanh Vĩnh Đông,Bến xe Chợ Lớn,Ba Làng,TRUE,140
+92_1,62-10,Thanh Vĩnh Đông - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Ba Làng,Bến xe Chợ Lớn,FALSE,140
+101_1,64,Lượt đi,Đầm Sen,Bến xe Miền Đông,BÃI XE BUÝT ĐẦM SEN,TRUE,55
+101_1,64,Lượt về,Bến xe Miền Đông,BÃI XE BUÝT ĐẦM SEN,Bến xe Miền Đông,FALSE,55
+102_1,65,Bến Thành - CMT8 - Bến xe An Sương,Bến xe An Sương,TĐH xe buýt Sài Gòn,Bến xe An Sương,TRUE,57
+102_1,65,Bến xe An Sương - CMT8 - Bến Thành,Bến Thành,Bến xe An Sương,TĐH xe buýt Sài Gòn,FALSE,57
+103_1,66,Lượt đi,Bến xe An Sương,Bến xe Chợ Lớn,Bến xe An Sương,TRUE,55
+103_1,66,Bến xe An Sương - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Bến xe An Sương,Bến xe Chợ Lớn,FALSE,55
+104_1,68,Lượt đi,KCX Tân Thuận,Bến xe Chợ Lớn,Khu chế xuất Tân Thuận,TRUE,65
+104_1,68,Lượt về,Bến xe Chợ Lớn,Khu chế xuất Tân Thuận,Bến xe Chợ Lớn,FALSE,60
+105_1,69,Lượt đi,KCN Tân Bình,TĐH xe buýt Sài Gòn,Khu công nghiệp Tân Bình,TRUE,70
+105_1,69,Lượt về,Công viên 23/9,Khu công nghiệp Tân Bình,TĐH xe buýt Sài Gòn,FALSE,70
+106_1,70,lượt đi: Tân Quy - Bến Súc,Bến Súc,Bến xe Tân Quy,Bến xe buýt Bến Súc,TRUE,60
+106_1,70,lượt về: Bến Súc - Tân Quy,Tân Quy,Bến xe buýt Bến Súc,Bến xe Tân Quy,FALSE,60
+109_1,70-3,Bến Thành - Mộc Bài,Mộc Bài,,,TRUE,150
+109_1,70-3,Mộc Bài - Bến Thành,Bến Thành,,,FALSE,150
+111_1,71,Lượt đi,Phật Cô Đơn,Bến xe An Sương,Phật Cô Đơn,TRUE,60
+111_1,71,Lượt về,Bến xe An Sương,Phật Cô Đơn,Bến xe An Sương,FALSE,60
+112_1,72,Lượt đi,Hiệp Phước,TĐH xe buýt Sài Gòn,Hiệp Phước,TRUE,45
+112_1,72,Lượt về,Công viên 23/9,Hiệp Phước,TĐH xe buýt Sài Gòn,FALSE,55
+113_1,73,Lượt đi,KCN Lê Minh Xuân,Chợ Bình Chánh,KCN LÊ MINH XUÂN,TRUE,65
+113_1,73,Lượt về,Chợ Bình Chánh,KCN LÊ MINH XUÂN,Chợ Bình Chánh,FALSE,65
+114_1,74,Lượt đi,Bến xe Củ Chi,Bến xe An Sương,Bến xe Củ Chi,TRUE,45
+114_1,74,Lượt về,Bến xe An Sương,Bến xe Củ Chi,Bến xe An Sương,FALSE,45
+115_1,75,Sài Gòn - Cần Giờ,Cần Giờ,TĐH xe buýt Sài Gòn,Cần Thạnh,TRUE,238
+115_1,75,Cần Giờ - Sài Gòn,Sài Gòn,Cần Thạnh,TĐH xe buýt Sài Gòn,FALSE,246
+116_1,76,Lượt đi,Đền Vua Hùng,Long Phước,Đền Hùng,TRUE,60
+116_1,76,Lượt về,Long Phước,Đền Hùng,Long Phước,FALSE,60
+117_1,77,Lượt về: Đồng Hòa - Cần Thạnh,Cần Thạnh,Đồng Hòa,Cần Thạnh,TRUE,30
+117_1,77,Lượt đi: Cần Thạnh - Đồng Hòa,Đồng Hòa,Cần Thạnh,Đồng Hòa,FALSE,30
+118_1,78,Lượt đi,Hóc Môn,Bãi xe buýt Thới An,Bãi xe buýt 19/5,TRUE,40
+118_1,78,Hóc Môn - Thới An,Thới An,Bãi xe buýt 19/5,Bãi xe buýt Thới An,FALSE,40
+119_1,79,Lượt đi,Đền Bến Dược,Bến xe Củ Chi,Bến Dược,TRUE,45
+119_1,79,Lượt về,Bến xe Củ Chi,Bến Dược,Bến xe Củ Chi,FALSE,45
+121_1,81,Lượt đi,Lê Minh Xuân,Bến xe Chợ Lớn,Đầm lầy 1,TRUE,60
+121_1,81,Lượt về,Bến xe Chợ Lớn,Đầm lầy 1,Bến xe Chợ Lớn,FALSE,60
+123_1,83,Lượt đi,Cầu Thầy Cai,Bến xe Củ Chi,Cầu Thầy Cai,TRUE,15
+123_1,83,Lượt về,Bến xe Củ Chi,Cầu Thầy Cai,Bến xe Củ Chi,FALSE,15
+124_1,84,Bến xe Chợ Lớn - Tân Túc,Tân Túc,Bến xe Chợ Lớn,Tân Túc,TRUE,45
+124_1,84,Tân Túc - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Tân Túc,Bến xe Chợ Lớn,FALSE,45
+125_1,85,Lượt đi: Bến xe An Sương - Cầu Lớn,Hậu Nghĩa,Bến xe An Sương,Cầu Lớn,TRUE,35
+125_1,85,Lượt về: Cầu Lớn - Bến xe An Sương,Bến xe An Sương,Cầu Lớn,Bến xe An Sương,FALSE,35
+126_1,86,Lượt đi,Đại học Tôn Đức Thắng,TĐH xe buýt Sài Gòn,Đại học Tôn Đức Thắng,TRUE,28
+126_1,86,Lượt về,Bến Thành,Đại học Tôn Đức Thắng,TĐH xe buýt Sài Gòn,FALSE,28
+127_1,87,Lượt đi,An Nhơn Tây,Bến xe Củ Chi,An Nhơn Tây,TRUE,40
+127_1,87,Lượt về,Bến xe Củ Chi,An Nhơn Tây,Bến xe Củ Chi,FALSE,40
+128_1,88,Lượt đi: Bến Thành - Chợ Long Phước,Chợ Long Phước,TĐH xe buýt Sài Gòn,Chợ Long Phước,TRUE,65
+128_1,88,Lượt về: Chợ Long Phước - Bến Thành,Bến Thành,Chợ Long Phước,TĐH xe buýt Sài Gòn,FALSE,65
+129_1,89,Lượt đi: Đại học Nông Lâm - Trường THPT Hiệp Bình,Trường THPT Hiệp Bình,Đại học Nông Lâm,Trường Hiệp Bình,TRUE,45
+129_1,89,Lượt về: Trường THPT Hiệp Bình - Đại học Nông Lâm,Đại học Nông Lâm,Trường Hiệp Bình,Đại học Nông Lâm,FALSE,45
+130_1,90,Lượt đi: Phà Bình Khánh - Cần Thạnh,Cần Thạnh,Bình Khánh,Cần Thạnh,TRUE,80
+130_1,90,Lượt về: Cần Thạnh - Phà Bình Khánh,Phà Bình Khánh,Cần Thạnh,Bình Khánh,FALSE,80
+131_1,91,Bến xe Miền Tây - Chợ nông sản Thủ Đức,Chợ nông sản Thủ Đức,Bến xe Miền Tây,Chợ nông sản Thủ Đức,TRUE,80
+131_1,91,Chợ nông sản Thủ Đức - Bến xe Miền Tây,Bến xe Miền Tây,Chợ nông sản Thủ Đức,Bến xe Miền Tây,FALSE,80
+133_1,93,Bến Thành - Đại học Nông Lâm,Đại học Nông Lâm,TĐH xe buýt Sài Gòn,Đại học Nông Lâm,TRUE,60
+133_1,93,Đại học Nông Lâm - Bến Thành,Bến Thành,Đại học Nông Lâm,TĐH xe buýt Sài Gòn,FALSE,60
+134_1,94,Bến xe Chợ Lớn - Bến xe Củ Chi,Bến xe Củ Chi,Bến xe Chợ Lớn,Bến xe Củ Chi,TRUE,75
+134_1,94,Bến xe Củ Chi - Bến xe Chợ Lớn,Bến xe Chợ Lớn,Bến xe Củ Chi,Bến xe Chợ Lớn,FALSE,75
+135_1,95,Lượt đi: Bến xe Miền Đông - Khu Công nghiệp Tân Bình,KCN Tân Bình,Bến xe Miền Đông,Khu công nghiệp Tân Bình,TRUE,65
+135_1,95,Lượt về: Khu Công nghiệp Tân Bình - Bến xe Miền Đông,Bến xe Miền Đông,Khu công nghiệp Tân Bình,Bến xe Miền Đông,FALSE,65
+136_1,96,Lượt đi,Chợ Bình Điền,TĐH xe buýt Sài Gòn,Chợ Đầu mối Bình Điền,TRUE,55
+136_1,96,Lượt về,Bến Thành,Chợ Đầu mối Bình Điền,TĐH xe buýt Sài Gòn,FALSE,55
+137_1,99,Lượt đi,Đại học Quốc gia,Chợ Thạnh Mỹ Lợi,Bến Xe Buýt ÐH Quốc Gia,TRUE,65
+137_1,99,Lượt về,Chợ Thạnh Mỹ Lợi,Bến Xe Buýt ÐH Quốc Gia,Chợ Thạnh Mỹ Lợi,FALSE,65
+156_1,C010,Đi làm,KCN Hiệp Phước,Bãi Xe Phổ Quang,Công ty Hồng Anh,TRUE,75
+156_1,C010,Về nhà,Phổ Quang,Công ty Hồng Anh,Bãi Xe Phổ Quang,FALSE,75
+178_1,127,Lượt đi: An Thới Đông - Bà Xán,Ngã ba Bà Xán,An Thới Đông,Bà Xán,TRUE,40
+178_1,127,Lượt về: Bà Xán - An Thới Đông,An Thới Đông,Bà Xán,An Thới Đông,FALSE,40
+179_1,128,Lượt đi: Tân Điền - An Nghĩa,An Nghĩa,Tân Điền,An Nghĩa,TRUE,60
+179_1,128,Lượt về: An Nghĩa - Tân Điền,Tân Điền,An Nghĩa,Tân Điền,FALSE,60
+197_1,119,Lượt đi: Sân bay Tân Sơn Nhất - Bến xe Miền Tây,Bến xe Miền Tây,Sân bay Tân Sơn Nhất,Bến xe Miền Tây,TRUE,65
+197_1,119,Lượt về: Bến xe Miền Tây - Sân bay Tân Sơn Nhất,Sân bay Tân Sơn Nhất,Bến xe Miền Tây,Sân bay Tân Sơn Nhất,FALSE,65
+199_1,109,TĐH xe buýt Sài Gòn - Sân bay Tân Sơn Nhất,Công viên 23/9,TĐH xe buýt Sài Gòn,Sân bay Tân Sơn Nhất,FALSE,45
+199_1,109,Sân bay Tân Sơn Nhất - TĐH xe buýt Sài Gòn,Sân bay Tân Sơn Nhất,Sân bay Tân Sơn Nhất,TĐH xe buýt Sài Gòn,TRUE,45
