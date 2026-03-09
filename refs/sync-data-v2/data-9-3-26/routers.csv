@@ -225,8 +225,8 @@ Key,RouteNo,RouteName,RouteVarShortName,StartStop,EndStop,Outbound,RunningTime
 136_1,96,Lượt về,Bến Thành,Chợ Đầu mối Bình Điền,TĐH xe buýt Sài Gòn,FALSE,55
 137_1,99,Lượt đi,Đại học Quốc gia,Chợ Thạnh Mỹ Lợi,Bến Xe Buýt ÐH Quốc Gia,TRUE,65
 137_1,99,Lượt về,Chợ Thạnh Mỹ Lợi,Bến Xe Buýt ÐH Quốc Gia,Chợ Thạnh Mỹ Lợi,FALSE,65
-156_1,C010,Đi làm,KCN Hiệp Phước,Bãi Xe Phổ Quang,Công ty Hồng Anh,TRUE,75
-156_1,C010,Về nhà,Phổ Quang,Công ty Hồng Anh,Bãi Xe Phổ Quang,FALSE,75
+156_1,C010,Lượt đi,KCN Hiệp Phước,Bãi Xe Phổ Quang,Công ty Hồng Anh,TRUE,75
+156_1,C010,Lượt về,Phổ Quang,Công ty Hồng Anh,Bãi Xe Phổ Quang,FALSE,75
 178_1,127,Lượt đi: An Thới Đông - Bà Xán,Ngã ba Bà Xán,An Thới Đông,Bà Xán,TRUE,40
 178_1,127,Lượt về: Bà Xán - An Thới Đông,An Thới Đông,Bà Xán,An Thới Đông,FALSE,40
 179_1,128,Lượt đi: Tân Điền - An Nghĩa,An Nghĩa,Tân Điền,An Nghĩa,TRUE,60
