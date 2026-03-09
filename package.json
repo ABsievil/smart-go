@@ -29,7 +29,11 @@
         "geocode-stations-improved": "ts-node -r tsconfig-paths/register refs/scripts/geocode-stations-improved.ts",
         "sync-station-coordinates-from-csv": "ts-node -r tsconfig-paths/register refs/scripts/sync-station-coordinates-from-csv.ts",
         "export-stations-missing-coordinates": "ts-node -r tsconfig-paths/register refs/scripts/export-stations-missing-coordinates.ts",
-        "clean-route-csv": "ts-node -r tsconfig-paths/register refs/scripts/clean-routes-csv.ts"
+        "clean-route-csv": "ts-node -r tsconfig-paths/register refs/scripts/clean-routes-csv.ts",
+        "sync-route-v2": "ts-node -r tsconfig-paths/register refs/sync-data-v2/scripts/sync-routes-v2.ts",
+        "sync-route-detail-v2": "ts-node -r tsconfig-paths/register refs/sync-data-v2/scripts/sync-route-detail-v2.ts",
+        "merge-station-lat-lng": "ts-node -r tsconfig-paths/register refs/sync-data-v2/scripts/merge-station-lat-lng.ts",
+        "sync-stations-v2": "ts-node -r tsconfig-paths/register refs/sync-data-v2/scripts/sync-stations-v2.ts"
     },
     "dependencies": {
         "@nestjs/common": "^10.0.0",
