@@ -77,33 +77,22 @@ export class GraphBuilderService {
             MAX_STATIONS_PER_PAGE,
         );
 
-        // Tạo map stations để tra cứu nhanh
+        // Tạo map stations để tra cứu nhanh theo _id (vì stationIds lưu _id)
         const stationMap = new Map<string, StationEntity>();
         for (const station of stations) {
-            stationMap.set(station.stationCode, station);
+            stationMap.set(station._id, station);
         }
 
-        // Xây dựng nodes và edges từ routes
+        // Xây dựng nodes và edges từ routes (dùng stationIds)
+        let routesWithStationIds = 0;
         for (const route of routes) {
-            // Xử lý routeForwardCodes (lượt đi)
-            if (route.routeForwardCodes) {
-                this.processRouteCodes(
+            if (route.stationIds && route.stationIds.length >= 2) {
+                routesWithStationIds++;
+                this.processStationIds(
                     route,
-                    route.routeForwardCodes,
+                    route.stationIds,
                     graph,
                     stationMap,
-                    'forward',
-                );
-            }
-
-            // Xử lý routeBackwardCodes (lượt về)
-            if (route.routeBackwardCodes) {
-                this.processRouteCodes(
-                    route,
-                    route.routeBackwardCodes,
-                    graph,
-                    stationMap,
-                    'backward',
                 );
             }
         }
@@ -112,53 +101,42 @@ export class GraphBuilderService {
     }
 
     /**
-     * @description Xử lý route codes để tạo edges
+     * @description Xử lý stationIds để tạo edges giữa các trạm liên tiếp
      */
-    private processRouteCodes(
+    private processStationIds(
         route: RouteEntity,
-        routeCodes: Map<string, string> | Record<string, string>,
+        stationIds: string[],
         graph: Graph,
         stationMap: Map<string, StationEntity>,
-        direction: 'forward' | 'backward',
     ): void {
-        // Map giữ nguyên thứ tự insertion, Object thì không đảm bảo
-        // Nếu là Map, giữ nguyên thứ tự; nếu là Object, chuyển sang Array
-        const codes =
-            routeCodes instanceof Map
-                ? Array.from(routeCodes.entries())
-                : Object.entries(routeCodes);
+        if (stationIds.length < 2) return;
 
-        if (codes.length < 2) return;
-
-        // Tạo edges giữa các stations liên tiếp (giữ nguyên thứ tự)
-        for (let i = 0; i < codes.length - 1; i++) {
-            const fromCode = codes[i][0];
-            const toCode = codes[i + 1][0];
-
-            const fromStation = stationMap.get(fromCode);
-            const toStation = stationMap.get(toCode);
+        // Tạo edges giữa các stations liên tiếp (theo thứ tự)
+        for (let i = 0; i < stationIds.length - 1; i++) {
+            // stationIds chứa _id, tra cứu station entity
+            const fromStation = stationMap.get(stationIds[i]);
+            const toStation = stationMap.get(stationIds[i + 1]);
 
             if (!fromStation || !toStation) continue;
 
-            // Tính khoảng cách
-            let distance = 0;
+            // Dùng stationCode làm key cho graph nodes (routing service cần stationCode)
+            const fromCode = fromStation.stationCode;
+            const toCode = toStation.stationCode;
+
+            // Tính khoảng cách từ tọa độ trực tiếp
+            let distance = DEFAULT_DISTANCE;
             if (
-                fromStation.coordinates?.latitude &&
-                fromStation.coordinates?.longitude &&
-                toStation.coordinates?.latitude &&
-                toStation.coordinates?.longitude
+                fromStation.latitude &&
+                fromStation.longitude &&
+                toStation.latitude &&
+                toStation.longitude
             ) {
                 distance = this.calculateDistance(
-                    fromStation.coordinates.latitude,
-                    fromStation.coordinates.longitude,
-                    toStation.coordinates.latitude,
-                    toStation.coordinates.longitude,
+                    fromStation.latitude,
+                    fromStation.longitude,
+                    toStation.latitude,
+                    toStation.longitude,
                 );
-            } else {
-                // Nếu không có coordinates, sử dụng distance từ routeCodes
-                // distanceFromPrevious là khoảng cách từ trạm trước đó
-                const distanceStr = codes[i + 1][1];
-                distance = parseFloat(distanceStr) || DEFAULT_DISTANCE;
             }
 
             // Tạo hoặc cập nhật node

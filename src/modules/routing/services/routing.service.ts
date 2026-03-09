@@ -188,8 +188,11 @@ export class RoutingService {
             const node = graph.nodes.get(code)!;
             return {
                 stationCode: node.stationCode,
-                stationName: node.station.stationName,
-                coordinates: node.station.coordinates,
+                stationName: node.station.stationName ?? '',
+                coordinates: {
+                    latitude: node.station.latitude,
+                    longitude: node.station.longitude,
+                },
             };
         });
 
@@ -355,23 +358,20 @@ export class RoutingService {
             from: GraphNode,
             to: GraphNode,
         ): number => {
-            const fromCoords = from.station.coordinates;
-            const toCoords = to.station.coordinates;
-
             if (
-                !fromCoords?.latitude ||
-                !fromCoords?.longitude ||
-                !toCoords?.latitude ||
-                !toCoords?.longitude
+                !from.station.latitude ||
+                !from.station.longitude ||
+                !to.station.latitude ||
+                !to.station.longitude
             ) {
                 return 0;
             }
 
             const distance = this.graphBuilder.calculateDistance(
-                fromCoords.latitude,
-                fromCoords.longitude,
-                toCoords.latitude,
-                toCoords.longitude,
+                from.station.latitude,
+                from.station.longitude,
+                to.station.latitude,
+                to.station.longitude,
             );
 
             const time =
@@ -556,16 +556,15 @@ export class RoutingService {
         let minDistance = Infinity;
 
         for (const [stationCode, node] of graph.nodes.entries()) {
-            const coords = node.station.coordinates;
-            if (!coords?.latitude || !coords?.longitude) {
+            if (!node.station.latitude || !node.station.longitude) {
                 continue;
             }
 
             const distance = this.graphBuilder.calculateDistance(
                 latitude,
                 longitude,
-                coords.latitude,
-                coords.longitude,
+                node.station.latitude,
+                node.station.longitude,
             );
 
             if (distance < minDistance) {
@@ -701,8 +700,8 @@ export class RoutingService {
             stationCode: station.stationCode,
             stationName: station.stationName,
             coordinates:
-                station.coordinates?.latitude !== undefined &&
-                station.coordinates?.longitude !== undefined
+                station.coordinates?.latitude != null &&
+                station.coordinates?.longitude != null
                     ? {
                           latitude: station.coordinates.latitude,
                           longitude: station.coordinates.longitude,
