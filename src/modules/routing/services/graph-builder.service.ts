@@ -12,7 +12,7 @@ import {
     EARTH_RADIUS_KM,
     DEGREES_TO_RADIANS,
     AVERAGE_BUS_SPEED,
-    COST_PER_KM,
+    FARE_PER_BOARDING,
     DEFAULT_DISTANCE,
     MINUTES_PER_HOUR,
     MAX_ROUTES_PER_PAGE,
@@ -193,8 +193,7 @@ export class GraphBuilderService {
                 return (edge.distance / AVERAGE_BUS_SPEED) * MINUTES_PER_HOUR;
 
             case RoutingCriteria.COST:
-                // Ước tính chi phí dựa trên giá vé
-                return edge.distance * COST_PER_KM;
+                return FARE_PER_BOARDING;
 
             default:
                 return edge.distance;

@@ -14,7 +14,8 @@ import { RoutingResponseData } from '@modules/routing/interfaces/routing-respons
 import {
     GRAPH_CACHE_TTL,
     AVERAGE_BUS_SPEED,
-    COST_PER_KM,
+    FARE_PER_BOARDING,
+    TRANSFER_WAIT_TIME,
     MINUTES_PER_HOUR,
     CONGESTION_MULTIPLIER,
     NORMAL_TRAFFIC_MULTIPLIER,
@@ -158,10 +159,7 @@ export class RoutingService {
                                 edge,
                                 RoutingCriteria.TIME,
                             ),
-                            cost: this.graphBuilder.calculateWeight(
-                                edge,
-                                RoutingCriteria.COST,
-                            ),
+                            cost: 0, // sẽ được tính lại sau khi có đủ thứ tự segments
                         });
                     }
                 }
@@ -170,6 +168,16 @@ export class RoutingService {
             } else {
                 break;
             }
+        }
+
+        // Tính chi phí theo model xe buýt Việt Nam:
+        // Giá vé CỐ ĐỊNH mỗi lần lên xe (FARE_PER_BOARDING), không tính theo km.
+        // Chỉ tính tiền khi routeCode thay đổi (chuyển tuyến) hoặc là segment đầu tiên.
+        let currentRouteCode: string | undefined = undefined;
+        for (const segment of segments) {
+            const isNewBoarding = segment.routeCode !== currentRouteCode;
+            segment.cost = isNewBoarding ? FARE_PER_BOARDING : 0;
+            currentRouteCode = segment.routeCode;
         }
 
         // Tính tổng distance, time, cost
@@ -374,16 +382,14 @@ export class RoutingService {
                 to.station.longitude,
             );
 
-            const time =
-                (distance / AVERAGE_BUS_SPEED) *
-                MINUTES_PER_HOUR *
-                congestionFactor;
-            const cost = distance * COST_PER_KM;
+            // Heuristic thời gian: đường chim bay / tốc độ (không nhân congestion → admissible)
+            const time = (distance / AVERAGE_BUS_SPEED) * MINUTES_PER_HOUR;
+
+            // Heuristic chi phí = 0 (admissible lower bound):
+            // không thể biết trước sẽ chuyển tuyến bao nhiêu lần trên đoạn còn lại
 
             return (
-                weights.timeWeight * time +
-                weights.costWeight * cost +
-                weights.distanceWeight * distance
+                weights.timeWeight * time + weights.distanceWeight * distance
             );
         };
 
@@ -476,13 +482,26 @@ export class RoutingService {
 
                 const neighbor = graph.nodes.get(neighborCode)!;
 
-                // Tính edge weight đa tiêu chí
+                // Tính edge weight đa tiêu chí — model xe buýt Việt Nam
                 const edgeDistance = edge.distance;
+
+                // Xác định đây có phải lần lên xe mới không
+                const previousRouteCode = cameFrom.get(currentCode)?.routeCode;
+                const isTransfer =
+                    previousRouteCode !== undefined &&
+                    previousRouteCode !== edge.routeCode;
+                const isFirstBoarding = previousRouteCode === undefined;
+                const isNewBoarding = isFirstBoarding || isTransfer;
+
+                // Thời gian di chuyển + thời gian chờ khi chuyển tuyến (chỉ khi transfer, không phải lần đầu)
                 const edgeTime =
                     (edgeDistance / AVERAGE_BUS_SPEED) *
-                    MINUTES_PER_HOUR *
-                    congestionFactor;
-                const edgeCost = edgeDistance * COST_PER_KM;
+                        MINUTES_PER_HOUR *
+                        congestionFactor +
+                    (isTransfer ? TRANSFER_WAIT_TIME : 0);
+
+                // Chi phí: CỐ ĐỊNH mỗi lần lên xe mới (không tính theo km)
+                const edgeCost = isNewBoarding ? FARE_PER_BOARDING : 0;
 
                 const edgeWeight =
                     weights.timeWeight * edgeTime +
@@ -712,6 +731,8 @@ export class RoutingService {
 
     /**
      * Tính optimization score
+     * totalCost tính bằng VND (số lần lên xe × FARE_PER_BOARDING).
+     * Normalize về "số lần lên xe" để cùng đơn vị với A* edge cost.
      */
     private calculateOptimizationScore(
         weights: MultiObjectiveWeights,
@@ -719,9 +740,10 @@ export class RoutingService {
         totalCost: number,
         totalDistance: number,
     ): number {
+        const boardingCount = totalCost / FARE_PER_BOARDING;
         return (
             weights.timeWeight * totalTime +
-            weights.costWeight * totalCost +
+            weights.costWeight * boardingCount +
             weights.distanceWeight * totalDistance
         );
     }
