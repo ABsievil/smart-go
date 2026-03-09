@@ -7,53 +7,51 @@ import {
 } from '@modules/stations/enums/station.enum';
 
 export class StationGetResponseDto extends BaseResponseDto {
-    @ApiProperty({ description: 'Station name' })
-    @Expose()
-    stationName: string;
-
     @ApiProperty({ description: 'Station code' })
     @Expose()
     stationCode: string;
 
-    @ApiProperty({ description: 'Address' })
+    @ApiPropertyOptional({ description: 'Station name' })
     @Expose()
-    address: string;
+    stationName?: string;
 
-    @ApiPropertyOptional({ description: 'Station URL' })
+    @ApiProperty({ description: 'Latitude coordinate' })
     @Expose()
-    url?: string;
+    latitude: number;
+
+    @ApiProperty({ description: 'Longitude coordinate' })
+    @Expose()
+    longitude: number;
+
+    @ApiPropertyOptional({ description: 'Station condition' })
+    @Expose()
+    condition?: string;
+
+    @ApiPropertyOptional({ description: 'Stop category' })
+    @Expose()
+    stopCategory?: string;
+
+    @ApiPropertyOptional({ description: 'Street name' })
+    @Expose()
+    streetName?: string;
+
+    @ApiPropertyOptional({ description: 'Address number' })
+    @Expose()
+    addressNo?: string;
+
+    @ApiPropertyOptional({ description: 'Has wheelchair access' })
+    @Expose()
+    hasWheelchair?: boolean;
+
+    @ApiPropertyOptional({ description: 'Has ramp' })
+    @Expose()
+    hasRamp?: boolean;
 
     @ApiProperty({ description: 'Station type', enum: StationType })
     @Expose()
     stationType: StationType;
 
-    @ApiProperty({ description: 'Has shelter' })
-    @Expose()
-    hasShelter: boolean;
-
-    @ApiProperty({ description: 'Has wheelchair access' })
-    @Expose()
-    hasWheelchair: boolean;
-
-    @ApiProperty({ description: 'Has elevator' })
-    @Expose()
-    hasElevator: boolean;
-
-    @ApiProperty({ description: 'Has ramp' })
-    @Expose()
-    hasRamp: boolean;
-
     @ApiProperty({ description: 'Status', enum: StationStatus })
     @Expose()
     status: StationStatus;
-
-    @ApiPropertyOptional({
-        description: 'Coordinates',
-        example: { latitude: 10.762622, longitude: 106.660172 },
-    })
-    @Expose()
-    coordinates?: {
-        latitude?: number;
-        longitude?: number;
-    };
 }
