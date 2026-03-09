@@ -61,9 +61,11 @@ export class RouteController {
         const allStationIds = Array.from(
             new Set(data.flatMap((route) => route.stationIds ?? [])),
         );
-        const { data: stations } = await this.stationService.findAll({
-            _id: { $in: allStationIds },
-        });
+        const { data: stations } = await this.stationService.findAll(
+            { _id: { $in: allStationIds } },
+            1,
+            allStationIds.length || 1,
+        );
 
         return {
             total,
