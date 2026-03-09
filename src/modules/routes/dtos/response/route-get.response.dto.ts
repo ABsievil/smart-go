@@ -3,17 +3,11 @@ import { Expose } from 'class-transformer';
 import { BaseResponseDto } from '@common/dtos/base-response.dto';
 import { TransportType, RouteStatus } from '@modules/routes/enums/route.enum';
 
-class OperatingTimeResponseDto {
-    @ApiPropertyOptional({ description: 'Operating time from' })
-    @Expose()
-    from?: string;
-
-    @ApiPropertyOptional({ description: 'Operating time to' })
-    @Expose()
-    to?: string;
-}
-
 export class RouteGetResponseDto extends BaseResponseDto {
+    @ApiPropertyOptional({ description: 'Route key' })
+    @Expose()
+    routeKey?: string;
+
     @ApiProperty({ description: 'Route code' })
     @Expose()
     routeCode: string;
@@ -22,25 +16,9 @@ export class RouteGetResponseDto extends BaseResponseDto {
     @Expose()
     routeName: string;
 
-    @ApiProperty({ description: 'Transport type', enum: TransportType })
+    @ApiPropertyOptional({ description: 'Route variant short name' })
     @Expose()
-    transportType: TransportType;
-
-    @ApiProperty({ description: 'Status', enum: RouteStatus })
-    @Expose()
-    status: RouteStatus;
-
-    @ApiPropertyOptional({ description: 'Operator name' })
-    @Expose()
-    operatorName?: string;
-
-    @ApiPropertyOptional({ description: 'Phone number' })
-    @Expose()
-    phoneNumber?: string;
-
-    @ApiPropertyOptional({ description: 'Vehicle type' })
-    @Expose()
-    vehicleType?: string;
+    routeVarShortName?: string;
 
     @ApiPropertyOptional({ description: 'Start point' })
     @Expose()
@@ -50,50 +28,66 @@ export class RouteGetResponseDto extends BaseResponseDto {
     @Expose()
     endPoint?: string;
 
-    @ApiPropertyOptional({ description: 'Frequency' })
+    @ApiPropertyOptional({ description: 'Is outbound direction (lượt đi)' })
     @Expose()
-    frequency?: string;
+    isOutbound?: boolean;
 
-    @ApiPropertyOptional({
-        description: 'Base fare',
-        type: [String],
-    })
+    @ApiPropertyOptional({ description: 'Running time' })
     @Expose()
-    baseFare?: string[];
+    runningTime?: string;
+
+    @ApiPropertyOptional({ description: 'Operator name' })
+    @Expose()
+    operatorName?: string;
+
+    @ApiProperty({ description: 'Transport type', enum: TransportType })
+    @Expose()
+    transportType: TransportType;
 
     @ApiPropertyOptional({ description: 'Total distance in km' })
     @Expose()
     totalDistance?: number;
 
-    @ApiPropertyOptional({ description: 'Is wheelchair accessible' })
+    @ApiPropertyOptional({ description: 'Vehicle type' })
     @Expose()
-    isWheelchairAccessible?: boolean;
+    vehicleType?: string;
 
-    @ApiPropertyOptional({ description: 'Operating time' })
+    @ApiPropertyOptional({ description: 'Operating time start' })
     @Expose()
-    operatingTime?: OperatingTimeResponseDto;
+    operatingTimeStart?: string;
 
-    @ApiPropertyOptional({ description: 'Trip time' })
+    @ApiPropertyOptional({ description: 'Operating time end' })
     @Expose()
-    tripTime?: string;
+    operatingTimeEnd?: string;
+
+    @ApiPropertyOptional({ description: 'Phone number' })
+    @Expose()
+    phoneNumber?: string;
+
+    @ApiPropertyOptional({ description: 'Base fare list', type: [String] })
+    @Expose()
+    baseFare?: string[];
 
     @ApiPropertyOptional({ description: 'Number of trips' })
     @Expose()
     numTrips?: string;
 
-    @ApiPropertyOptional({
-        description: 'Route forward station codes map',
-        type: 'object',
-        additionalProperties: { type: 'string' },
-    })
+    @ApiPropertyOptional({ description: 'Trip time' })
     @Expose()
-    routeForwardCodes?: Record<string, string>;
+    tripTime?: string;
+
+    @ApiPropertyOptional({ description: 'Frequency between trips' })
+    @Expose()
+    frequency?: string;
+
+    @ApiProperty({ description: 'Status', enum: RouteStatus })
+    @Expose()
+    status: RouteStatus;
 
     @ApiPropertyOptional({
-        description: 'Route backward station codes map',
-        type: 'object',
-        additionalProperties: { type: 'string' },
+        description: 'List of station IDs/codes on this route',
+        type: [String],
     })
     @Expose()
-    routeBackwardCodes?: Record<string, string>;
+    stationIds?: string[];
 }
