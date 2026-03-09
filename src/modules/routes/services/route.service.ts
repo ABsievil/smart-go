@@ -59,21 +59,6 @@ export class RouteService {
         return route;
     }
 
-    async findByCode(routeCode: string): Promise<RouteEntity> {
-        const routes = await this.routeRepository.find<RouteEntity>(
-            { routeCode },
-            { lean: true },
-        );
-
-        if (routes.length === 0) {
-            throw new NotFoundException(
-                `Route with code ${routeCode} not found`,
-            );
-        }
-
-        return routes[0];
-    }
-
     async create(createDto: RouteCreateRequestDto): Promise<RouteDoc> {
         const routeData = Object.assign(new RouteEntity(), createDto);
 
