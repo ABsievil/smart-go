@@ -15,30 +15,22 @@ export class StationService {
     constructor(private readonly stationRepository: StationRepository) {}
 
     mapGet(station: StationDoc | StationEntity): StationGetResponseDto {
-        return plainToInstance(
-            StationGetResponseDto,
-            station instanceof Document ? station.toObject() : { ...station },
-            {
-                excludeExtraneousValues: true,
-            },
-        );
+        const raw =
+            station instanceof Document ? station.toObject() : { ...station };
+
+        return plainToInstance(StationGetResponseDto, raw, {
+            excludeExtraneousValues: true,
+        });
     }
 
     mapList(stations: StationDoc[] | StationEntity[]): StationGetResponseDto[] {
         return plainToInstance(
             StationGetResponseDto,
-            stations.map((e: StationDoc | StationEntity) => {
-                const raw = e instanceof Document ? e.toObject() : { ...e };
-                return raw;
-            }),
-            {
-                excludeExtraneousValues: true,
-            },
+            stations.map((e: StationDoc | StationEntity) =>
+                e instanceof Document ? e.toObject() : { ...e },
+            ),
+            { excludeExtraneousValues: true },
         );
-    }
-
-    async create(createDto: StationCreateRequestDto): Promise<StationDoc> {
-        return await this.stationRepository.create(createDto);
     }
 
     async findAll(
@@ -70,37 +62,21 @@ export class StationService {
         return station;
     }
 
-    async findByCode(stationCode: string): Promise<StationEntity> {
-        const stations = await this.stationRepository.find<StationEntity>(
-            { stationCode },
-            { lean: true },
-        );
+    async create(createDto: StationCreateRequestDto): Promise<StationDoc> {
+        const stationData = Object.assign(new StationEntity(), createDto);
 
-        if (stations.length === 0) {
-            throw new NotFoundException(
-                `Station with code ${stationCode} not found`,
-            );
-        }
-
-        return stations[0];
-    }
-
-    async findByCodes(stationCodes: string[]): Promise<StationEntity[]> {
-        if (!stationCodes.length) return [];
-
-        return this.stationRepository.find<StationEntity>(
-            { stationCode: { $in: stationCodes } },
-            { lean: true },
-        );
+        return await this.stationRepository.create(stationData);
     }
 
     async update(
         id: string,
         updateDto: StationUpdateRequestDto,
     ): Promise<StationDoc> {
+        const updateData = Object.assign(new StationEntity(), updateDto);
+
         const updatedStation = await this.stationRepository.update<StationDoc>(
             { _id: id },
-            updateDto,
+            updateData,
         );
 
         if (!updatedStation) {
@@ -110,7 +86,7 @@ export class StationService {
         return updatedStation;
     }
 
-    async remove(id: string): Promise<void> {
+    async delete(id: string): Promise<void> {
         const deleted = await this.stationRepository.delete({ _id: id });
 
         if (!deleted) {

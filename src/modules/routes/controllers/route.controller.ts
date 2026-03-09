@@ -22,8 +22,6 @@ import { RouteUpdateRequestDto } from '@modules/routes/dtos/request/route-update
 import { RouteGetResponseDto } from '@modules/routes/dtos/response/route-get.response.dto';
 import { RouteListResponseDto } from '@modules/routes/dtos/response/route-list.response.dto';
 
-type RouteDirection = 'forward' | 'backward' | 'both';
-
 @ApiTags('Routes')
 @Controller('routes')
 export class RouteController {
@@ -35,62 +33,6 @@ export class RouteController {
         this.pinoLogger.setContext(RouteController.name);
     }
 
-    /**
-     * @description Extract station codes from route codes (Map or object)
-     */
-    private processStationCodes(codes: any, stationCodeSet: Set<string>): void {
-        if (!codes) return;
-
-        if (codes instanceof Map) {
-            for (const key of codes.keys()) {
-                stationCodeSet.add(String(key));
-            }
-        } else if (typeof codes === 'object') {
-            for (const key of Object.keys(codes)) {
-                stationCodeSet.add(String(key));
-            }
-        }
-    }
-
-    /**
-     * @description Extract station codes from route based on direction
-     */
-    private extractStationCodesFromRoute(
-        route: any,
-        direction: RouteDirection,
-        stationCodeSet: Set<string>,
-    ): void {
-        const routeForwardCodes = route?.routeForwardCodes;
-        const routeBackwardCodes = route?.routeBackwardCodes;
-
-        if (direction === 'forward' || direction === 'both') {
-            this.processStationCodes(routeForwardCodes, stationCodeSet);
-        }
-
-        if (direction === 'backward' || direction === 'both') {
-            this.processStationCodes(routeBackwardCodes, stationCodeSet);
-        }
-    }
-
-    // @Post()
-    // @LanguageResponse({
-    //     module: 'routes',
-    //     successKey: 'create',
-    // })
-    // @ApiOperation({ summary: 'Create a new route' })
-    // @ApiResponse({
-    //     status: 201,
-    //     description: 'Route created successfully',
-    //     type: RouteGetResponseDto,
-    // })
-    // @HttpCode(HttpStatus.CREATED)
-    // async create(
-    //     @Body() createDto: RouteCreateRequestDto,
-    // ): Promise<RouteGetResponseDto> {
-    //     const route = await this.routeService.create(createDto);
-    //     return this.routeService.mapGet(route);
-    // }
-
     @Get()
     @LanguageResponse({
         module: 'routes',
@@ -99,14 +41,6 @@ export class RouteController {
     @ApiOperation({ summary: 'Get all routes' })
     @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
     @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-    @ApiQuery({
-        name: 'direction',
-        required: false,
-        enum: ['forward', 'backward', 'both'],
-        example: 'both',
-        description:
-            'Direction to get station codes: forward (lượt đi), backward (lượt về), or both',
-    })
     @ApiResponse({
         status: 200,
         description: 'List of routes',
@@ -115,25 +49,23 @@ export class RouteController {
     async findAll(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-        @Query('direction', new DefaultValuePipe('both'))
-        direction: RouteDirection,
         @Query() query: Record<string, any>,
     ): Promise<any> {
-        const { page: _, limit: __, direction: ___, ...filter } = query;
+        const { page: _, limit: __, ...filter } = query;
         const { data, total } = await this.routeService.findAll(
             filter,
             page,
             limit,
         );
 
-        // Lấy danh sách stationCode từ routeForwardCodes hoặc routeBackwardCodes dựa trên direction
-        const stationCodeSet = new Set<string>();
-        for (const route of data) {
-            this.extractStationCodesFromRoute(route, direction, stationCodeSet);
-        }
-
-        const allStationCodes = Array.from(stationCodeSet);
-        const stations = await this.stationService.findByCodes(allStationCodes);
+        const allStationIds = Array.from(
+            new Set(data.flatMap((route) => route.stationIds ?? [])),
+        );
+        const { data: stations } = await this.stationService.findAll(
+            { _id: { $in: allStationIds } },
+            1,
+            allStationIds.length || 1,
+        );
 
         return {
             total,
@@ -150,33 +82,21 @@ export class RouteController {
         successKey: 'findOne',
     })
     @ApiOperation({ summary: 'Get route by ID' })
-    @ApiQuery({
-        name: 'direction',
-        required: false,
-        enum: ['forward', 'backward', 'both'],
-        example: 'both',
-        description:
-            'Direction to get station codes: forward (lượt đi), backward (lượt về), or both',
-    })
     @ApiResponse({
         status: 200,
         description: 'Route found',
         type: RouteGetResponseDto,
     })
     @ApiResponse({ status: 404, description: 'Route not found' })
-    async findOne(
-        @Param('id') id: string,
-        @Query('direction', new DefaultValuePipe('both'))
-        direction: RouteDirection,
-    ): Promise<any> {
+    async findOne(@Param('id') id: string): Promise<any> {
         const route = await this.routeService.findOne(id);
 
-        // Lấy danh sách stationCode từ routeForwardCodes hoặc routeBackwardCodes dựa trên direction
-        const stationCodeSet = new Set<string>();
-        this.extractStationCodesFromRoute(route, direction, stationCodeSet);
-
-        const allStationCodes = Array.from(stationCodeSet);
-        const stations = await this.stationService.findByCodes(allStationCodes);
+        const stationIds = route.stationIds ?? [];
+        const { data: stations } = await this.stationService.findAll(
+            { _id: { $in: stationIds } },
+            1,
+            stationIds.length || 1,
+        );
 
         return {
             route: this.routeService.mapGet(route),
@@ -184,36 +104,55 @@ export class RouteController {
         };
     }
 
-    // @Put(':id')
-    // @LanguageResponse({
-    //     module: 'routes',
-    //     successKey: 'update',
-    // })
-    // @ApiOperation({ summary: 'Update route by ID' })
-    // @ApiResponse({
-    //     status: 200,
-    //     description: 'Route updated successfully',
-    //     type: RouteGetResponseDto,
-    // })
-    // @ApiResponse({ status: 404, description: 'Route not found' })
-    // async update(
-    //     @Param('id') id: string,
-    //     @Body() updateDto: RouteUpdateRequestDto,
-    // ): Promise<RouteGetResponseDto> {
-    //     const route = await this.routeService.update(id, updateDto);
-    //     return this.routeService.mapGet(route);
-    // }
+    @Post()
+    @LanguageResponse({
+        module: 'routes',
+        successKey: 'create',
+    })
+    @ApiOperation({ summary: 'Create a new route' })
+    @ApiResponse({
+        status: 201,
+        description: 'Route created successfully',
+        type: RouteGetResponseDto,
+    })
+    @HttpCode(HttpStatus.CREATED)
+    async create(
+        @Body() createDto: RouteCreateRequestDto,
+    ): Promise<RouteGetResponseDto> {
+        const route = await this.routeService.create(createDto);
+        return this.routeService.mapGet(route);
+    }
 
-    // @Delete(':id')
-    // @LanguageResponse({
-    //     module: 'routes',
-    //     successKey: 'remove',
-    // })
-    // @ApiOperation({ summary: 'Delete route by ID' })
-    // @ApiResponse({ status: 200, description: 'Route deleted successfully' })
-    // @ApiResponse({ status: 404, description: 'Route not found' })
-    // @HttpCode(HttpStatus.OK)
-    // async remove(@Param('id') id: string): Promise<void> {
-    //     return this.routeService.remove(id);
-    // }
+    @Put(':id')
+    @LanguageResponse({
+        module: 'routes',
+        successKey: 'update',
+    })
+    @ApiOperation({ summary: 'Update route by ID' })
+    @ApiResponse({
+        status: 200,
+        description: 'Route updated successfully',
+        type: RouteGetResponseDto,
+    })
+    @ApiResponse({ status: 404, description: 'Route not found' })
+    async update(
+        @Param('id') id: string,
+        @Body() updateDto: RouteUpdateRequestDto,
+    ): Promise<RouteGetResponseDto> {
+        const route = await this.routeService.update(id, updateDto);
+        return this.routeService.mapGet(route);
+    }
+
+    @Delete(':id')
+    @LanguageResponse({
+        module: 'routes',
+        successKey: 'remove',
+    })
+    @ApiOperation({ summary: 'Delete route by ID' })
+    @ApiResponse({ status: 200, description: 'Route deleted successfully' })
+    @ApiResponse({ status: 404, description: 'Route not found' })
+    @HttpCode(HttpStatus.OK)
+    async remove(@Param('id') id: string): Promise<void> {
+        return this.routeService.delete(id);
+    }
 }

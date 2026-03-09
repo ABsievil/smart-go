@@ -4,26 +4,17 @@ import {
     IsNumber,
     IsBoolean,
     IsOptional,
-    ValidateNested,
     IsArray,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TransportType, RouteStatus } from '@modules/routes/enums/route.enum';
 
-class OperatingTimeDto {
-    @ApiPropertyOptional({ description: 'Operating time from' })
-    @IsOptional()
-    @IsString()
-    from?: string;
-
-    @ApiPropertyOptional({ description: 'Operating time to' })
-    @IsOptional()
-    @IsString()
-    to?: string;
-}
-
 export class RouteCreateRequestDto {
+    @ApiPropertyOptional({ description: 'Route key' })
+    @IsOptional()
+    @IsString()
+    routeKey?: string;
+
     @ApiProperty({ description: 'Route code', example: 'R001' })
     @IsString()
     routeCode: string;
@@ -32,36 +23,13 @@ export class RouteCreateRequestDto {
     @IsString()
     routeName: string;
 
-    @ApiProperty({ description: 'Transport type', enum: TransportType })
-    @IsEnum(TransportType)
-    transportType: TransportType;
-
     @ApiPropertyOptional({
-        description: 'Status',
-        enum: RouteStatus,
-        default: RouteStatus.ACTIVE,
-    })
-    @IsOptional()
-    @IsEnum(RouteStatus)
-    status?: RouteStatus;
-
-    @ApiPropertyOptional({ description: 'Operator name' })
-    @IsOptional()
-    @IsString()
-    operatorName?: string;
-
-    @ApiPropertyOptional({
-        description: 'Phone number',
-        example: '028.3776.3777',
+        description: 'Route variant short name',
+        example: 'Tuyến 1',
     })
     @IsOptional()
     @IsString()
-    phoneNumber?: string;
-
-    @ApiPropertyOptional({ description: 'Vehicle type', example: '50 chỗ' })
-    @IsOptional()
-    @IsString()
-    vehicleType?: string;
+    routeVarShortName?: string;
 
     @ApiPropertyOptional({ description: 'Start point' })
     @IsOptional()
@@ -73,13 +41,64 @@ export class RouteCreateRequestDto {
     @IsString()
     endPoint?: string;
 
-    @ApiPropertyOptional({ description: 'Frequency', example: '15 - 18 phút' })
+    @ApiPropertyOptional({
+        description: 'Is outbound direction (lượt đi)',
+        example: true,
+    })
+    @IsOptional()
+    @IsBoolean()
+    isOutbound?: boolean;
+
+    @ApiPropertyOptional({ description: 'Running time', example: '35 phút' })
     @IsOptional()
     @IsString()
-    frequency?: string;
+    runningTime?: string;
+
+    @ApiPropertyOptional({ description: 'Operator name' })
+    @IsOptional()
+    @IsString()
+    operatorName?: string;
+
+    @ApiProperty({ description: 'Transport type', enum: TransportType })
+    @IsEnum(TransportType)
+    transportType: TransportType;
+
+    @ApiPropertyOptional({ description: 'Total distance in km', example: 8.59 })
+    @IsOptional()
+    @IsNumber()
+    totalDistance?: number;
+
+    @ApiPropertyOptional({ description: 'Vehicle type', example: '50 chỗ' })
+    @IsOptional()
+    @IsString()
+    vehicleType?: string;
 
     @ApiPropertyOptional({
-        description: 'Base fare',
+        description: 'Operating time start',
+        example: '05:00',
+    })
+    @IsOptional()
+    @IsString()
+    operatingTimeStart?: string;
+
+    @ApiPropertyOptional({
+        description: 'Operating time end',
+        example: '21:30',
+    })
+    @IsOptional()
+    @IsString()
+    operatingTimeEnd?: string;
+
+    @ApiPropertyOptional({
+        description: 'Phone number',
+        example: '028.3776.3777',
+    })
+    @IsOptional()
+    @IsString()
+    phoneNumber?: string;
+
+    @ApiPropertyOptional({
+        description: 'Base fare list',
         type: [String],
         example: [
             'Vé lượt trợ giá: 5,000 VNĐ',
@@ -91,30 +110,6 @@ export class RouteCreateRequestDto {
     @IsString({ each: true })
     baseFare?: string[];
 
-    @ApiPropertyOptional({ description: 'Total distance in km', example: 8.59 })
-    @IsOptional()
-    @IsNumber()
-    totalDistance?: number;
-
-    @ApiPropertyOptional({
-        description: 'Is wheelchair accessible',
-        example: false,
-    })
-    @IsOptional()
-    @IsBoolean()
-    isWheelchairAccessible?: boolean;
-
-    @ApiPropertyOptional({ description: 'Operating time' })
-    @IsOptional()
-    @ValidateNested()
-    @Type(() => OperatingTimeDto)
-    operatingTime?: OperatingTimeDto;
-
-    @ApiPropertyOptional({ description: 'Trip time', example: '35 phút' })
-    @IsOptional()
-    @IsString()
-    tripTime?: string;
-
     @ApiPropertyOptional({
         description: 'Number of trips',
         example: '120 chuyến/ngày',
@@ -123,17 +118,34 @@ export class RouteCreateRequestDto {
     @IsString()
     numTrips?: string;
 
-    @ApiPropertyOptional({
-        description: 'Route forward station codes map',
-        example: { ST001: '0.5 km', ST002: '1.2 km' },
-    })
+    @ApiPropertyOptional({ description: 'Trip time', example: '35 phút' })
     @IsOptional()
-    routeForwardCodes?: Record<string, string>;
+    @IsString()
+    tripTime?: string;
 
     @ApiPropertyOptional({
-        description: 'Route backward station codes map',
-        example: { ST001: '0.5 km', ST002: '1.2 km' },
+        description: 'Frequency between trips',
+        example: '15 - 18 phút',
     })
     @IsOptional()
-    routeBackwardCodes?: Record<string, string>;
+    @IsString()
+    frequency?: string;
+
+    @ApiPropertyOptional({
+        description: 'Status',
+        enum: RouteStatus,
+        default: RouteStatus.ACTIVE,
+    })
+    @IsOptional()
+    @IsEnum(RouteStatus)
+    status?: RouteStatus;
+
+    @ApiPropertyOptional({
+        description: 'List of station IDs/codes on this route',
+        type: [String],
+    })
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    stationIds?: string[];
 }
