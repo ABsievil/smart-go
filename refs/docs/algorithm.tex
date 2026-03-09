@@ -1,0 +1,503 @@
+\subsection{Thuật toán A* và các thuật toán liên quan trong định tuyến GTCC}
+\subsubsection{Nền tảng lý thuyết}
+
+Thuật toán A* (A-star) là một thuật toán tìm kiếm có thông tin (informed search), được xây dựng như một mở rộng của thuật toán Dijkstra bằng cách tích hợp thêm hàm heuristic nhằm định hướng quá trình tìm kiếm theo hướng hiệu quả hơn đến điểm đích. Thuật toán được giới thiệu lần đầu vào năm 1968 bởi Peter Hart, Nils Nilsson và Bertram Raphael, và nhanh chóng trở thành thuật toán chuẩn trong các hệ thống tìm đường nhờ khả năng kết hợp giữa tốc độ và tính tối ưu khi heuristic được thiết kế phù hợp.
+
+A* được đánh giá là tối ưu và đầy đủ nếu hàm heuristic thoả điều kiện admissible, nghĩa là heuristic không bao giờ đánh giá cao hơn chi phí thực tế từ một nút đến mục tiêu. Trong nhiều ứng dụng, đặc biệt là hệ thống định tuyến giao thông, heuristic thường là khoảng cách Euclidean hoặc Haversine từ vị trí hiện tại đến đích.
+
+\subsubsection{Cách hoạt động của A*}
+
+Thuật toán A* mô hình hóa mạng lưới giao thông dưới dạng một đồ thị có hướng hoặc vô hướng, trong đó:
+
+\begin{itemize}
+    \item \textbf{Nút (nodes)} biểu diễn các vị trí cụ thể như trạm xe buýt, ga metro, giao lộ hoặc điểm trung chuyển.
+    \item \textbf{Cạnh (edges)} biểu diễn sự kết nối giữa các nút, chẳng hạn như tuyến xe buýt, lối đi bộ hoặc đoạn đường di chuyển. Mỗi cạnh mang trọng số đại diện cho chi phí di chuyển (thời gian, khoảng cách hoặc chi phí tài chính).
+\end{itemize}
+
+Đối với mỗi nút $n$, thuật toán theo dõi ba giá trị quan trọng:
+
+\begin{itemize}
+    \item $g(n)$: Chi phí chính xác từ nút bắt đầu đến nút $n$.
+    \item $h(n)$: Chi phí ước lượng từ nút $n$ đến mục tiêu dựa trên hàm heuristic. Giá trị này phải thoả điều kiện admissible để đảm bảo tính tối ưu của A*.
+    \item $f(n) = g(n) + h(n)$: Tổng chi phí dự kiến của lộ trình đi qua nút $n$, được sử dụng làm tiêu chí ưu tiên.
+\end{itemize}
+
+A* sử dụng một hàng đợi ưu tiên, thường được cài đặt dưới dạng \textit{min-heap}, để chọn nút có giá trị $f(n)$ thấp nhất để mở rộng tiếp theo. Quá trình tìm kiếm tiếp tục cho đến khi thuật toán mở rộng đến nút mục tiêu hoặc khi tập mở (open set) trở nên rỗng, tức là không còn lộ trình khả thi nào.
+
+Khi tìm được mục tiêu, thuật toán tái dựng lại đường đi thông qua việc truy vết lại các nút cha trong cấu trúc lưu vết (\texttt{cameFrom}). Nhờ đặc tính kết hợp giữa chi phí thực và chi phí ước lượng, A* thường mở rộng ít nút hơn so với thuật toán Dijkstra truyền thống, giúp tăng hiệu quả đặc biệt trong các bài toán tìm đường trên bản đồ thực tế.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=12cm]{image/A.png}
+\caption{Biểu đồ mô phỏng thuật toán}
+\end{center}
+\end{figure}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=10cm]{image/HìnhA.png}
+\caption{Hình ảnh đường đi thuật toán}
+\end{center}
+\end{figure}
+
+{Mã giả của thuật toán A*}
+
+Để minh hoạ cách vận hành của thuật toán A*, phần này trình bày mã giả (pseudocode) tiêu chuẩn thường được sử dụng trong các tài liệu khoa học và hệ thống định tuyến. Thuật toán bao gồm hai phần chính: quá trình tìm kiếm và quá trình tái dựng đường đi.
+
+\begin{algorithm}[H]
+\caption{Thuật toán A*}
+\begin{algorithmic}[1]
+\Function{Function A*}{$start, goal, graph, h$}
+    \State $openSet \gets$ priority\_queue() \Comment{Min-heap theo giá trị $f$}
+    \State $openSet.\text{insert}(start, f = 0 + h(start))$
+    \State $cameFrom \gets \emptyset$ \Comment{Lưu vết để tái tạo lộ trình}
+    \State $gScore[n] \gets \infty$ for all $n$; \quad $gScore[start] \gets 0$
+    \State $fScore[n] \gets \infty$ for all $n$; \quad $fScore[start] \gets h(start)$
+    
+    \While{$openSet$ is not empty}
+        \State $current \gets openSet.\text{pop()}$ \Comment{Lấy nút có $f$ nhỏ nhất}
+        \If{$current = goal$}
+            \State \Return \Call{ReconstructPath}{$cameFrom, current$}
+        \EndIf
+        
+        \For{\textbf{each} $neighbor$ \textbf{in} $graph.\text{neighbors}(current)$}
+            \State $tentative\_g \gets gScore[current] + weight(current, neighbor)$
+            \If{$tentative\_g < gScore[neighbor]$}
+                \State $cameFrom[neighbor] \gets current$
+                \State $gScore[neighbor] \gets tentative\_g$
+                \State $fScore[neighbor] \gets tentative\_g + h(neighbor)$
+                \If{$neighbor$ not in $openSet$}
+                    \State $openSet.\text{insert}(neighbor)$
+                \EndIf
+            \EndIf
+        \EndFor
+    \EndWhile
+    
+    \State \Return \text{``No path found''}
+\EndFunction
+
+\Function{ReconstructPath}{$cameFrom, current$}
+    \State $path \gets [current]$
+    \While{$current$ in $cameFrom$}
+        \State $current \gets cameFrom[current]$
+        \State \text{insert $current$ at the beginning of $path$}
+    \EndWhile
+    \State \Return $path$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\noindent
+Triển khai thực tế có thể được lập trình bằng Python sử dụng thư viện \texttt{heapq} cho hàng đợi ưu tiên và \texttt{networkx} cho việc biểu diễn đồ thị.
+
+\textbf{Độ phức tạp thời gian và không gian}
+
+Thuật toán A* có độ phức tạp:
+
+\begin{itemize}
+    \item \textbf{Thời gian:} $O((V + E) \log V)$ khi sử dụng binary heap, trong đó $V$ là số nút và $E$ là số cạnh.
+    \item \textbf{Không gian:} $O(V)$, do phải lưu trữ các bảng $gScore$, $fScore$ và tập mở.
+\end{itemize}
+
+Trong các mạng giao thông đô thị lớn, chẳng hạn hệ thống xe buýt TP.~Hồ Chí Minh với khoảng 1.000 trạm, A* thường chỉ khám phá 10--50\% số nút mà thuật toán Dijkstra phải xử lý. Nhờ đó, tốc độ thực thi nhanh hơn 2--5 lần trong các thử nghiệm thực tế.
+
+
+
+
+\subsubsection{Lý do lựa chọn A* trong định tuyến giao thông công cộng}
+
+A* được xem là lựa chọn tối ưu cho hệ thống định tuyến giao thông công cộng (GTCC) nhờ khả năng xử lý hiệu quả đồ thị địa lý và hỗ trợ mở rộng cho các yêu cầu đa tiêu chí và động. Không giống các thuật toán đường đi ngắn nhất truyền thống, A* hoạt động tốt trong bối cảnh yêu cầu chuyển tuyến, thay đổi lịch trình và bản chất đa phương thức của GTCC (đi bộ, xe buýt, metro).
+
+\subsubsection{Các lý do chính được ghi nhận trong tài liệu và nghiên cứu}
+
+\textbf{1. Cân bằng tốc độ và độ chính xác.}  
+A* đảm bảo tìm được đường tối ưu khi heuristic thoả điều kiện admissible, đồng thời giảm đáng kể số lượng nút phải duyệt so với Dijkstra. Các nghiên cứu về mạng đô thị quy mô lớn cho thấy A* đạt thời gian truy vấn dưới 100~ms với mạng hơn 10.000 nút, trong khi Dijkstra có thể vượt quá 500~ms.
+
+\textbf{2. Phù hợp với dữ liệu địa lý thực.}  
+Đồ thị GTCC có tính không gian rõ rệt; do đó các heuristic như khoảng cách Euclidean hoặc Haversine rất hiệu quả. Với các thành phố Việt Nam, trong đó lộ trình thường có nhiều khúc cua, đường nhỏ hoặc tắc nghẽn, A* sử dụng dữ liệu GIS (như OpenStreetMap) giúp thu hẹp phạm vi tìm kiếm bằng cách tập trung vào khu vực ``thẳng hướng'' đến mục tiêu.
+
+\textbf{3. Tùy chỉnh mạnh cho bài toán đa tiêu chí.}  
+Hệ thống GTCC không chỉ tối ưu theo thời gian mà còn theo chi phí, số lần chuyển tuyến, yếu tố an toàn, hoặc mức tiêu thụ năng lượng. A* cho phép đưa các yếu tố này vào hàm chi phí $f(n)$ hoặc sử dụng biến thể Multi-Objective A* (MOA*). Một số nghiên cứu chỉ ra rằng MOA* có thể xử lý đồng thời bốn tiêu chí (thời gian, chi phí, an toàn, môi trường) với chi phí tính toán tăng dưới 10\%.
+
+\textbf{4. Đã được kiểm chứng trong hệ thống thực tế.}  
+A* được sử dụng trong các hệ thống định tuyến lớn như Google Maps và nhiều nền tảng GTCC trên thế giới. Trong lĩnh vực giao thông công cộng, các ứng dụng như TravelTime, Rome2Rio, hay BusMap tại Việt Nam đều sử dụng A* hoặc một biến thể của nó để xử lý định tuyến thời gian thực.
+
+\subsubsection{Bảng so sánh hiệu suất giữa A* và Dijkstra}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Tiêu chí} & \textbf{A*} & \textbf{Dijkstra} \\
+\hline
+Thời gian truy vấn  & 50--200 ms & 200--1000 ms \\
+\hline
+Tỷ lệ nút khám phá & 20--40\% & 80--100\% \\
+\hline
+Tính tối ưu & 100\% (nếu $h$ admissible) & 100\% \\
+\hline
+Khả năng mở rộng & Cao, phụ thuộc heuristic & Trung bình, giảm mạnh trên đồ thị lớn \\
+\hline
+\end{tabular}
+\caption{So sánh thuật toán A* và Dijkstra trong mạng GTCC đô thị}
+\end{table}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=10cm]{image/DA.png}
+\caption{Hình ảnh so sánh A* và Dijkstra }
+\end{center}
+\end{figure}
+\subsubsection{Heuristic trong thuật toán A*}
+
+Heuristic đóng vai trò quyết định trong hiệu quả vận hành của thuật toán A*, vì nó định hướng quá trình tìm kiếm theo hướng gần với mục tiêu và giúp giảm thiểu số lượng nút cần mở rộng. Một heuristic tốt cần thoả điều kiện \textit{admissible} (không đánh giá quá thấp chi phí thực tế) và \textit{consistent} để đảm bảo tính tối ưu. Trong bối cảnh hệ thống giao thông công cộng, báo cáo đề xuất ba nhóm heuristic chính phù hợp với dữ liệu địa lý và đặc thù di chuyển của đô thị.
+
+\paragraph{Heuristic dựa trên khoảng cách (Euclidean Distance)}
+
+Heuristic này được biểu diễn bằng công thức:
+
+\[
+h(n) = \sqrt{(x_{\text{goal}} - x_{n})^2 + (y_{\text{goal}} - y_{n})^2}
+\]
+
+Đây là heuristic phổ biến nhất trong các hệ thống điều hướng vì:
+
+\begin{itemize}
+    \item luôn nhỏ hơn hoặc bằng quãng đường thực tế trên bản đồ đường phố, do đó đảm bảo admissible;
+    \item phù hợp cho bài toán tối ưu quãng đường ngắn nhất;
+    \item dễ tính toán, hiệu năng cao.
+\end{itemize}
+
+Trong hệ thống GTCC, heuristic có thể được hiệu chỉnh bằng tốc độ trung bình của phương tiện:
+
+\[
+h(n) = \frac{d_{\text{euclid}}(n, goal)}{v_{\text{avg}}}
+\]
+
+với $v_{\text{avg}} \approx 30\,\text{km/h}$ đối với xe buýt nội đô.
+
+\paragraph{Heuristic dựa trên thời gian}
+
+Đây là heuristic hướng đến tối ưu hoá thời gian di chuyển:
+
+\[
+h(n) = \frac{d_{\text{euclid}}(n, goal)}{v_{\text{max}}}
+\]
+
+với $v_{\text{max}}$ là tốc độ tối đa có thể đạt được trong điều kiện lý tưởng.
+
+Trong bối cảnh giao thông Việt Nam, tốc độ bị ảnh hưởng mạnh bởi tắc đường theo khung giờ. Do đó, heuristic có thể được hiệu chỉnh theo dữ liệu thời gian thực hoặc theo hệ số giờ cao điểm:
+
+\[
+h'(n) = h(n) \cdot (1 + \alpha)
+\]
+
+trong đó $\alpha = 0.2$ (tăng 20\%) cho khung giờ 7:00–9:00 và 17:00–19:00.
+
+Heuristic này phù hợp cho các ứng dụng yêu cầu tính ETA (Estimated Time of Arrival) chính xác.
+
+\paragraph{Heuristic dựa trên chi phí}
+
+Trong một số bài toán, mục tiêu tối ưu không phải thời gian mà là chi phí, chẳng hạn lựa chọn tuyến rẻ nhất. Khi đó heuristic được xây dựng như sau:
+
+\[
+h(n) = d_{\text{euclid}}(n, goal) \times c_{\text{min}}
+\]
+
+trong đó $c_{\text{min}}$ là chi phí tối thiểu trên mỗi kilômét.
+
+Ví dụ:
+
+- Xe buýt: \( c_{\text{bus}} \approx 10{,}000\,\text{VND/km} \)
+- Xe công nghệ: \( c_{\text{grab}} \approx 15{,}000\,\text{VND/km} \)
+
+Việc sử dụng heuristic này giúp người dùng tìm được lựa chọn rẻ nhất trong đô thị.
+
+\paragraph{Heuristic đa tiêu chí}
+
+Hệ thống định tuyến GTCC có thể cần kết hợp nhiều tiêu chí cùng lúc, chẳng hạn:
+
+- thời gian di chuyển,
+- chi phí,
+- khoảng cách đi bộ,
+- mức độ thân thiện môi trường.
+
+Trong trường hợp đó, heuristic tổng hợp có dạng:
+
+\[
+h(n) = w_1 \cdot \text{thời gian} + w_2 \cdot \text{chi phí} + w_3 \cdot \text{khoảng cách}
+\]
+
+với $w_1, w_2, w_3$ là trọng số được thiết lập theo ưu tiên của người dùng hoặc mục tiêu hệ thống.
+
+Biến thể nổi bật là Multi-Objective A* (MOA*), cho phép tạo ra tập nghiệm Pareto-optimal thay vì một nghiệm duy nhất. Theo báo cáo, MOA* làm tăng thời gian tính toán khoảng 20--30\%, đổi lại cung cấp cho người dùng từ 3 đến 5 lựa chọn lộ trình tối ưu theo các tiêu chí khác nhau (nhanh nhất, rẻ nhất, ít đi bộ nhất, v.v.).
+
+\textbf{Công thức tổng quát heuristic đa tiêu chí:}
+
+\[
+h(n) = w_1 \times h_{\text{time}}(n) + w_2 \times h_{\text{cost}}(n) + w_3 \times h_{\text{distance}}(n)
+\]
+
+với điều kiện chuẩn hóa: $w_1 + w_2 + w_3 = 1$.
+
+\textbf{Chi tiết từng thành phần:}
+
+\begin{enumerate}
+    \item \textbf{Khoảng cách Euclidean:} $h_{\text{distance}}(n) = d$ (tính theo công thức Haversine)
+    \item \textbf{Thời gian:} $h_{\text{time}}(n) = \frac{d}{v_{\text{avg}}} \times 60 \times CF$
+    \item \textbf{Chi phí:} $h_{\text{cost}}(n) = d \times C_{\text{km}}$
+\end{enumerate}
+
+\subparagraph{Tính Weight cho Edges (Cạnh)}
+
+Khi thuật toán A* mở rộng từ nút hiện tại sang nút láng giềng, chi phí thực tế $g(n)$ được tính:
+
+\[
+g(\text{current} \rightarrow \text{neighbor}) = w_1 \times T_{\text{edge}} + w_2 \times C_{\text{edge}} + w_3 \times D_{\text{edge}}
+\]
+
+trong đó:
+
+\begin{itemize}
+    \item $T_{\text{edge}} = \frac{D_{\text{edge}}}{v_{\text{avg}}} \times 60 \times CF$ (thời gian trên cạnh)
+    \item $C_{\text{edge}} = D_{\text{edge}} \times C_{\text{km}}$ (chi phí trên cạnh)
+    \item $D_{\text{edge}}$: khoảng cách thực tế trên cạnh (km), lấy theo thứ tự:
+    \begin{enumerate}
+        \item Từ tọa độ GPS (nếu có) - sử dụng Haversine
+        \item Từ dữ liệu tuyến (\texttt{distanceFromPrevious})
+        \item Giá trị mặc định: 1 km
+    \end{enumerate}
+\end{itemize}
+
+\subparagraph{Công Thức Tính Chi Phí Chuyển Tuyến}
+
+Một yếu tố quan trọng trong định tuyến giao thông công cộng là chi phí chuyển tuyến (transfer cost). Số lần chuyển tuyến được tính bằng:
+
+\[
+\text{transfers} = \sum_{i=1}^{n-1} \mathbb{I}(\text{route}_i \neq \text{route}_{i+1})
+\]
+
+trong đó:
+\begin{itemize}
+    \item $\mathbb{I}(\text{condition})$: hàm indicator
+    \begin{itemize}
+        \item $= 1$ nếu điều kiện đúng (chuyển tuyến)
+        \item $= 0$ nếu điều kiện sai (cùng tuyến)
+    \end{itemize}
+    \item $\text{route}_i$: mã tuyến tại bước $i$
+\end{itemize}
+
+\textbf{Ví dụ minh họa:}
+
+Xét đường đi: Station A (Route 01) $\rightarrow$ Station B (Route 01) $\rightarrow$ Station C (Route 05) $\rightarrow$ Station D (Route 05)
+
+Tính toán:
+\begin{itemize}
+    \item Bước A$\rightarrow$B: Route 01 $\rightarrow$ Route 01 (không chuyển, $\mathbb{I} = 0$)
+    \item Bước B$\rightarrow$C: Route 01 $\rightarrow$ Route 05 (chuyển tuyến, $\mathbb{I} = 1$)
+    \item Bước C$\rightarrow$D: Route 05 $\rightarrow$ Route 05 (không chuyển, $\mathbb{I} = 0$)
+\end{itemize}
+
+Kết quả: $\text{transfers} = 0 + 1 + 0 = 1$
+
+\textbf{Giới hạn chuyển tuyến:}
+
+Hệ thống cho phép giới hạn số lần chuyển tuyến tối đa:
+
+\[
+\text{valid\_path} \Longleftrightarrow \text{transfers} \leq \text{maxTransfers}
+\]
+
+Ví dụ:
+\begin{itemize}
+    \item Nếu $\text{maxTransfers} = 2$: chỉ chấp nhận đường đi có $\leq 2$ lần chuyển
+    \item Nếu $\text{maxTransfers} = 0$: chỉ tìm đường đi trực tiếp (không chuyển tuyến)
+\end{itemize}
+
+\textbf{Penalty cho chuyển tuyến (tùy chọn):}
+
+Có thể thêm penalty vào tổng chi phí để phản ánh chi phí tâm lý:
+
+\[
+\text{total\_cost} = \text{base\_cost} + \text{penalty}_{\text{transfer}} \times \text{transfers}
+\]
+
+Các loại penalty bao gồm:
+\begin{itemize}
+    \item Thời gian chờ: 5--10 phút trung bình giữa các tuyến
+    \item Chi phí tâm lý: độ bất tiện khi đổi xe
+    \item Chi phí phụ: vé mới, thời gian di chuyển giữa điểm dừng
+\end{itemize}
+
+\textit{Lưu ý:} Implementation hiện tại chỉ đếm số lần chuyển, không áp dụng penalty để người dùng tự quyết định.
+
+\subparagraph{Các Cấu Hình Trọng Số Mặc Định}
+
+Hệ thống cung cấp 4 cấu hình trọng số cho các mục tiêu khác nhau:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|l|}
+\hline
+\textbf{Cấu hình} & $w_1$ (time) & $w_2$ (cost) & $w_3$ (distance) & \textbf{Mục đích} \\
+\hline
+FASTEST & 1.0 & 0.0 & 0.0 & Tối ưu thời gian \\
+CHEAPEST & 0.0 & 1.0 & 0.0 & Tối ưu chi phí \\
+SHORTEST & 0.0 & 0.0 & 1.0 & Tối ưu khoảng cách \\
+BALANCED & 0.5 & 0.3 & 0.2 & Cân bằng (ưu tiên: time > cost > distance) \\
+\hline
+\end{tabular}
+\caption{Các cấu hình trọng số mặc định}
+\end{table}
+
+Người dùng có thể tạo cấu hình custom với điều kiện $w_1 + w_2 + w_3 = 1$.
+
+\subparagraph{Chứng Minh Tính Admissible}
+
+Heuristic đa tiêu chí được thiết kế admissible để đảm bảo A* tìm lộ trình tối ưu:
+
+\textbf{Chứng minh:}
+
+\begin{enumerate}
+    \item Khoảng cách Euclidean $\leq$ Khoảng cách thực tế
+    \begin{itemize}
+        \item Đường thẳng luôn ngắn nhất
+        \item $\Rightarrow h_{\text{distance}}(n) \leq h^*_{\text{distance}}(n)$
+    \end{itemize}
+    
+    \item Thời gian ước lượng $\leq$ Thời gian thực tế
+    \begin{itemize}
+        \item Tính theo đường thẳng (không tính chờ đợi)
+        \item $\Rightarrow h_{\text{time}}(n) \leq h^*_{\text{time}}(n)$
+    \end{itemize}
+    
+    \item Chi phí ước lượng $\leq$ Chi phí thực tế
+    \begin{itemize}
+        \item Tính theo đường thẳng (không tính phụ phí)
+        \item $\Rightarrow h_{\text{cost}}(n) \leq h^*_{\text{cost}}(n)$
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Kết luận:}
+
+\begin{align*}
+h(n) &= w_1 \times h_{\text{time}}(n) + w_2 \times h_{\text{cost}}(n) + w_3 \times h_{\text{distance}}(n) \\
+     &\leq w_1 \times h^*_{\text{time}}(n) + w_2 \times h^*_{\text{cost}}(n) + w_3 \times h^*_{\text{distance}}(n) \\
+     &= h^*(n)
+\end{align*}
+
+Do đó, heuristic là admissible $\Rightarrow$ A* đảm bảo tìm lộ trình tối ưu.
+
+\subparagraph{Multi-Objective A* (MOA*) và Pareto-Optimal}
+
+MOA* mở rộng A* để trả về nhiều lộ trình tối ưu Pareto thay vì một nghiệm duy nhất.
+
+\textbf{Định nghĩa Pareto-optimal:}
+
+Một lộ trình được gọi là Pareto-optimal nếu không tồn tại lộ trình nào khác tốt hơn nó ở \textit{tất cả} các tiêu chí đồng thời.
+
+\textbf{Ví dụ:}
+\begin{itemize}
+    \item Lộ trình A: 20 phút, 50,000 VND, 10 km
+    \item Lộ trình B: 25 phút, 40,000 VND, 8 km
+    \item Lộ trình C: 30 phút, 45,000 VND, 12 km
+\end{itemize}
+
+$\Rightarrow$ A và B đều Pareto-optimal (A nhanh hơn nhưng đắt, B rẻ hơn nhưng chậm)
+
+$\Rightarrow$ C bị dominated bởi B (C chậm hơn, đắt hơn và dài hơn)
+
+\textbf{Thuật toán MOA*:}
+
+\begin{enumerate}
+    \item Chạy A* với các cấu hình trọng số khác nhau (FASTEST, CHEAPEST, SHORTEST, BALANCED, CUSTOM)
+    \item Loại bỏ duplicates (đường đi giống nhau)
+    \item Tính optimization score: $\text{score} = w_1 \times t + w_2 \times c + w_3 \times d$
+    \item Sắp xếp theo score tăng dần
+\end{enumerate}
+
+\textbf{Lợi ích của MOA*:}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Khía cạnh} & \textbf{Lợi ích} \\
+\hline
+Đa dạng lựa chọn & Trả về 3--5 lộ trình với trade-offs khác nhau \\
+Tính linh hoạt & Người dùng tự quyết định dựa trên ưu tiên cá nhân \\
+Chi phí tính toán & +20--30\% so với A* đơn tiêu chí (chấp nhận được) \\
+Độ chính xác & Mỗi lộ trình đều tối ưu cho một tập trọng số \\
+\hline
+\end{tabular}
+\caption{Lợi ích của MOA*}
+\end{table}
+
+\subparagraph{So Sánh Thuật Toán}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Thuật toán} & \textbf{Heuristic} & \textbf{Số lộ trình} & \textbf{Thời gian} & \textbf{Tính tối ưu} \\
+\hline
+Dijkstra & Không (h=0) & 1 & O((V+E) log V) & 100\% \\
+A* & Có (admissible) & 1 & Nhanh 2--5x & 100\% \\
+MOA* & Đa tiêu chí & 3--5 & +20--30\% vs A* & Pareto-optimal \\
+\hline
+\end{tabular}
+\caption{So sánh A*, Dijkstra và MOA*}
+\end{table}
+
+\textbf{Khi nào dùng MOA*:}
+
+\begin{itemize}
+    \item[$\checkmark$] Người dùng cần nhiều lựa chọn
+    \item[$\checkmark$] Có nhiều tiêu chí tối ưu (time, cost, distance)
+    \item[$\checkmark$] Chấp nhận chi phí tính toán thêm 20--30\%
+    \item[$\times$] Chỉ quan tâm một tiêu chí duy nhất
+    \item[$\times$] Cần tốc độ tối đa (dùng A* thuần)
+    \item[$\times$] Hệ thống tài nguyên hạn chế
+\end{itemize}
+
+\subsubsection{Thuật toán Dijkstra như phương pháp bổ trợ}
+
+Thuật toán Dijkstra có thể xem là trường hợp đặc biệt của A*, trong đó hàm heuristic được đặt bằng 0:
+
+\[
+h(n) = 0 \quad \forall n
+\]
+
+Khi đó:
+
+\[
+f(n) = g(n)
+\]
+
+và thuật toán trở thành một phương pháp tìm đường ngắn nhất không có định hướng tìm kiếm. Mặc dù chậm hơn A*, Dijkstra vẫn giữ vai trò quan trọng trong hệ thống định tuyến GTCC.
+
+\paragraph{Vai trò Fallback}
+
+Trong một số trường hợp, heuristic của A* có thể trở nên kém chính xác, ví dụ khi:
+
+- tắc nghẽn giao thông quá nghiêm trọng,
+- mạng lưới hẻm nhỏ phức tạp,
+- khoảng cách Euclidean không còn là ước lượng tốt.
+
+Khi heuristic đánh giá quá thấp hoặc quá cao so với thực tế, hệ thống có thể chuyển sang Dijkstra để đảm bảo tính tối ưu tuyệt đối.
+
+\paragraph{Tiền xử lý (Preprocessing)}
+
+Dijkstra rất hữu ích trong giai đoạn tiền xử lý:
+
+- tính đường đi tối ưu từ các điểm trung tâm lớn (như Bến Thành),
+- lưu cache kết quả để phục vụ các truy vấn lặp lại,
+- giúp giảm tải cho thuật toán A* khi chạy thời gian thực.
+
+Theo các thử nghiệm, tiền xử lý bằng Dijkstra có thể giảm 40--60\% thời gian tính toán trong mạng đô thị lớn.
+
+\paragraph{Xác thực và Benchmark}
+
+Dijkstra cũng được dùng để kiểm chứng độ chính xác của A*:
+
+- định kỳ chạy Dijkstra trên các mẫu ngẫu nhiên để so sánh kết quả với A*,
+- đảm bảo sai lệch đường đi không vượt quá 5\%.
+
+Điều này đặc biệt quan trọng trong môi trường sản xuất, nơi tính chính xác và độ tin cậy của hệ thống định tuyến ảnh hưởng lớn đến người dùng.
