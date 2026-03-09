@@ -9,7 +9,7 @@ export class RouteEntity extends DBEntityBase {
     @Prop({ required: false, type: String })
     routeKey?: string;
 
-    @Prop({ required: true, unique: true })
+    @Prop({ required: true })
     routeCode: string;
 
     @Prop({ required: true, type: String })
@@ -48,7 +48,10 @@ export class RouteEntity extends DBEntityBase {
     vehicleType?: string;
 
     @Prop({ required: false, type: String })
-    operatingTime?: string;
+    operatingTimeStart?: string;
+
+    @Prop({ required: false, type: String })
+    operatingTimeEnd?: string;
 
     @Prop({ required: false, type: String })
     phoneNumber?: string;
@@ -72,6 +75,9 @@ export class RouteEntity extends DBEntityBase {
         default: RouteStatus.ACTIVE,
     })
     status: RouteStatus;
+
+    @Prop({ required: false, type: [String] })
+    stationIds: string[];
 }
 
 export type RouteDoc = IDatabaseDocument<RouteEntity>;

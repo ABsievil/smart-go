@@ -6,17 +6,41 @@ import { StationStatus } from '@modules/stations/enums/station.enum';
 
 @Schema({ collection: 'stations_V3', timestamps: true })
 export class StationEntity extends DBEntityBase {
-    @Prop({ required: true })
-    stationName: string;
-
     @Prop({ required: true, unique: true })
     stationCode: string;
 
-    @Prop({ required: true })
-    address: string;
+    @Prop({ required: false })
+    stationName?: string;
+
+    @Prop({
+        required: true,
+        type: Number,
+    })
+    latitude: number;
+
+    @Prop({
+        required: true,
+        type: Number,
+    })
+    longitude: number;
 
     @Prop({ required: false })
-    url?: string;
+    condition: string;
+
+    @Prop({ required: false })
+    stopCategory: string;
+
+    @Prop({ required: false })
+    streetName: string;
+
+    @Prop({ required: false })
+    addressNo: string;
+
+    @Prop({ required: false, type: Boolean, default: false })
+    hasWheelchair: boolean;
+
+    @Prop({ required: false, type: Boolean, default: false })
+    hasRamp: boolean;
 
     @Prop({
         required: true,
@@ -24,18 +48,6 @@ export class StationEntity extends DBEntityBase {
         enum: StationType,
     })
     stationType: StationType;
-
-    @Prop({ required: true, type: Boolean, default: false })
-    hasShelter: boolean;
-
-    @Prop({ required: true, type: Boolean, default: false })
-    hasWheelchair: boolean;
-
-    @Prop({ required: true, type: Boolean, default: false })
-    hasElevator: boolean;
-
-    @Prop({ required: true, type: Boolean, default: false })
-    hasRamp: boolean;
 
     @Prop({
         required: true,
@@ -45,18 +57,14 @@ export class StationEntity extends DBEntityBase {
     })
     status: StationStatus;
 
-    @Prop({
-        required: false,
-        _id: false,
-        type: {
-            latitude: { type: Number, required: false },
-            longitude: { type: Number, required: false },
-        },
-    })
-    coordinates?: {
-        latitude?: number;
-        longitude?: number;
-    };
+    // @Prop({ required: false })
+    // url?: string;
+
+    // @Prop({ required: true, type: Boolean, default: false })
+    // hasShelter: boolean;
+
+    // @Prop({ required: true, type: Boolean, default: false })
+    // hasElevator: boolean;
 }
 
 export type StationDoc = IDatabaseDocument<StationEntity>;
