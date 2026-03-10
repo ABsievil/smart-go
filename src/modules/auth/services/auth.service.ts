@@ -12,7 +12,10 @@ import { IJwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
 import { IAuthUser } from '@modules/auth/interfaces/auth-user.interface';
 import { LoginRequestDto } from '@modules/auth/dtos/request/login.request.dto';
 import { RegisterRequestDto } from '@modules/auth/dtos/request/register.request.dto';
-import { AuthTokenResponseDto } from '@modules/auth/dtos/response/auth-token.response.dto';
+import {
+    AccessTokenResponseDto,
+    AuthTokenResponseDto,
+} from '@modules/auth/dtos/response/auth-token.response.dto';
 
 @Injectable()
 export class AuthService {
@@ -68,9 +71,7 @@ export class AuthService {
         return this.login(authUser);
     }
 
-    async refreshToken(
-        user: IAuthUser,
-    ): Promise<Pick<AuthTokenResponseDto, 'accessToken'>> {
+    async refreshToken(user: IAuthUser): Promise<AccessTokenResponseDto> {
         const payload: IJwtPayload = {
             sub: user._id,
             email: user.email,
