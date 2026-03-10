@@ -19,7 +19,6 @@ export abstract class BaseService<
         protected readonly repository: TRepository,
         private readonly entityClass: new () => TEntity,
         private readonly getResponseDto: ClassConstructor<TGetResponseDto>,
-        private readonly notFoundResourceName: string,
     ) {}
 
     mapGet(item: TDoc | TEntity): TGetResponseDto {
@@ -70,9 +69,7 @@ export abstract class BaseService<
         });
 
         if (!entity) {
-            throw new NotFoundException(
-                `${this.notFoundResourceName} with ID ${id} not found`,
-            );
+            throw new NotFoundException(`Resource with ID ${id} not found`);
         }
 
         return entity;
@@ -93,9 +90,7 @@ export abstract class BaseService<
         );
 
         if (!updated) {
-            throw new NotFoundException(
-                `${this.notFoundResourceName} with ID ${id} not found`,
-            );
+            throw new NotFoundException(`Resource with ID ${id} not found`);
         }
 
         return updated;
@@ -105,9 +100,7 @@ export abstract class BaseService<
         const deleted = await this.repository.delete({ _id: id });
 
         if (!deleted) {
-            throw new NotFoundException(
-                `${this.notFoundResourceName} with ID ${id} not found`,
-            );
+            throw new NotFoundException(`Resource with ID ${id} not found`);
         }
     }
 }

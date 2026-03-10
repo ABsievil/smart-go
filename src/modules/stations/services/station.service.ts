@@ -19,11 +19,6 @@ export class StationService extends BaseService<
     StationRepository
 > {
     constructor(private readonly stationRepository: StationRepository) {
-        super(
-            stationRepository,
-            StationEntity,
-            StationGetResponseDto,
-            'Station',
-        );
+        super(stationRepository, StationEntity, StationGetResponseDto);
     }
 }

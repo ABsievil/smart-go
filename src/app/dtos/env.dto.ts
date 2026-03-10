@@ -71,4 +71,25 @@ export class EnvironmentVariablesDto {
     @IsOptional()
     @IsString()
     JWT_REFRESH_EXPIRES_IN?: string;
+
+    // VNPAY
+    @IsOptional()
+    @IsString()
+    VNPAY_TMN_CODE?: string;
+
+    @IsOptional()
+    @IsString()
+    VNPAY_HASH_SECRET?: string;
+
+    @IsOptional()
+    @IsString()
+    VNPAY_PAYMENT_URL?: string;
+
+    @IsOptional()
+    @IsString()
+    VNPAY_RETURN_URL?: string;
+
+    @IsOptional()
+    @IsString()
+    VNPAY_LOCALE?: string;
 }
