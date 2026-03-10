@@ -57,10 +57,10 @@ export class StationController {
         );
 
         return {
-            data: this.stationService.mapList(data),
             total,
             page,
             limit,
+            data: this.stationService.mapList(data),
         };
     }
 

@@ -19,6 +19,6 @@ export class RouteService extends BaseService<
     RouteRepository
 > {
     constructor(private readonly routeRepository: RouteRepository) {
-        super(routeRepository, RouteEntity, RouteGetResponseDto, 'Route');
+        super(routeRepository, RouteEntity, RouteGetResponseDto);
     }
 }
