@@ -54,4 +54,21 @@ export class EnvironmentVariablesDto {
     @IsOptional()
     @IsString()
     APP_LANGUAGE?: string;
+
+    // JWT
+    @IsOptional()
+    @IsString()
+    JWT_SECRET?: string;
+
+    @IsOptional()
+    @IsString()
+    JWT_EXPIRES_IN?: string;
+
+    @IsOptional()
+    @IsString()
+    JWT_REFRESH_SECRET?: string;
+
+    @IsOptional()
+    @IsString()
+    JWT_REFRESH_EXPIRES_IN?: string;
 }

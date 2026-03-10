@@ -21,6 +21,6 @@ import { DB_CONNECTION_NAME } from '@common/database/constants/database.constant
         ),
     ],
     providers: [UserRepository, UserService],
-    exports: [UserService],
+    exports: [UserService, UserRepository],
 })
 export class UserModule {}

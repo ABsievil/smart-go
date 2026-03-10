@@ -7,6 +7,7 @@ import { RouteModule } from '@modules/routes/route.module';
 import { StationModule } from '@modules/stations/station.module';
 import { RoutingController } from '@modules/routing/controllers/routing.controller';
 import { RoutingModule } from '@modules/routing/routing.module';
+import { AuthModule } from '@modules/auth/auth.module';
 
 @Module({
     controllers: [
@@ -15,6 +16,12 @@ import { RoutingModule } from '@modules/routing/routing.module';
         StationController,
         RoutingController,
     ],
-    imports: [UserModule, RouteModule, StationModule, RoutingModule],
+    imports: [
+        AuthModule,
+        UserModule,
+        RouteModule,
+        StationModule,
+        RoutingModule,
+    ],
 })
 export class RoutesSharedModule {}
