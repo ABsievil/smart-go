@@ -8,6 +8,8 @@ import { StationModule } from '@modules/stations/station.module';
 import { RoutingController } from '@modules/routing/controllers/routing.controller';
 import { RoutingModule } from '@modules/routing/routing.module';
 import { AuthModule } from '@modules/auth/auth.module';
+import { PaymentController } from '@modules/payment/controllers/payment.controller';
+import { PaymentModule } from '@modules/payment/payment.module';
 
 @Module({
     controllers: [
@@ -15,6 +17,7 @@ import { AuthModule } from '@modules/auth/auth.module';
         RouteController,
         StationController,
         RoutingController,
+        PaymentController,
     ],
     imports: [
         AuthModule,
@@ -22,6 +25,7 @@ import { AuthModule } from '@modules/auth/auth.module';
         RouteModule,
         StationModule,
         RoutingModule,
+        PaymentModule,
     ],
 })
 export class RoutesSharedModule {}

@@ -1,0 +1,10 @@
+{
+    "success": {
+        "create": "Payment URL created successfully",
+        "return": "Payment result retrieved successfully"
+    },
+    "error": {
+        "create": "Failed to create payment URL",
+        "return": "Failed to retrieve payment result"
+    }
+}

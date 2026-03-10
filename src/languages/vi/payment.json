@@ -1,0 +1,10 @@
+{
+    "success": {
+        "create": "Tạo URL thanh toán thành công",
+        "return": "Lấy kết quả thanh toán thành công"
+    },
+    "error": {
+        "create": "Tạo URL thanh toán thất bại",
+        "return": "Lấy kết quả thanh toán thất bại"
+    }
+}
