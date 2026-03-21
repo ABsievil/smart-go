@@ -1,10 +1,13 @@
 import {
     Body,
+    BadRequestException,
     Controller,
     Get,
     HttpCode,
     HttpStatus,
+    Query,
     Req,
+    Res,
     Post,
     UseGuards,
 } from '@nestjs/common';
@@ -25,16 +28,22 @@ import { LanguageResponse } from '@common/language/decorators/language-response.
 import { LoginRequestDto } from '@modules/auth/dtos/request/login.request.dto';
 import { RegisterRequestDto } from '@modules/auth/dtos/request/register.request.dto';
 import { RefreshTokenRequestDto } from '@modules/auth/dtos/request/refresh-token.request.dto';
+import { GoogleAuthCodeExchangeRequestDto } from '@modules/auth/dtos/request/google-auth-code-exchange.request.dto';
 import {
     AccessTokenResponseDto,
     AuthTokenResponseDto,
     AuthUserResponseDto,
 } from '@modules/auth/dtos/response/auth-token.response.dto';
+import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly configService: ConfigService,
+    ) {}
 
     @Public()
     @Get('google')
@@ -47,19 +56,78 @@ export class AuthController {
     googleAuth(): void {}
 
     @Public()
+    @Get('google/mobile/callback')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({
+        summary:
+            'Google OAuth mobile callback (debug only for testing in dev environment)',
+    })
+    @ApiResponse({
+        status: HttpStatus.FOUND,
+        description:
+            'Redirect to mobile app with short-lived auth_code and state',
+    })
+    googleMobileCallback(): string {
+        return 'Login by mobile with google success';
+    }
+
+    @Public()
     @Get('google/callback')
     @UseGuards(GoogleAuthGuard)
+    @ApiOperation({
+        summary: 'Google OAuth callback (redirect with auth code)',
+    })
+    @ApiResponse({
+        status: HttpStatus.FOUND,
+        description:
+            'Redirect to mobile app with short-lived auth_code and state',
+    })
+    googleAuthCallback(
+        @Req() request: { user: IAuthUser; query?: { state?: string } },
+        @Res() response: Response,
+    ): void {
+        const state = request.query?.state;
+        if (!state) {
+            throw new BadRequestException(
+                'Missing state in Google OAuth callback',
+            );
+        }
+
+        const authCode = this.authService.createGoogleAuthCode(
+            request.user,
+            state,
+        );
+        const mobileRedirectUrl = this.configService.get<string>(
+            'auth.oauth.google.mobileRedirectUrl',
+        );
+
+        const url = new URL(mobileRedirectUrl);
+        url.searchParams.set('auth_code', authCode);
+        url.searchParams.set('state', state);
+        response.redirect(url.toString());
+    }
+
+    @Public()
+    @Post('google/exchange')
+    @HttpCode(HttpStatus.OK)
     @LanguageResponse({ module: 'auth', successKey: 'googleLogin' })
-    @ApiOperation({ summary: 'Google OAuth callback' })
+    @ApiOperation({
+        summary: 'Exchange short-lived Google auth code for access tokens',
+    })
+    @ApiBody({ type: GoogleAuthCodeExchangeRequestDto })
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'Google login successful',
         type: AuthTokenResponseDto,
     })
-    googleAuthCallback(
-        @Req() request: { user: IAuthUser },
+    @ApiResponse({
+        status: HttpStatus.UNAUTHORIZED,
+        description: 'Auth code is invalid, expired, or state mismatched',
+    })
+    googleExchange(
+        @Body() dto: GoogleAuthCodeExchangeRequestDto,
     ): Promise<AuthTokenResponseDto> {
-        return this.authService.login(request.user);
+        return this.authService.exchangeGoogleAuthCode(dto.authCode, dto.state);
     }
 
     @Public()

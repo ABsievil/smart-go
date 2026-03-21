@@ -6,6 +6,7 @@ import type { StringValue } from 'ms';
 import { PassportModule } from '@nestjs/passport';
 import { UserModule } from '@modules/users/user.module';
 import { AuthService } from '@modules/auth/services/auth.service';
+import { GoogleAuthCodeStoreService } from '@modules/auth/services/google-auth-code-store.service';
 import { AuthController } from '@modules/auth/controllers/auth.controller';
 import { JwtStrategy } from '@modules/auth/strategies/jwt.strategy';
 import { JwtRefreshStrategy } from '@modules/auth/strategies/jwt-refresh.strategy';
@@ -32,6 +33,7 @@ import { RolesGuard } from '@modules/auth/guards/roles.guard';
     controllers: [AuthController],
     providers: [
         AuthService,
+        GoogleAuthCodeStoreService,
         JwtStrategy,
         JwtRefreshStrategy,
         LocalStrategy,

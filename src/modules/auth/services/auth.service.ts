@@ -1,7 +1,8 @@
 import {
+    BadRequestException,
     ConflictException,
     Injectable,
-    UnauthorizedException,    
+    UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -12,6 +13,7 @@ import { UserService } from '@modules/users/services/user.service';
 import { IJwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
 import { IAuthUser } from '@modules/auth/interfaces/auth-user.interface';
 import { IGoogleProfile } from '@modules/auth/interfaces/google-profile.interface';
+import { AUTH_OAUTH } from '@modules/auth/constants/auth.constants';
 import { LoginRequestDto } from '@modules/auth/dtos/request/login.request.dto';
 import { RegisterRequestDto } from '@modules/auth/dtos/request/register.request.dto';
 import {
@@ -19,6 +21,7 @@ import {
     AuthTokenResponseDto,
 } from '@modules/auth/dtos/response/auth-token.response.dto';
 import { UserRole } from '@modules/users/enums/user-role.enum';
+import { GoogleAuthCodeStoreService } from '@modules/auth/services/google-auth-code-store.service';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +29,7 @@ export class AuthService {
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
+        private readonly googleAuthCodeStoreService: GoogleAuthCodeStoreService,
     ) {}
 
     async validateUser(
@@ -67,7 +71,9 @@ export class AuthService {
 
     async validateGoogleUser(profile: IGoogleProfile): Promise<IAuthUser> {
         if (!profile.email) {
-            throw new UnauthorizedException('Google account does not provide email');
+            throw new UnauthorizedException(
+                'Google account does not provide email',
+            );
         }
 
         const email = profile.email.toLowerCase();
@@ -99,6 +105,42 @@ export class AuthService {
         return {
             accessToken: this.jwtService.sign(payload),
         };
+    }
+
+    createGoogleAuthCode(user: IAuthUser, state: string): string {
+        if (!state) {
+            throw new BadRequestException('state is required');
+        }
+
+        const authCode = `${AUTH_OAUTH.GOOGLE_AUTH_CODE_PREFIX}${randomBytes(24).toString('hex')}`;
+        const ttlSeconds = this.configService.get<number>(
+            'auth.oauth.google.authCodeTtlSeconds',
+        );
+
+        this.googleAuthCodeStoreService.save({
+            code: authCode,
+            user,
+            state,
+            expiresAt: Date.now() + ttlSeconds * 1000,
+        });
+
+        return authCode;
+    }
+
+    exchangeGoogleAuthCode(
+        authCode: string,
+        state: string,
+    ): Promise<AuthTokenResponseDto> {
+        const payload = this.googleAuthCodeStoreService.consume(authCode);
+        if (!payload) {
+            throw new UnauthorizedException('Auth code is invalid or expired');
+        }
+
+        if (payload.state !== state) {
+            throw new UnauthorizedException('State mismatch');
+        }
+
+        return this.login(payload.user);
     }
 
     private _generateTokens(
