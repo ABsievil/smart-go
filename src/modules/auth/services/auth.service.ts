@@ -107,7 +107,7 @@ export class AuthService {
         };
     }
 
-    createGoogleAuthCode(user: IAuthUser, state: string): string {
+    async createGoogleAuthCode(user: IAuthUser, state: string): Promise<string> {
         if (!state) {
             throw new BadRequestException('state is required');
         }
@@ -117,7 +117,7 @@ export class AuthService {
             'auth.oauth.google.authCodeTtlSeconds',
         );
 
-        this.googleAuthCodeStoreService.save({
+        await this.googleAuthCodeStoreService.save({
             code: authCode,
             user,
             state,
@@ -127,11 +127,11 @@ export class AuthService {
         return authCode;
     }
 
-    exchangeGoogleAuthCode(
+    async exchangeGoogleAuthCode(
         authCode: string,
         state: string,
     ): Promise<AuthTokenResponseDto> {
-        const payload = this.googleAuthCodeStoreService.consume(authCode);
+        const payload = await this.googleAuthCodeStoreService.consume(authCode);
         if (!payload) {
             throw new UnauthorizedException('Auth code is invalid or expired');
         }

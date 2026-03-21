@@ -1,25 +1,37 @@
 import { Injectable } from '@nestjs/common';
+import { RedisService } from '@common/redis/redis.service';
+import { AUTH_OAUTH } from '@modules/auth/constants/auth.constants';
 import { IGoogleAuthCodePayload } from '@modules/auth/interfaces/google-auth-code-payload.interface';
 
 @Injectable()
 export class GoogleAuthCodeStoreService {
-    private readonly store = new Map<string, IGoogleAuthCodePayload>();
+    constructor(private readonly redisService: RedisService) {}
 
-    save(payload: IGoogleAuthCodePayload): void {
-        this.store.set(payload.code, payload);
+    async save(payload: IGoogleAuthCodePayload): Promise<void> {
+        const key = this.getKey(payload.code);
+        const ttlMs = payload.expiresAt - Date.now();
+        const ttlSeconds = Math.max(1, Math.ceil(ttlMs / 1000));
+
+        await this.redisService.set(key, JSON.stringify(payload), ttlSeconds);
     }
 
-    consume(code: string): IGoogleAuthCodePayload | null {
-        const payload = this.store.get(code);
-        if (!payload) {
+    async consume(code: string): Promise<IGoogleAuthCodePayload | null> {
+        const key = this.getKey(code);
+        const raw = await this.redisService.getClient().call('GETDEL', key);
+
+        if (typeof raw !== 'string') {
             return null;
         }
 
-        this.store.delete(code);
+        const payload = JSON.parse(raw) as IGoogleAuthCodePayload;
         if (Date.now() > payload.expiresAt) {
             return null;
         }
 
         return payload;
+    }
+
+    private getKey(code: string): string {
+        return `${AUTH_OAUTH.GOOGLE_AUTH_CODE_REDIS_KEY_PREFIX}${code}`;
     }
 }

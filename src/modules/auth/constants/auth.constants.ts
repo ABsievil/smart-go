@@ -12,4 +12,5 @@ export const AUTH_METADATA = {
 
 export const AUTH_OAUTH = {
     GOOGLE_AUTH_CODE_PREFIX: 'gac_',
+    GOOGLE_AUTH_CODE_REDIS_KEY_PREFIX: 'oauth:google:auth-code:',
 } as const;
