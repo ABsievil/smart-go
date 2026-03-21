@@ -5,6 +5,7 @@ import appConfig from '@common/configs/app.config';
 import authConfig from '@common/configs/auth.config';
 import vnpayConfig from '@common/configs/vnpay.config';
 import cloudinaryConfig from '@common/configs/cloudinary.config';
+import redisConfig from '@common/configs/redis.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DB_CONNECTION_NAME } from '@common/database/constants/database.constant';
 import { set } from 'mongoose';
@@ -13,12 +14,14 @@ import { LogConfigModule } from '@common/logger/log-config.module';
 import { LogConfigService } from '@common/logger/log-config.service';
 import { LanguageModule } from '@common/language/language.module';
 import { UploadModule } from '@common/upload/upload.module';
+import { RedisModule } from '@common/redis/redis.module';
 
 @Global()
 @Module({
     imports: [
         LanguageModule,
         UploadModule,
+        RedisModule,
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath: '.env',
@@ -28,6 +31,7 @@ import { UploadModule } from '@common/upload/upload.module';
                 authConfig,
                 vnpayConfig,
                 cloudinaryConfig,
+                redisConfig,
             ],
         }),
         PinoLoggerModule.forRootAsync({
