@@ -68,6 +68,14 @@ export const WEIGHT_CONFIG_SHORTEST = {
     distanceWeight: 1.0,
 };
 
+// ─── Đi bộ ───────────────────────────────────────────────────────────────────
+export const WALKING_SPEED_KMH = 5; // km/h (tốc độ đi bộ trung bình)
+export const CANDIDATE_STATIONS_COUNT = 3; // top-N trạm gần nhất xem xét khi tìm đường từ tọa độ
+// Khoảng cách đi bộ tối đa chấp nhận được để đến/từ trạm xe buýt tại TP.HCM.
+// Nếu không có trạm nào trong bán kính này, fallback dần lên MAX_WALKING_DISTANCE_KM_FALLBACK.
+export const MAX_WALKING_DISTANCE_KM = 1.0; // km (~12 phút đi bộ)
+export const MAX_WALKING_DISTANCE_KM_FALLBACK = 3.0; // km — dùng khi không có trạm nào ≤ 1km
+
 // Balanced: ưu tiên thời gian, phạt nhẹ số lần chuyển tuyến và khoảng cách
 // costWeight nhỏ để bù cho đơn vị VND lớn hơn nhiều so với phút và km
 export const WEIGHT_CONFIG_BALANCED = {

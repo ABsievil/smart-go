@@ -4,10 +4,14 @@ import { GraphBuilderService } from './graph-builder.service';
 import { PriorityQueue } from './priority-queue';
 import { Graph, GraphNode } from '@modules/routing/interfaces/graph.interface';
 import { RoutePath } from '@modules/routing/interfaces/routing.interface';
-import { RoutingCriteria } from '@modules/routing/enums/routing.enum';
+import {
+    ENUM_WALKING_LEG_TYPE,
+    RoutingCriteria,
+} from '@modules/routing/enums/routing.enum';
 import {
     RoutingResponseDto,
     ParetoOptimalPathDto,
+    WalkingLegDto,
 } from '@modules/routing/dtos/response/routing.response.dto';
 import { RoutingMetricsDto } from '@modules/routing/dtos/response/routing-metrics.dto';
 import { RoutingResponseData } from '@modules/routing/interfaces/routing-response.interface';
@@ -27,6 +31,10 @@ import {
     WEIGHT_CONFIG_CHEAPEST,
     WEIGHT_CONFIG_SHORTEST,
     WEIGHT_CONFIG_BALANCED,
+    WALKING_SPEED_KMH,
+    CANDIDATE_STATIONS_COUNT,
+    MAX_WALKING_DISTANCE_KM,
+    MAX_WALKING_DISTANCE_KM_FALLBACK,
 } from '@modules/routing/constants/routing.constants';
 import { CongestionFactors } from '@modules/routing/interfaces/congestion-factor.interface';
 import { MultiObjectiveWeights } from '@modules/routing/interfaces/multi-objective-weight.interface';
@@ -564,35 +572,341 @@ export class RoutingService {
     }
 
     /**
-     * Tìm trạm gần nhất từ tọa độ
+     * Tìm top-N trạm gần nhất từ tọa độ, sắp xếp theo khoảng cách tăng dần.
+     *
+     * Chiến lược lọc khoảng cách đi bộ:
+     *  1. Ưu tiên các trạm trong bán kính MAX_WALKING_DISTANCE_KM (1 km).
+     *  2. Nếu không có trạm nào trong bán kính đó, fallback lên
+     *     MAX_WALKING_DISTANCE_KM_FALLBACK (3 km) để vẫn trả về kết quả.
+     *  3. Nếu vẫn không có, trả về trạm gần nhất tuyệt đối (tránh lỗi).
      */
-    async findNearestStation(
+    async findTopNNearestStations(
         latitude: number,
         longitude: number,
-    ): Promise<string | null> {
+        n: number = CANDIDATE_STATIONS_COUNT,
+    ): Promise<
+        Array<{
+            stationCode: string;
+            stationName: string;
+            distanceKm: number;
+            latitude: number;
+            longitude: number;
+        }>
+    > {
         const graph = await this.getGraph();
-        let nearestStationCode: string | null = null;
-        let minDistance = Infinity;
+        const allCandidates: Array<{
+            stationCode: string;
+            stationName: string;
+            distanceKm: number;
+            latitude: number;
+            longitude: number;
+        }> = [];
 
         for (const [stationCode, node] of graph.nodes.entries()) {
-            if (!node.station.latitude || !node.station.longitude) {
-                continue;
-            }
+            if (!node.station.latitude || !node.station.longitude) continue;
 
-            const distance = this.graphBuilder.calculateDistance(
+            const distanceKm = this.graphBuilder.calculateDistance(
                 latitude,
                 longitude,
                 node.station.latitude,
                 node.station.longitude,
             );
 
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestStationCode = stationCode;
+            allCandidates.push({
+                stationCode,
+                stationName: node.station.stationName ?? '',
+                distanceKm,
+                latitude: node.station.latitude,
+                longitude: node.station.longitude,
+            });
+        }
+
+        allCandidates.sort((a, b) => a.distanceKm - b.distanceKm);
+
+        // Lọc theo bán kính ưu tiên, fallback nếu cần
+        const withinPreferred = allCandidates.filter(
+            (c) => c.distanceKm <= MAX_WALKING_DISTANCE_KM,
+        );
+        if (withinPreferred.length >= 1) {
+            return withinPreferred.slice(0, n);
+        }
+
+        const withinFallback = allCandidates.filter(
+            (c) => c.distanceKm <= MAX_WALKING_DISTANCE_KM_FALLBACK,
+        );
+        if (withinFallback.length >= 1) {
+            this.logger.warn(
+                `No station within ${MAX_WALKING_DISTANCE_KM}km, ` +
+                    `falling back to ${MAX_WALKING_DISTANCE_KM_FALLBACK}km radius ` +
+                    `(nearest: ${allCandidates[0]?.distanceKm.toFixed(2)}km)`,
+            );
+            return withinFallback.slice(0, n);
+        }
+
+        // Fallback tuyệt đối: trả về trạm gần nhất dù xa đến đâu
+        this.logger.warn(
+            `No station within fallback radius ${MAX_WALKING_DISTANCE_KM_FALLBACK}km, ` +
+                `returning absolute nearest (${allCandidates[0]?.distanceKm.toFixed(2)}km)`,
+        );
+        return allCandidates.slice(0, n);
+    }
+
+    /**
+     * Tìm trạm gần nhất từ tọa độ (backward compat)
+     */
+    async findNearestStation(
+        latitude: number,
+        longitude: number,
+    ): Promise<string | null> {
+        const candidates = await this.findTopNNearestStations(
+            latitude,
+            longitude,
+            1,
+        );
+        return candidates[0]?.stationCode ?? null;
+    }
+
+    /**
+     * Tạo walking leg từ tọa độ người dùng đến/từ một trạm
+     */
+    private buildWalkingLegInternal(
+        type: ENUM_WALKING_LEG_TYPE,
+        userCoords: { latitude: number; longitude: number },
+        station: {
+            stationCode: string;
+            stationName: string;
+            latitude: number;
+            longitude: number;
+        },
+    ): WalkingLegDto {
+        const distanceKm = this.graphBuilder.calculateDistance(
+            userCoords.latitude,
+            userCoords.longitude,
+            station.latitude,
+            station.longitude,
+        );
+        const estimatedTimeMinutes =
+            (distanceKm / WALKING_SPEED_KMH) * MINUTES_PER_HOUR;
+
+        return {
+            type,
+            fromCoordinates:
+                type === ENUM_WALKING_LEG_TYPE.TO_FIRST_STATION
+                    ? {
+                          latitude: userCoords.latitude,
+                          longitude: userCoords.longitude,
+                      }
+                    : {
+                          latitude: station.latitude,
+                          longitude: station.longitude,
+                      },
+            toCoordinates:
+                type === ENUM_WALKING_LEG_TYPE.TO_FIRST_STATION
+                    ? {
+                          latitude: station.latitude,
+                          longitude: station.longitude,
+                      }
+                    : {
+                          latitude: userCoords.latitude,
+                          longitude: userCoords.longitude,
+                      },
+            stationCode: station.stationCode,
+            stationName: station.stationName,
+            distanceKm,
+            estimatedTimeMinutes,
+        };
+    }
+
+    /**
+     * Tạo walking leg từ tọa độ người dùng đến/từ một trạm theo stationCode
+     * Dùng cho mixed case (stationCode một bên, coordinates bên còn lại)
+     */
+    async buildWalkingLeg(
+        type: ENUM_WALKING_LEG_TYPE,
+        userCoords: { latitude: number; longitude: number },
+        stationCode: string,
+    ): Promise<WalkingLegDto | null> {
+        const graph = await this.getGraph();
+        const node = graph.nodes.get(stationCode);
+        if (!node?.station.latitude || !node?.station.longitude) return null;
+
+        return this.buildWalkingLegInternal(type, userCoords, {
+            stationCode,
+            stationName: node.station.stationName ?? '',
+            latitude: node.station.latitude,
+            longitude: node.station.longitude,
+        });
+    }
+
+    /**
+     * Tìm đường từ tọa độ người dùng với multi-station selection và walking legs.
+     *
+     * Thay vì cố định 1 trạm gần nhất, phương thức này xem xét top-N trạm
+     * gần nhất ở cả 2 đầu, chạy MOA* cho mọi tổ hợp, tính cả đoạn đi bộ
+     * vào tổng chi phí, rồi trả về numPaths lộ trình tốt nhất toàn cục.
+     */
+    async findPathsFromCoordinates(
+        fromLat: number,
+        fromLon: number,
+        toLat: number,
+        toLon: number,
+        weights: MultiObjectiveWeights,
+        numPaths: number = 3,
+        maxTransfers?: number,
+        timeOfDay?: number,
+        congestionAware: boolean = true,
+    ): Promise<RoutingResponseData> {
+        const startTime = Date.now();
+        const graph = await this.getGraph();
+        const cacheHit = this.graphCache !== null;
+
+        const congestionFactor = congestionAware
+            ? this.getCongestionFactor(timeOfDay)
+            : NORMAL_TRAFFIC_MULTIPLIER;
+
+        const normalizedWeights = this.normalizeWeights(weights);
+
+        // Dùng tất cả weight configs (không giới hạn numPaths ở đây)
+        // để đảm bảo khám phá đầy đủ rồi mới chọn top-numPaths cuối cùng
+        const allDefaultConfigs = this.getDefaultWeightConfigs();
+        const customConfig = this.createCustomWeightConfig(normalizedWeights);
+        const allConfigs = customConfig
+            ? [...allDefaultConfigs, customConfig]
+            : allDefaultConfigs;
+
+        const fromCandidates = await this.findTopNNearestStations(
+            fromLat,
+            fromLon,
+            CANDIDATE_STATIONS_COUNT,
+        );
+        const toCandidates = await this.findTopNNearestStations(
+            toLat,
+            toLon,
+            CANDIDATE_STATIONS_COUNT,
+        );
+
+        if (fromCandidates.length === 0) {
+            throw new NotFoundException(
+                'Không tìm thấy trạm nào gần điểm xuất phát',
+            );
+        }
+        if (toCandidates.length === 0) {
+            throw new NotFoundException(
+                'Không tìm thấy trạm nào gần điểm đích',
+            );
+        }
+
+        const allPaths: ParetoOptimalPathDto[] = [];
+        let totalNodesExplored = 0;
+
+        for (const fromCandidate of fromCandidates) {
+            for (const toCandidate of toCandidates) {
+                if (fromCandidate.stationCode === toCandidate.stationCode)
+                    continue;
+
+                const walkingFromLeg = this.buildWalkingLegInternal(
+                    ENUM_WALKING_LEG_TYPE.TO_FIRST_STATION,
+                    { latitude: fromLat, longitude: fromLon },
+                    fromCandidate,
+                );
+                const walkingToLeg = this.buildWalkingLegInternal(
+                    ENUM_WALKING_LEG_TYPE.FROM_LAST_STATION,
+                    { latitude: toLat, longitude: toLon },
+                    toCandidate,
+                );
+
+                const totalWalkingDistanceKm =
+                    walkingFromLeg.distanceKm + walkingToLeg.distanceKm;
+                const totalWalkingTimeMinutes =
+                    walkingFromLeg.estimatedTimeMinutes +
+                    walkingToLeg.estimatedTimeMinutes;
+
+                for (const config of allConfigs) {
+                    const path = await this.findPathWithMultiObjectiveWeights(
+                        fromCandidate.stationCode,
+                        toCandidate.stationCode,
+                        config.weights,
+                        maxTransfers,
+                        congestionFactor,
+                        graph,
+                    );
+
+                    if (path) {
+                        totalNodesExplored += path.nodesExplored ?? 0;
+
+                        const transitDistanceKm = path.totalDistance;
+                        const transitTimeMinutes = path.totalTime;
+                        const totalDistance =
+                            transitDistanceKm + totalWalkingDistanceKm;
+                        const totalTime =
+                            transitTimeMinutes + totalWalkingTimeMinutes;
+
+                        const optimizationScore =
+                            this.calculateOptimizationScore(
+                                config.weights,
+                                totalTime,
+                                path.totalCost,
+                                totalDistance,
+                            );
+
+                        const mappedStations = path.stations.map((s) =>
+                            this.mapStationInfo(s),
+                        );
+
+                        allPaths.push({
+                            stations: mappedStations,
+                            routes: path.routes,
+                            totalDistance,
+                            totalTime,
+                            totalCost: path.totalCost,
+                            transfers: this.countTransfersFromSegments(
+                                path.segments,
+                            ),
+                            segments: path.segments,
+                            optimizationScore,
+                            optimizationType: config.type,
+                            walkingLegs: [walkingFromLeg, walkingToLeg],
+                            totalWalkingDistanceKm,
+                            totalWalkingTimeMinutes,
+                            transitDistanceKm,
+                            transitTimeMinutes,
+                        });
+                    }
+                }
             }
         }
 
-        return nearestStationCode;
+        const uniquePaths = this.removeDuplicatePaths(allPaths);
+        uniquePaths.sort((a, b) => a.optimizationScore - b.optimizationScore);
+        const finalPaths = uniquePaths.slice(0, numPaths);
+
+        const executionTime = Date.now() - startTime;
+
+        const metrics: RoutingMetricsDto = {
+            algorithm: 'MOA*+Walking',
+            executionTimeMs: executionTime,
+            nodesExplored: totalNodesExplored,
+            explorationRatePercent:
+                graph.nodes.size > 0
+                    ? (totalNodesExplored / graph.nodes.size) * 100
+                    : 0,
+            heuristicUsed: true,
+            hasFallback: false,
+            cacheHit,
+        };
+
+        this.logger.debug(
+            `MOA*+Walking: ${finalPaths.length} paths in ${executionTime}ms, ` +
+                `${totalNodesExplored} nodes explored, ` +
+                `${fromCandidates.length}×${toCandidates.length} station pairs considered`,
+        );
+
+        return {
+            paths: finalPaths,
+            metrics,
+            congestionApplied: congestionAware && congestionFactor !== 1.0,
+            timeOfDay: timeOfDay ?? new Date().getHours(),
+        };
     }
 
     mapGet(routingData: RoutingResponseData): RoutingResponseDto {
