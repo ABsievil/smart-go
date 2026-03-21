@@ -17,7 +17,7 @@ import { PinoLogger } from 'nestjs-pino';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import {
     UploadSingleFile,
-    UploadedFilePipe,
+    UploadedFile,
 } from '@common/upload/decorators/upload-file.decorator';
 import { UploadService } from '@common/upload/services/upload.service';
 import { UserService } from '@modules/users/services/user.service';
@@ -106,7 +106,7 @@ export class UserController {
     @Roles(UserRole.ADMIN)
     async create(
         @Body() createDto: UserCreateRequestDto,
-        @UploadedFilePipe() file: Express.Multer.File,
+        @UploadedFile() file: Express.Multer.File,
     ): Promise<UserGetResponseDto> {
         const user = await this.userService.create({
             ...createDto,
@@ -141,7 +141,7 @@ export class UserController {
     async update(
         @Param('id') id: string,
         @Body() updateDto: UserUpdateRequestDto,
-        @UploadedFilePipe() file: Express.Multer.File,
+        @UploadedFile() file: Express.Multer.File,
     ): Promise<UserGetResponseDto> {
         const uploaded = await this.uploadService.uploadBuffer(file, {
             folder: `${USER_CONSTANTS.UPLOAD_FOLDER}/${id}/${USER_CONSTANTS.AVATAR}`,
