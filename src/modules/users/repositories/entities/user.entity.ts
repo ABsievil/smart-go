@@ -22,6 +22,9 @@ export class UserEntity extends DBEntityBase {
         default: UserRole.USER,
     })
     role: UserRole;
+
+    @Prop({ required: false, trim: true })
+    avatar?: string;
 }
 
 export type UserDoc = IDatabaseDocument<UserEntity>;

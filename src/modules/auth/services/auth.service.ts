@@ -16,6 +16,7 @@ import {
     AccessTokenResponseDto,
     AuthTokenResponseDto,
 } from '@modules/auth/dtos/response/auth-token.response.dto';
+import { UserRole } from '@modules/users/enums/user-role.enum';
 
 @Injectable()
 export class AuthService {
@@ -56,9 +57,10 @@ export class AuthService {
 
         const hashedPassword = await bcrypt.hash(dto.password, 12);
         const newUser = await this.userService.create({
-            email: dto.email,
+            email: dto.email.toLowerCase(),
             name: dto.name,
             password: hashedPassword,
+            role: UserRole.USER,
         });
 
         const authUser: IAuthUser = {
