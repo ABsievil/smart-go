@@ -10,6 +10,7 @@ import { AuthController } from '@modules/auth/controllers/auth.controller';
 import { JwtStrategy } from '@modules/auth/strategies/jwt.strategy';
 import { JwtRefreshStrategy } from '@modules/auth/strategies/jwt-refresh.strategy';
 import { LocalStrategy } from '@modules/auth/strategies/local.strategy';
+import { GoogleStrategy } from '@modules/auth/strategies/google.strategy';
 import { JwtAuthGuard } from '@modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@modules/auth/guards/roles.guard';
 
@@ -34,6 +35,7 @@ import { RolesGuard } from '@modules/auth/guards/roles.guard';
         JwtStrategy,
         JwtRefreshStrategy,
         LocalStrategy,
+        GoogleStrategy,
         // Apply JwtAuthGuard globally — use @Public() to bypass
         {
             provide: APP_GUARD,

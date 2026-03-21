@@ -1,7 +1,7 @@
 import {
     applyDecorators,
     ParseFilePipeBuilder,
-    UploadedFile,
+    UploadedFile as NestUploadedFile,
     UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -38,13 +38,13 @@ export const UploadSingleFile = (options?: IUploadFileDecoratorOptions) => {
     );
 };
 
-export const UploadedFilePipe = (options?: IUploadFileDecoratorOptions) => {
+export const UploadedFile = (options?: IUploadFileDecoratorOptions) => {
     const maxSizeInBytes =
         options?.maxSizeInBytes ?? UPLOAD_LIMIT.DEFAULT_MAX_FILE_SIZE;
     const allowedMimeTypes =
         options?.allowedMimeTypes ?? UPLOAD_ALLOWED_MIME_TYPES.IMAGE;
 
-    return UploadedFile(
+    return NestUploadedFile(
         new ParseFilePipeBuilder()
             .addMaxSizeValidator({
                 maxSize: maxSizeInBytes,

@@ -1,0 +1,16 @@
+{
+    "success": {
+        "create": "User created successfully",
+        "findAll": "Users retrieved successfully",
+        "findOne": "User retrieved successfully",
+        "update": "User updated successfully",
+        "remove": "User deleted successfully"
+    },
+    "error": {
+        "create": "Failed to create user",
+        "findAll": "Failed to retrieve users",
+        "findOne": "User not found",
+        "update": "Failed to update user",
+        "remove": "Failed to delete user"
+    }
+}

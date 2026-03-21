@@ -1,15 +1,17 @@
 import {
     ConflictException,
     Injectable,
-    UnauthorizedException,
+    UnauthorizedException,    
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import type { StringValue } from 'ms';
+import { randomBytes } from 'crypto';
 import { UserService } from '@modules/users/services/user.service';
 import { IJwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
 import { IAuthUser } from '@modules/auth/interfaces/auth-user.interface';
+import { IGoogleProfile } from '@modules/auth/interfaces/google-profile.interface';
 import { LoginRequestDto } from '@modules/auth/dtos/request/login.request.dto';
 import { RegisterRequestDto } from '@modules/auth/dtos/request/register.request.dto';
 import {
@@ -36,12 +38,7 @@ export class AuthService {
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) return null;
 
-        return {
-            _id: user._id as string,
-            email: user.email,
-            name: user.name,
-            role: user.role,
-        };
+        return this.toAuthUser(user);
     }
 
     async login(user: IAuthUser): Promise<AuthTokenResponseDto> {
@@ -63,14 +60,34 @@ export class AuthService {
             role: UserRole.USER,
         });
 
-        const authUser: IAuthUser = {
-            _id: newUser._id as string,
-            email: newUser.email,
-            name: newUser.name,
-            role: newUser.role,
-        };
+        const authUser: IAuthUser = this.toAuthUser(newUser);
 
         return this.login(authUser);
+    }
+
+    async validateGoogleUser(profile: IGoogleProfile): Promise<IAuthUser> {
+        if (!profile.email) {
+            throw new UnauthorizedException('Google account does not provide email');
+        }
+
+        const email = profile.email.toLowerCase();
+        const userByEmail = await this.userService.findByEmail(email);
+        if (userByEmail) {
+            return this.toAuthUser(userByEmail);
+        }
+
+        const randomPassword = randomBytes(32).toString('hex');
+        const hashedPassword = await bcrypt.hash(randomPassword, 12);
+
+        const newUser = await this.userService.create({
+            email,
+            name: profile.name || email.split('@')[0],
+            password: hashedPassword,
+            role: UserRole.USER,
+            avatar: profile.avatar,
+        });
+
+        return this.toAuthUser(newUser);
     }
 
     async refreshToken(user: IAuthUser): Promise<AccessTokenResponseDto> {
@@ -103,5 +120,19 @@ export class AuthService {
         });
 
         return { accessToken, refreshToken };
+    }
+
+    private toAuthUser(user: {
+        _id: string;
+        email: string;
+        name: string;
+        role: UserRole;
+    }): IAuthUser {
+        return {
+            _id: user._id as string,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+        };
     }
 }
