@@ -8,7 +8,12 @@ import {
     Query,
     Req,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiOperation,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { Public } from '@modules/auth/decorators/auth.decorator';
 import { PaymentService } from '@modules/payment/services/payment.service';
@@ -24,6 +29,7 @@ export class PaymentController {
     constructor(private readonly paymentService: PaymentService) {}
 
     @Post('vnpay/create')
+    @ApiBearerAuth()
     @HttpCode(HttpStatus.OK)
     @LanguageResponse({ module: 'payment', successKey: 'create' })
     @ApiOperation({ summary: 'Create a VNPAY payment URL' })

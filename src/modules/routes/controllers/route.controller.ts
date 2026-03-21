@@ -12,7 +12,13 @@ import {
     ParseIntPipe,
     DefaultValuePipe,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiQuery,
+    ApiBearerAuth,
+} from '@nestjs/swagger';
 import { PinoLogger } from 'nestjs-pino';
 import { RouteService } from '@modules/routes/services/route.service';
 import { StationService } from '@modules/stations/services/station.service';
@@ -34,6 +40,7 @@ export class RouteController {
     }
 
     @Get()
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'routes',
         successKey: 'findAll',
@@ -75,6 +82,7 @@ export class RouteController {
     }
 
     @Get(':id')
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'routes',
         successKey: 'findOne',
@@ -101,6 +109,7 @@ export class RouteController {
     }
 
     @Post()
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'routes',
         successKey: 'create',
@@ -120,6 +129,7 @@ export class RouteController {
     }
 
     @Put(':id')
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'routes',
         successKey: 'update',
@@ -140,6 +150,7 @@ export class RouteController {
     }
 
     @Delete(':id')
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'routes',
         successKey: 'remove',

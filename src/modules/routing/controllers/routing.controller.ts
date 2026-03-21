@@ -6,7 +6,12 @@ import {
     HttpStatus,
     BadRequestException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import { RoutingService } from '@modules/routing/services/routing.service';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
@@ -31,6 +36,7 @@ export class RoutingController {
         private readonly logger: Logger,
     ) {}
     @Post('find-path')
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'routing',
         successKey: 'findPath',
