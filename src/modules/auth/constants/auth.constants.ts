@@ -2,6 +2,7 @@ export const AUTH_STRATEGY = {
     JWT: 'jwt',
     JWT_REFRESH: 'jwt-refresh',
     LOCAL: 'local',
+    GOOGLE: 'google',
 } as const;
 
 export const AUTH_METADATA = {

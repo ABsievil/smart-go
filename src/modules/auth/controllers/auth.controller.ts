@@ -4,6 +4,7 @@ import {
     Get,
     HttpCode,
     HttpStatus,
+    Req,
     Post,
     UseGuards,
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import {
 import { AuthService } from '@modules/auth/services/auth.service';
 import { LocalAuthGuard } from '@modules/auth/guards/local-auth.guard';
 import { JwtRefreshGuard } from '@modules/auth/guards/jwt-refresh.guard';
+import { GoogleAuthGuard } from '@modules/auth/guards/google-auth.guard';
 import { CurrentUser, Public } from '@modules/auth/decorators/auth.decorator';
 import { IAuthUser } from '@modules/auth/interfaces/auth-user.interface';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
@@ -33,6 +35,32 @@ import {
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
+
+    @Public()
+    @Get('google')
+    @UseGuards(GoogleAuthGuard)
+    @ApiOperation({ summary: 'Login with Google OAuth2' })
+    @ApiResponse({
+        status: HttpStatus.FOUND,
+        description: 'Redirect to Google consent page',
+    })
+    googleAuth(): void {}
+
+    @Public()
+    @Get('google/callback')
+    @UseGuards(GoogleAuthGuard)
+    @LanguageResponse({ module: 'auth', successKey: 'googleLogin' })
+    @ApiOperation({ summary: 'Google OAuth callback' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Google login successful',
+        type: AuthTokenResponseDto,
+    })
+    googleAuthCallback(
+        @Req() request: { user: IAuthUser },
+    ): Promise<AuthTokenResponseDto> {
+        return this.authService.login(request.user);
+    }
 
     @Public()
     @Post('register')
