@@ -82,10 +82,10 @@ export class AuthController {
         description:
             'Redirect to mobile app with short-lived auth_code and state',
     })
-    googleAuthCallback(
+    async googleAuthCallback(
         @Req() request: { user: IAuthUser; query?: { state?: string } },
         @Res() response: Response,
-    ): void {
+    ): Promise<void> {
         const state = request.query?.state;
         if (!state) {
             throw new BadRequestException(
@@ -93,7 +93,7 @@ export class AuthController {
             );
         }
 
-        const authCode = this.authService.createGoogleAuthCode(
+        const authCode = await this.authService.createGoogleAuthCode(
             request.user,
             state,
         );
