@@ -12,7 +12,13 @@ import {
     Put,
     Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiOperation,
+    ApiQuery,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { PinoLogger } from 'nestjs-pino';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import {
@@ -41,6 +47,7 @@ export class UserController {
     }
 
     @Get()
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'users',
         successKey: 'findAll',
@@ -74,6 +81,7 @@ export class UserController {
     }
 
     @Get(':id')
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'users',
         successKey: 'findOne',
@@ -91,6 +99,7 @@ export class UserController {
     }
 
     @Post()
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'users',
         successKey: 'create',
@@ -126,6 +135,7 @@ export class UserController {
     }
 
     @Put(':id')
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'users',
         successKey: 'update',
@@ -154,6 +164,7 @@ export class UserController {
     }
 
     @Delete(':id')
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'users',
         successKey: 'remove',
