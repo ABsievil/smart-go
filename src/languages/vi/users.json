@@ -1,0 +1,16 @@
+{
+    "success": {
+        "create": "Tạo người dùng thành công",
+        "findAll": "Lấy danh sách người dùng thành công",
+        "findOne": "Lấy thông tin người dùng thành công",
+        "update": "Cập nhật người dùng thành công",
+        "remove": "Xóa người dùng thành công"
+    },
+    "error": {
+        "create": "Không thể tạo người dùng",
+        "findAll": "Không thể lấy danh sách người dùng",
+        "findOne": "Không tìm thấy người dùng",
+        "update": "Không thể cập nhật người dùng",
+        "remove": "Không thể xóa người dùng"
+    }
+}
