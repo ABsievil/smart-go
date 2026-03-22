@@ -11,9 +11,7 @@ import chatbotConfig from '@common/configs/chatbot.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DB_CONNECTION_NAME } from '@common/database/constants/database.constant';
 import { set } from 'mongoose';
-import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
-import { LogConfigModule } from '@common/logger/log-config.module';
-import { LogConfigService } from '@common/logger/log-config.service';
+import { LoggerModule } from '@common/logger/logger.module';
 import { LanguageModule } from '@common/language/language.module';
 import { UploadModule } from '@common/upload/upload.module';
 import { RedisModule } from '@common/redis/redis.module';
@@ -38,12 +36,7 @@ import { RedisModule } from '@common/redis/redis.module';
                 chatbotConfig,
             ],
         }),
-        PinoLoggerModule.forRootAsync({
-            imports: [LogConfigModule],
-            inject: [LogConfigService],
-            useFactory: (logConfig: LogConfigService) =>
-                logConfig.createOptions(),
-        }),
+        LoggerModule,
         MongooseModule.forRootAsync({
             imports: [ConfigModule],
             connectionName: DB_CONNECTION_NAME,

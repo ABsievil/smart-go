@@ -19,7 +19,6 @@ import {
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { PinoLogger } from 'nestjs-pino';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import {
     UploadSingleFile,
@@ -41,10 +40,7 @@ export class UserController {
     constructor(
         private readonly userService: UserService,
         private readonly uploadService: UploadService,
-        private readonly pinoLogger: PinoLogger,
-    ) {
-        this.pinoLogger.setContext(UserController.name);
-    }
+    ) {}
 
     @Get()
     @ApiBearerAuth()

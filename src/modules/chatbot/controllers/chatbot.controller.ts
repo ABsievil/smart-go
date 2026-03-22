@@ -12,7 +12,7 @@ import {
     ApiResponse,
     ApiBearerAuth,
 } from '@nestjs/swagger';
-import { Logger } from 'nestjs-pino';
+import { Logger } from '@nestjs/common';
 import { ChatbotService } from '@modules/chatbot/services/chatbot.service';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { ChatRequestDto } from '@modules/chatbot/dtos/request/chat.request.dto';
@@ -32,10 +32,9 @@ import { EMBED_FILE_TIMEOUT_MS } from '@modules/chatbot/constants/chatbot.consta
 @ApiTags('Chatbot')
 @Controller('chatbot')
 export class ChatbotController {
-    constructor(
-        private readonly chatbotService: ChatbotService,
-        private readonly logger: Logger,
-    ) {}
+    private readonly logger = new Logger(ChatbotController.name);
+
+    constructor(private readonly chatbotService: ChatbotService) {}
 
     @Post('chat')
     @ApiBearerAuth()

@@ -1,7 +1,6 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MilvusClient, DataType } from '@zilliz/milvus2-sdk-node';
-import { Logger } from 'nestjs-pino';
 import { randomUUID } from 'crypto';
 import { IVectorSearchResult } from '@modules/chatbot/interfaces/vector-search-result.interface';
 import { ChatbotEmbedType } from '@modules/chatbot/enums/chatbot.enum';
@@ -21,14 +20,12 @@ import {
 
 @Injectable()
 export class ZillizService implements OnModuleInit {
+    private readonly logger = new Logger(ZillizService.name);
     private client: MilvusClient;
     private collectionName: string;
     private dimension: number;
 
-    constructor(
-        private readonly configService: ConfigService,
-        private readonly logger: Logger,
-    ) {}
+    constructor(private readonly configService: ConfigService) {}
 
     async onModuleInit() {
         const uri = this.configService.get<string>('chatbot.zilliz.uri');

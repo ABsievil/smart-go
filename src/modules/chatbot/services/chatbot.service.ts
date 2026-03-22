@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Logger } from 'nestjs-pino';
+import { Logger } from '@nestjs/common';
 import { HuggingFaceService } from '@modules/chatbot/services/huggingface.service';
 import { ZillizService } from '@modules/chatbot/services/zilliz.service';
 import { IChatMessage } from '@modules/chatbot/interfaces/chat-message.interface';
@@ -23,12 +23,12 @@ import {
 @Injectable()
 export class ChatbotService {
     private readonly contextLimit: number;
+    private readonly logger = new Logger(ChatbotService.name);
 
     constructor(
         private readonly configService: ConfigService,
         private readonly huggingFaceService: HuggingFaceService,
         private readonly zillizService: ZillizService,
-        private readonly logger: Logger,
     ) {
         this.contextLimit = this.configService.get<number>(
             'chatbot.contextLimit',

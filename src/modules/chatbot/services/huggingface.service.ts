@@ -2,6 +2,7 @@ import {
     BadRequestException,
     Injectable,
     InternalServerErrorException,
+    Logger,
     OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -10,12 +11,12 @@ import {
     type InferenceProvider,
 } from '@huggingface/inference';
 import OpenAI from 'openai';
-import { Logger } from 'nestjs-pino';
 import { IChatMessage } from '@modules/chatbot/interfaces/chat-message.interface';
 import { ChatMessageRole } from '@modules/chatbot/enums/chatbot.enum';
 
 @Injectable()
 export class HuggingFaceService implements OnModuleInit {
+    private readonly logger = new Logger(HuggingFaceService.name);
     // Client embedding — @huggingface/inference SDK
     private inferenceClient: InferenceClient;
 
@@ -29,10 +30,7 @@ export class HuggingFaceService implements OnModuleInit {
     private inferenceProvider: string;
     private routerBaseUrl: string;
 
-    constructor(
-        private readonly configService: ConfigService,
-        private readonly logger: Logger,
-    ) {}
+    constructor(private readonly configService: ConfigService) {}
 
     onModuleInit() {
         const token = this.configService.get<string>(
