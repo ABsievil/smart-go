@@ -1,0 +1,14 @@
+{
+    "success": {
+        "chat": "Response generated successfully",
+        "embed": "Knowledge embedded successfully",
+        "embedFile": "Knowledge batch embedded successfully"
+    },
+    "error": {
+        "chat": "Failed to generate response",
+        "embed": "Failed to embed knowledge",
+        "embeddingFailed": "Failed to generate text embedding",
+        "searchFailed": "Failed to search vector database",
+        "modelUnavailable": "AI model is currently unavailable"
+    }
+}

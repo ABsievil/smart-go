@@ -7,6 +7,7 @@ import momoConfig from '@common/configs/momo.config';
 import vnpayConfig from '@common/configs/vnpay.config';
 import cloudinaryConfig from '@common/configs/cloudinary.config';
 import redisConfig from '@common/configs/redis.config';
+import chatbotConfig from '@common/configs/chatbot.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DB_CONNECTION_NAME } from '@common/database/constants/database.constant';
 import { set } from 'mongoose';
@@ -26,7 +27,7 @@ import { RedisModule } from '@common/redis/redis.module';
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath: '.env',
-            load: [
+                load: [
                 databaseConfig,
                 appConfig,
                 authConfig,
@@ -34,6 +35,7 @@ import { RedisModule } from '@common/redis/redis.module';
                 vnpayConfig,
                 cloudinaryConfig,
                 redisConfig,
+                chatbotConfig,
             ],
         }),
         PinoLoggerModule.forRootAsync({
