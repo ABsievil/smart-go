@@ -29,6 +29,10 @@ import {
     UploadSingleFile,
     UploadedFile,
 } from '@common/upload/decorators/upload-file.decorator';
+import {
+    UPLOAD_ALLOWED_MIME_TYPES,
+    UPLOAD_FIELD,
+} from '@common/upload/constants/upload.constants';
 import { RequestTimeout } from '@common/decorators/request-timeout.decorator';
 import {
     CHAT_MAX_HISTORY_TURNS,
@@ -36,6 +40,7 @@ import {
 } from '@modules/chatbot/constants/chatbot.constants';
 import { randomUUID } from 'node:crypto';
 import { MessageCreateRequestDto } from '@modules/messages/dtos/request/message-create.request.dto';
+import { Public } from '@modules/auth/decorators/auth.decorator';
 
 @ApiTags('Chatbot')
 @Controller('chatbot')
@@ -48,7 +53,7 @@ export class ChatbotController {
     ) {}
 
     @Post('chat')
-    @ApiBearerAuth()
+    @Public()
     @LanguageResponse({
         module: 'chatbot',
         successKey: 'chat',
@@ -143,7 +148,6 @@ Dành riêng cho Admin. Nhúng một đoạn văn bản kiến thức vào Zilli
         module: 'chatbot',
         successKey: 'embedFile',
     })
-    @UploadSingleFile({ allowedMimeTypes: ['application/json'] })
     @ApiOperation({
         summary: '[Admin] Nhúng kiến thức hàng loạt từ file JSON',
         description: `
@@ -168,8 +172,12 @@ Dành riêng cho Admin. Upload file JSON chứa mảng các mục kiến thức 
         description: 'Kết quả nhúng hàng loạt',
         type: EmbedListResponseDto,
     })
+    @HttpCode(HttpStatus.CREATED)
+    @UploadSingleFile({ fieldName: UPLOAD_FIELD.FILE })
     async embedFromFile(
-        @UploadedFile({ allowedMimeTypes: ['application/json'] })
+        @UploadedFile({
+            allowedMimeTypes: [...UPLOAD_ALLOWED_MIME_TYPES.TEXT_AND_DOCUMENT],
+        })
         file: Express.Multer.File,
     ): Promise<EmbedListResponseDto> {
         let items: EmbedRequestDto[];

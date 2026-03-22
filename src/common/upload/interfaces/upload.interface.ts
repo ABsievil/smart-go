@@ -4,6 +4,7 @@ export interface IUploadFileDecoratorOptions {
     fieldName?: string;
     maxSizeInBytes?: number;
     allowedMimeTypes?: string[];
+    skipMagicNumbersValidation?: boolean;
 }
 
 export interface ICloudinaryUploadOptions {
@@ -11,6 +12,7 @@ export interface ICloudinaryUploadOptions {
     publicId?: string;
     resourceType?: CloudinaryResourceType;
     overwrite?: boolean;
+    allowedMimeTypes?: readonly string[];
 }
 
 export interface ICloudinaryUploadedFile {

@@ -10,7 +10,9 @@ import { Readable } from 'stream';
 import {
     CLOUDINARY_DEFAULT,
     UPLOAD_ALLOWED_MIME_TYPES,
+    UPLOAD_DEFAULT_ALLOWED_MIME_TYPES,
 } from '@common/upload/constants/upload.constants';
+import { CloudinaryResourceType } from '@common/upload/enums/upload.enum';
 import {
     ICloudinaryUploadOptions,
     ICloudinaryUploadedFile,
@@ -33,7 +35,7 @@ export class UploadService implements OnModuleInit {
         file: Express.Multer.File,
         options?: ICloudinaryUploadOptions,
     ): Promise<ICloudinaryUploadedFile> {
-        this.validateFile(file);
+        this.validateFile(file, options);
 
         const uploaded = await this.uploadToCloudinary(file, options);
         return this.mapUploadResponse(uploaded);
@@ -58,7 +60,7 @@ export class UploadService implements OnModuleInit {
                     public_id: options?.publicId,
                     resource_type:
                         options?.resourceType ??
-                        CLOUDINARY_DEFAULT.RESOURCE_TYPE,
+                        this.resolveResourceType(file, options),
                     overwrite: options?.overwrite ?? false,
                 },
                 (error, result) => {
@@ -79,14 +81,32 @@ export class UploadService implements OnModuleInit {
         });
     }
 
-    private validateFile(file: Express.Multer.File): void {
+    private validateFile(
+        file: Express.Multer.File,
+        options?: ICloudinaryUploadOptions,
+    ): void {
         if (!file) {
             throw new BadRequestException('File is required');
         }
 
-        if (!UPLOAD_ALLOWED_MIME_TYPES.IMAGE.includes(file.mimetype as any)) {
+        const allowed = options?.allowedMimeTypes?.length
+            ? [...options.allowedMimeTypes]
+            : [...UPLOAD_DEFAULT_ALLOWED_MIME_TYPES];
+
+        if (!allowed.includes(file.mimetype)) {
             throw new BadRequestException('Invalid file type');
         }
+    }
+
+    private resolveResourceType(
+        file: Express.Multer.File,
+        _options?: ICloudinaryUploadOptions,
+    ): CloudinaryResourceType {
+        const imageMimes = UPLOAD_ALLOWED_MIME_TYPES.IMAGE as readonly string[];
+        if (imageMimes.includes(file.mimetype)) {
+            return CLOUDINARY_DEFAULT.RESOURCE_TYPE;
+        }
+        return CloudinaryResourceType.RAW;
     }
 
     private mapUploadResponse(

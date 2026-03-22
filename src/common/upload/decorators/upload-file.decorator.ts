@@ -7,18 +7,23 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import {
-    UPLOAD_ALLOWED_MIME_TYPES,
+    UPLOAD_DEFAULT_ALLOWED_MIME_TYPES,
     UPLOAD_FIELD,
     UPLOAD_LIMIT,
 } from '@common/upload/constants/upload.constants';
 import { IUploadFileDecoratorOptions } from '@common/upload/interfaces/upload.interface';
 
+function escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function buildMimeWhitelistRegExp(mimeTypes: string[]): RegExp {
+    const escaped = mimeTypes.map(escapeRegExp);
+    return new RegExp(`^(${escaped.join('|')})(;|$)`);
+}
+
 export const UploadSingleFile = (options?: IUploadFileDecoratorOptions) => {
     const fieldName = options?.fieldName ?? UPLOAD_FIELD.FILE;
-    const maxSizeInBytes =
-        options?.maxSizeInBytes ?? UPLOAD_LIMIT.DEFAULT_MAX_FILE_SIZE;
-    const allowedMimeTypes =
-        options?.allowedMimeTypes ?? UPLOAD_ALLOWED_MIME_TYPES.IMAGE;
 
     return applyDecorators(
         ApiConsumes('multipart/form-data'),
@@ -41,8 +46,11 @@ export const UploadSingleFile = (options?: IUploadFileDecoratorOptions) => {
 export const UploadedFile = (options?: IUploadFileDecoratorOptions) => {
     const maxSizeInBytes =
         options?.maxSizeInBytes ?? UPLOAD_LIMIT.DEFAULT_MAX_FILE_SIZE;
-    const allowedMimeTypes =
-        options?.allowedMimeTypes ?? UPLOAD_ALLOWED_MIME_TYPES.IMAGE;
+    const allowedMimeTypes = options?.allowedMimeTypes ?? [
+        ...UPLOAD_DEFAULT_ALLOWED_MIME_TYPES,
+    ];
+    const skipMagicNumbersValidation =
+        options?.skipMagicNumbersValidation ?? true;
 
     return NestUploadedFile(
         new ParseFilePipeBuilder()
@@ -50,11 +58,8 @@ export const UploadedFile = (options?: IUploadFileDecoratorOptions) => {
                 maxSize: maxSizeInBytes,
             })
             .addFileTypeValidator({
-                fileType: new RegExp(
-                    `(${allowedMimeTypes
-                        .map((mimeType) => mimeType.replace('/', '\\/'))
-                        .join('|')})`,
-                ),
+                fileType: buildMimeWhitelistRegExp(allowedMimeTypes),
+                skipMagicNumbersValidation,
             })
             .build({
                 fileIsRequired: true,

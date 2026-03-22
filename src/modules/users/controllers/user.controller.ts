@@ -24,6 +24,7 @@ import {
     UploadSingleFile,
     UploadedFile,
 } from '@common/upload/decorators/upload-file.decorator';
+import { UPLOAD_ALLOWED_MIME_TYPES } from '@common/upload/constants/upload.constants';
 import { UploadService } from '@common/upload/services/upload.service';
 import { UserService } from '@modules/users/services/user.service';
 import { UserUpdateRequestDto } from '@modules/users/dtos/request/user-update.request.dto';
@@ -111,7 +112,11 @@ export class UserController {
     @Roles(UserRole.ADMIN)
     async create(
         @Body() createDto: UserCreateRequestDto,
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile({
+            allowedMimeTypes: [...UPLOAD_ALLOWED_MIME_TYPES.IMAGE],
+            skipMagicNumbersValidation: false,
+        })
+        file: Express.Multer.File,
     ): Promise<UserGetResponseDto> {
         const user = await this.userService.create({
             ...createDto,
@@ -119,6 +124,7 @@ export class UserController {
 
         const uploaded = await this.uploadService.uploadBuffer(file, {
             folder: `${USER_CONSTANTS.UPLOAD_FOLDER}/${user._id}/${USER_CONSTANTS.AVATAR}`,
+            allowedMimeTypes: [...UPLOAD_ALLOWED_MIME_TYPES.IMAGE],
         });
 
         let updatedUser = user;
@@ -147,10 +153,15 @@ export class UserController {
     async update(
         @Param('id') id: string,
         @Body() updateDto: UserUpdateRequestDto,
-        @UploadedFile() file: Express.Multer.File,
+        @UploadedFile({
+            allowedMimeTypes: [...UPLOAD_ALLOWED_MIME_TYPES.IMAGE],
+            skipMagicNumbersValidation: false,
+        })
+        file: Express.Multer.File,
     ): Promise<UserGetResponseDto> {
         const uploaded = await this.uploadService.uploadBuffer(file, {
             folder: `${USER_CONSTANTS.UPLOAD_FOLDER}/${id}/${USER_CONSTANTS.AVATAR}`,
+            allowedMimeTypes: [...UPLOAD_ALLOWED_MIME_TYPES.IMAGE],
         });
         const user = await this.userService.update(id, {
             ...updateDto,
