@@ -48,14 +48,16 @@ export class MessageController {
         name: 'search',
         required: false,
         type: String,
-        description: 'Search in message content (uses searchFields or defaults to content)',
+        description:
+            'Search in message content (uses searchFields or defaults to content)',
     })
     @ApiQuery({
         name: 'orderBy',
         required: false,
         type: String,
         example: 'createdAt',
-        description: 'Field to sort by (merged with default createdAt when omitted)',
+        description:
+            'Field to sort by (merged with default createdAt when omitted)',
     })
     @ApiQuery({
         name: 'orderDirection',
@@ -68,7 +70,8 @@ export class MessageController {
         required: false,
         type: String,
         example: 'content',
-        description: 'Comma-separated field names for search (default: content)',
+        description:
+            'Comma-separated field names for search (default: content)',
     })
     @ApiResponse({
         status: 200,
@@ -95,8 +98,7 @@ export class MessageController {
             searchFieldsRaw
                 ?.split(',')
                 .map((s) => s.trim())
-                .filter(Boolean) ??
-            (searchTrimmed ? ['content'] : undefined);
+                .filter(Boolean) ?? (searchTrimmed ? ['content'] : undefined);
 
         const orderDirection =
             orderDirectionRaw?.toLowerCase() === OrderDirection.DESC
@@ -107,10 +109,9 @@ export class MessageController {
             { conversationId: cid, userId },
             page,
             limit,
-            { sort: { createdAt: 1 } },
-            searchTrimmed,
             orderBy?.trim() || undefined,
             orderDirection,
+            searchTrimmed,
             searchFields,
         );
 
@@ -185,11 +186,9 @@ export class MessageController {
         @Param('id') id: string,
         @Body() updateDto: MessageUpdateRequestDto,
     ): Promise<MessageGetResponseDto> {
-        const updatedMessage = await this.messageService.update(
-            id,
-            updateDto,
-            { userId },
-        );
+        const updatedMessage = await this.messageService.update(id, updateDto, {
+            userId,
+        });
         return this.messageService.mapGet(updatedMessage);
     }
 

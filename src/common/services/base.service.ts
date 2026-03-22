@@ -46,11 +46,11 @@ export abstract class BaseService<
         filter: Record<string, any> = {},
         page?: number,
         limit?: number,
-        repositoryOptions: FindOptions = {},
-        search?: string,
         orderBy?: string,
         orderDirection: OrderDirection = OrderDirection.ASC,
+        search?: string,
         searchFields?: string[],
+        repositoryOptions: FindOptions = {},
     ): Promise<{ data: TEntity[]; total: number }> {
         const sort: FindOptions['sort'] = {
             ...repositoryOptions.sort,
