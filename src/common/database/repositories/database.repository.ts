@@ -1,4 +1,8 @@
 import { Model, PopulateOptions, Document, PipelineStage } from 'mongoose';
+import {
+    SEARCH_REGEX_CASE_INSENSITIVE_FLAG,
+    SEARCH_REGEX_ESCAPE,
+} from '@common/database/constants/search-query.constant';
 import { DBEntityBase } from '@common/database/repositories/entities/database.entity';
 
 export type IDatabaseDocument<T> = T & Document;
@@ -8,6 +12,8 @@ export interface FindOptions {
     select?: string | Record<string, 0 | 1>;
     populate?: PopulateOptions | (string | PopulateOptions)[];
     lean?: boolean;
+    search?: string;
+    searchFields?: string[];
 }
 
 export interface FindAllOptions extends FindOptions {
@@ -30,6 +36,38 @@ export class DBRepositoryBase<
         this._join = options;
     }
 
+    protected buildMatchStage(
+        filter: Record<string, any> = {},
+        options: Pick<FindOptions, 'search' | 'searchFields'> = {},
+    ): Record<string, any> {
+        const base: Record<string, any> = {
+            ...filter,
+            deleted: false,
+        };
+        const q = options.search?.trim();
+        const fields = options.searchFields?.filter(Boolean);
+        if (q && fields?.length) {
+            const escaped = q.replace(
+                SEARCH_REGEX_ESCAPE.PATTERN,
+                SEARCH_REGEX_ESCAPE.REPLACEMENT,
+            );
+            return {
+                $and: [
+                    base,
+                    {
+                        $or: fields.map((field) => ({
+                            [field]: {
+                                $regex: escaped,
+                                $options: SEARCH_REGEX_CASE_INSENSITIVE_FLAG,
+                            },
+                        })),
+                    },
+                ],
+            };
+        }
+        return base;
+    }
+
     /**
      * Find documents using aggregation pipeline
      */
@@ -39,10 +77,7 @@ export class DBRepositoryBase<
     ): Promise<T[]> {
         const pipeline: PipelineStage[] = [
             {
-                $match: {
-                    ...filter,
-                    deleted: false,
-                },
+                $match: this.buildMatchStage(filter, options),
             },
         ];
 
@@ -101,10 +136,7 @@ export class DBRepositoryBase<
 
         const pipeline: PipelineStage[] = [
             {
-                $match: {
-                    ...filter,
-                    deleted: false,
-                },
+                $match: this.buildMatchStage(filter, options),
             },
         ];
 
@@ -169,13 +201,11 @@ export class DBRepositoryBase<
     async findOneById<T = Entity>(
         id: string,
         options: FindOptions = {},
+        filter: Record<string, any> = {},
     ): Promise<T | null> {
         const pipeline: PipelineStage[] = [
             {
-                $match: {
-                    _id: id,
-                    deleted: false,
-                },
+                $match: this.buildMatchStage({ ...filter, _id: id }, options),
             },
         ];
 
@@ -291,13 +321,13 @@ export class DBRepositoryBase<
     /**
      * Count documents
      */
-    async count(filter: Record<string, any> = {}): Promise<number> {
+    async count(
+        filter: Record<string, any> = {},
+        options: Pick<FindOptions, 'search' | 'searchFields'> = {},
+    ): Promise<number> {
         const pipeline: PipelineStage[] = [
             {
-                $match: {
-                    ...filter,
-                    deleted: false,
-                },
+                $match: this.buildMatchStage(filter, options),
             },
             {
                 $count: 'total',
