@@ -4,7 +4,7 @@ export class PaymentResultResponseDto {
     @ApiProperty({ description: 'Whether the payment was successful' })
     success: boolean;
 
-    @ApiProperty({ description: 'VNPAY response code' })
+    @ApiProperty({ description: 'Gateway response code' })
     responseCode: string;
 
     @ApiProperty({ description: 'Transaction reference' })
@@ -16,7 +16,7 @@ export class PaymentResultResponseDto {
     @ApiPropertyOptional({ description: 'Bank code used for payment' })
     bankCode?: string;
 
-    @ApiPropertyOptional({ description: 'VNPAY transaction number' })
+    @ApiPropertyOptional({ description: 'Gateway transaction number' })
     transactionNo?: string;
 
     @ApiPropertyOptional({ description: 'Order information' })
