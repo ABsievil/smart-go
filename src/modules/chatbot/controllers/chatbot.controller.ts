@@ -40,7 +40,6 @@ import {
 } from '@modules/chatbot/constants/chatbot.constants';
 import { randomUUID } from 'node:crypto';
 import { MessageCreateRequestDto } from '@modules/messages/dtos/request/message-create.request.dto';
-import { Public } from '@modules/auth/decorators/auth.decorator';
 
 @ApiTags('Chatbot')
 @Controller('chatbot')
@@ -53,7 +52,7 @@ export class ChatbotController {
     ) {}
 
     @Post('chat')
-    @Public()
+    @ApiBearerAuth()
     @LanguageResponse({
         module: 'chatbot',
         successKey: 'chat',
