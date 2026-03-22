@@ -5,6 +5,7 @@ import {
     HttpCode,
     HttpStatus,
     BadRequestException,
+    Logger,
 } from '@nestjs/common';
 import {
     ApiTags,
@@ -12,29 +13,39 @@ import {
     ApiResponse,
     ApiBearerAuth,
 } from '@nestjs/swagger';
-import { Logger } from '@nestjs/common';
 import { ChatbotService } from '@modules/chatbot/services/chatbot.service';
+import { MessageService } from '@modules/messages/services/message.service';
+import { OrderDirection } from '@common/database/enums/order-direction.enum';
+import { messagesToChatHistoryItems } from '@modules/chatbot/utils/message-to-chat-history.util';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { ChatRequestDto } from '@modules/chatbot/dtos/request/chat.request.dto';
 import { EmbedRequestDto } from '@modules/chatbot/dtos/request/embed.request.dto';
 import { ChatResponseDto } from '@modules/chatbot/dtos/response/chat.response.dto';
 import { EmbedGetResponseDto } from '@modules/chatbot/dtos/response/embed-get.response.dto';
 import { EmbedListResponseDto } from '@modules/chatbot/dtos/response/embed-list.response.dto';
-import { Roles } from '@modules/auth/decorators/auth.decorator';
+import { CurrentUser, Roles } from '@modules/auth/decorators/auth.decorator';
 import { UserRole } from '@modules/users/enums/user-role.enum';
 import {
     UploadSingleFile,
     UploadedFile,
 } from '@common/upload/decorators/upload-file.decorator';
 import { RequestTimeout } from '@common/decorators/request-timeout.decorator';
-import { EMBED_FILE_TIMEOUT_MS } from '@modules/chatbot/constants/chatbot.constants';
+import {
+    CHAT_MAX_HISTORY_TURNS,
+    EMBED_FILE_TIMEOUT_MS,
+} from '@modules/chatbot/constants/chatbot.constants';
+import { randomUUID } from 'node:crypto';
+import { MessageCreateRequestDto } from '@modules/messages/dtos/request/message-create.request.dto';
 
 @ApiTags('Chatbot')
 @Controller('chatbot')
 export class ChatbotController {
     private readonly logger = new Logger(ChatbotController.name);
 
-    constructor(private readonly chatbotService: ChatbotService) {}
+    constructor(
+        private readonly chatbotService: ChatbotService,
+        private readonly messageService: MessageService,
+    ) {}
 
     @Post('chat')
     @ApiBearerAuth()
@@ -47,8 +58,9 @@ export class ChatbotController {
         description: `
 Gửi tin nhắn và nhận câu trả lời từ AI Assistant với hỗ trợ RAG (Retrieval-Augmented Generation).
 **Hỗ trợ:**
-- Lịch sử cuộc trò chuyện (tối đa ${10} lượt)
+- Lịch sử cuộc trò chuyện theo \`conversationId\` (tối đa ${CHAT_MAX_HISTORY_TURNS} lượt, lấy từ DB)
 - RAG từ knowledge base (tuyến, trạm, FAQ)
+- Lưu tin người dùng và câu trả lời bot vào DB; response trả về \`conversationId\` (hội thoại mới được tạo UUID nếu chưa gửi)
         `,
     })
     @ApiResponse({
@@ -57,9 +69,45 @@ Gửi tin nhắn và nhận câu trả lời từ AI Assistant với hỗ trợ 
         type: ChatResponseDto,
     })
     @HttpCode(HttpStatus.OK)
-    async chat(@Body() dto: ChatRequestDto): Promise<ChatResponseDto> {
+    async chat(
+        @CurrentUser('_id') userId: string,
+        @Body() dto: ChatRequestDto,
+    ): Promise<ChatResponseDto> {
         this.logger.debug(`Chat request: "${dto.message.slice(0, 80)}"`);
-        return this.chatbotService.chat(dto.message, dto.history);
+
+        const providedCid = dto.conversationId?.trim();
+        const conversationId = providedCid || randomUUID();
+        let history = [];
+
+        if (providedCid) {
+            const { data } = await this.messageService.findAll(
+                { conversationId: providedCid, userId },
+                1,
+                CHAT_MAX_HISTORY_TURNS * 2,
+                'createdAt',
+                OrderDirection.DESC,
+            );
+            const chronological = [...data].reverse();
+            history = messagesToChatHistoryItems(chronological);
+        }
+
+        const result = await this.chatbotService.chat(dto.message, history);
+
+        await this.messageService.create({
+            conversationId,
+            userId,
+            role: UserRole.USER,
+            content: dto.message,
+        } as MessageCreateRequestDto);
+
+        await this.messageService.create({
+            conversationId,
+            userId,
+            role: UserRole.BOT,
+            content: result.reply,
+        } as MessageCreateRequestDto);
+
+        return { ...result, conversationId };
     }
 
     @Post('embed')

@@ -1,15 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-    IsString,
-    IsNotEmpty,
-    IsOptional,
-    IsArray,
-    ValidateNested,
-    IsEnum,
-    MaxLength,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import { ChatHistoryItemDto } from './chat-history-item.request.dto';
+import { IsString, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
 export class ChatRequestDto {
     @ApiProperty({
@@ -22,12 +12,12 @@ export class ChatRequestDto {
     message: string;
 
     @ApiPropertyOptional({
-        description: 'Lịch sử cuộc trò chuyện trước đó',
-        type: [ChatHistoryItemDto],
+        description:
+            'ID cuộc hội thoại — server tải lịch sử tin nhắn từ DB (theo user hiện tại). Bỏ qua nếu chưa có hội thoại.',
+        example: '507f1f77bcf86cd799439011',
     })
     @IsOptional()
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => ChatHistoryItemDto)
-    history?: ChatHistoryItemDto[];
+    @IsString()
+    @IsNotEmpty()
+    conversationId?: string;
 }
