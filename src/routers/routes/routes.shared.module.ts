@@ -12,6 +12,8 @@ import { PaymentController } from '@modules/payment/controllers/payment.controll
 import { PaymentModule } from '@modules/payment/payment.module';
 import { ChatbotController } from '@modules/chatbot/controllers/chatbot.controller';
 import { ChatbotModule } from '@modules/chatbot/chatbot.module';
+import { MessageController } from '@modules/messages/controllers/message.controller';
+import { MessageModule } from '@modules/messages/message.module';
 
 @Module({
     controllers: [
@@ -21,6 +23,7 @@ import { ChatbotModule } from '@modules/chatbot/chatbot.module';
         RoutingController,
         PaymentController,
         ChatbotController,
+        MessageController,
     ],
     imports: [
         AuthModule,
@@ -30,6 +33,7 @@ import { ChatbotModule } from '@modules/chatbot/chatbot.module';
         RoutingModule,
         PaymentModule,
         ChatbotModule,
+        MessageModule,
     ],
 })
 export class RoutesSharedModule {}

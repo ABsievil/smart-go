@@ -111,6 +111,23 @@ export class HuggingFaceService implements OnModuleInit {
     }
 
     /**
+     * Chuyển đổi vai trò ChatMessageRole sang role của OpenAI SDK.
+     */
+    private toOpenAiChatRole(
+        role: ChatMessageRole,
+    ): 'system' | 'user' | 'assistant' {
+        switch (role) {
+            case ChatMessageRole.SYSTEM:
+                return 'system';
+            case ChatMessageRole.ASSISTANT:
+                return 'assistant';
+            case ChatMessageRole.USER:
+            default:
+                return 'user';
+        }
+    }
+
+    /**
      * Gọi chat completion qua OpenAI SDK trỏ vào HuggingFace router.
      * Hỗ trợ các model được host bởi Groq, Nebius,... thông qua HF router.
      */
@@ -119,9 +136,12 @@ export class HuggingFaceService implements OnModuleInit {
         systemPrompt: string,
     ): Promise<string> {
         const payload: OpenAI.Chat.ChatCompletionMessageParam[] = [
-            { role: ChatMessageRole.SYSTEM, content: systemPrompt },
+            {
+                role: this.toOpenAiChatRole(ChatMessageRole.SYSTEM),
+                content: systemPrompt,
+            },
             ...messages.map((m) => ({
-                role: m.role as ChatMessageRole,
+                role: this.toOpenAiChatRole(m.role),
                 content: m.content,
             })),
         ];

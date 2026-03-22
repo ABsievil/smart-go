@@ -10,6 +10,14 @@ export class ChatResponseDto {
     @Expose()
     reply: string;
 
+    @ApiProperty({
+        description:
+            'ID cuộc hội thoại — tin nhắn đã được lưu DB; gửi lại field này ở lần chat tiếp theo để nối lịch sử',
+        example: '550e8400-e29b-41d4-a716-446655440000',
+    })
+    @Expose()
+    conversationId: string;
+
     @ApiPropertyOptional({
         description: 'Số lượng tài liệu tham khảo được tìm thấy trong vector DB',
         example: 3,

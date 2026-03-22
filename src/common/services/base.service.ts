@@ -3,8 +3,10 @@ import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { Document } from 'mongoose';
 import {
     DBRepositoryBase,
+    FindOptions,
     IDatabaseDocument,
 } from '@common/database/repositories/database.repository';
+import { OrderDirection } from '@common/database/enums/order-direction.enum';
 import { DBEntityBase } from '@common/database/repositories/entities/database.entity';
 
 export abstract class BaseService<
@@ -44,11 +46,41 @@ export abstract class BaseService<
         filter: Record<string, any> = {},
         page?: number,
         limit?: number,
+        orderBy?: string,
+        orderDirection: OrderDirection = OrderDirection.ASC,
+        search?: string,
+        searchFields?: string[],
+        repositoryOptions: FindOptions = {},
     ): Promise<{ data: TEntity[]; total: number }> {
+        const sort: FindOptions['sort'] = {
+            ...repositoryOptions.sort,
+            ...(orderBy
+                ? {
+                      [orderBy]:
+                          orderDirection === OrderDirection.DESC ? -1 : 1,
+                  }
+                : {}),
+        };
+
+        const options: FindOptions = {
+            ...repositoryOptions,
+            lean: true,
+            ...(search !== undefined && search !== ''
+                ? { search, searchFields }
+                : {}),
+            ...(Object.keys(sort ?? {}).length ? { sort } : {}),
+        };
+
+        const countOptions: Pick<FindOptions, 'search' | 'searchFields'> = {
+            ...(search !== undefined && search !== ''
+                ? { search, searchFields }
+                : {}),
+        };
+
         if (page === undefined && limit === undefined) {
             const [data, total] = await Promise.all([
-                this.repository.find<TEntity>(filter, { lean: true }),
-                this.repository.count(filter),
+                this.repository.find<TEntity>(filter, options),
+                this.repository.count(filter, countOptions),
             ]);
             return { data, total };
         }
@@ -57,16 +89,22 @@ export abstract class BaseService<
             filter,
             page ?? 1,
             limit ?? 10,
-            { lean: true },
+            options,
         );
 
         return { data, total };
     }
 
-    async findOne(id: string): Promise<TEntity> {
-        const entity = await this.repository.findOneById<TEntity>(id, {
-            lean: true,
-        });
+    async findOne(
+        id: string,
+        filter: Record<string, any> = {},
+        repositoryOptions: FindOptions = {},
+    ): Promise<TEntity> {
+        const entity = await this.repository.findOneById<TEntity>(
+            id,
+            { ...repositoryOptions, lean: true },
+            filter,
+        );
 
         if (!entity) {
             throw new NotFoundException(`Resource with ID ${id} not found`);
@@ -81,11 +119,15 @@ export abstract class BaseService<
         return await this.repository.create(entityData);
     }
 
-    async update(id: string, updateDto: TUpdateRequestDto): Promise<TDoc> {
+    async update(
+        id: string,
+        updateDto: TUpdateRequestDto,
+        filter: Record<string, any> = {},
+    ): Promise<TDoc> {
         const updateData = Object.assign(new this.entityClass(), updateDto);
 
         const updated = await this.repository.update<TDoc>(
-            { _id: id },
+            { ...filter, _id: id },
             updateData,
         );
 
@@ -96,8 +138,8 @@ export abstract class BaseService<
         return updated;
     }
 
-    async delete(id: string): Promise<void> {
-        const deleted = await this.repository.delete({ _id: id });
+    async delete(id: string, filter: Record<string, any> = {}): Promise<void> {
+        const deleted = await this.repository.delete({ ...filter, _id: id });
 
         if (!deleted) {
             throw new NotFoundException(`Resource with ID ${id} not found`);

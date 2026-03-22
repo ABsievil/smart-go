@@ -46,7 +46,7 @@ export class ChatbotService {
     async chat(
         message: string,
         history: ChatHistoryItemDto[] = [],
-    ): Promise<ChatResponseDto> {
+    ): Promise<Omit<ChatResponseDto, 'conversationId'>> {
         // Bước 1: Embed tin nhắn người dùng để tìm context liên quan
         const embedding =
             await this.huggingFaceService.generateEmbedding(message);

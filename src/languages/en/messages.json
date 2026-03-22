@@ -1,0 +1,16 @@
+{
+    "success": {
+        "create": "Message created successfully",
+        "findAll": "Messages retrieved successfully",
+        "findOne": "Message retrieved successfully",
+        "update": "Message updated successfully",
+        "remove": "Message deleted successfully"
+    },
+    "error": {
+        "create": "Failed to create message",
+        "findAll": "Failed to retrieve messages",
+        "findOne": "Message not found",
+        "update": "Failed to update message",
+        "remove": "Failed to delete message"
+    }
+}

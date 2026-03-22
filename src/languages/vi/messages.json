@@ -1,0 +1,16 @@
+{
+    "success": {
+        "create": "Tạo tin nhắn thành công",
+        "findAll": "Lấy danh sách tin nhắn thành công",
+        "findOne": "Lấy tin nhắn thành công",
+        "update": "Cập nhật tin nhắn thành công",
+        "remove": "Xóa tin nhắn thành công"
+    },
+    "error": {
+        "create": "Không thể tạo tin nhắn",
+        "findAll": "Không thể lấy danh sách tin nhắn",
+        "findOne": "Không tìm thấy tin nhắn",
+        "update": "Không thể cập nhật tin nhắn",
+        "remove": "Không thể xóa tin nhắn"
+    }
+}
