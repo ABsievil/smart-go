@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Logger } from '@nestjs/common';
 import { HuggingFaceService } from '@modules/chatbot/services/huggingface.service';
 import { ZillizService } from '@modules/chatbot/services/zilliz.service';
 import { IChatMessage } from '@modules/chatbot/interfaces/chat-message.interface';
@@ -58,17 +57,22 @@ export class ChatbotService {
             this.contextLimit,
         );
 
+        const ragHits = contextDocs.map((d) => ({
+            score: Number(d.score.toFixed(4)),
+            type: d.type,
+            metadata: d.metadata ?? {},
+        }));
         this.logger.debug(
-            `Found ${contextDocs.length} context documents for message: "${message.slice(0, 80)}..."`,
+            `RAG ${contextDocs.length} hit(s)\n${JSON.stringify(ragHits, null, 2)}`,
         );
 
         // Bước 3: Gắn context RAG vào system prompt hằng số
         const enrichedSystemPrompt =
             this.buildSystemPromptWithContext(contextDocs);
-
+        this.logger.debug(`Enriched system prompt: ${enrichedSystemPrompt}`);
         // Bước 4: Chuẩn bị lịch sử hội thoại (giới hạn số turn để tránh vượt context window)
         const messages = this.buildMessageHistory(history, message);
-
+        this.logger.debug(`Messages: ${JSON.stringify(messages, null, 2)}`);
         // Bước 5: Gọi LLM sinh câu trả lời
         const reply = await this.huggingFaceService.chatCompletion(
             messages,
@@ -103,11 +107,17 @@ export class ChatbotService {
      * Nhúng hàng loạt kiến thức từ danh sách items (parse từ file JSON).
      * Các item được xử lý tuần tự để tránh rate-limit từ HuggingFace.
      */
-    async embedFromFile(items: EmbedRequestDto[]): Promise<EmbedListResponseDto> {
+    async embedFromFile(
+        items: EmbedRequestDto[],
+    ): Promise<EmbedListResponseDto> {
         const data: EmbedGetResponseDto[] = [];
 
         for (const item of items) {
-            const result = await this.embed(item.text, item.type, item.metadata);
+            const result = await this.embed(
+                item.text,
+                item.type,
+                item.metadata,
+            );
             data.push(result);
         }
 
@@ -120,6 +130,7 @@ export class ChatbotService {
 
     /**
      * Ghép context RAG vào system prompt để LLM có thêm thông tin thực tế.
+     * Vector search trả về `text` (đoạn đã embed, thường ngắn) và `metadata` (chi tiết có cấu trúc).
      */
     private buildSystemPromptWithContext(
         contextDocs: IVectorSearchResult[],
@@ -129,10 +140,31 @@ export class ChatbotService {
         }
 
         const contextBlock = contextDocs
-            .map((doc, i) => `[${i + 1}] ${doc.text}`)
-            .join('\n');
+            .map((doc, i) => this.formatContextChunk(doc, i))
+            .join('\n\n');
 
-        return CHATBOT_SYSTEM_PROMPT_WITH_CONTEXT.replace('{context}', contextBlock);
+        return CHATBOT_SYSTEM_PROMPT_WITH_CONTEXT.replace(
+            '{context}',
+            contextBlock,
+        );
+    }
+
+    /** Format chunk context: phần text để embed + metadata chi tiết (JSON) nếu có. */
+    private formatContextChunk(
+        doc: IVectorSearchResult,
+        index: number,
+    ): string {
+        const label = `[${index + 1}]`;
+        const textLine = doc.text?.trim()
+            ? `${label} ${doc.text.trim()}`
+            : `${label} (type: ${doc.type}, no text field)`;
+
+        const meta = doc.metadata;
+        if (!meta || Object.keys(meta).length === 0) {
+            return textLine;
+        }
+
+        return `${textLine}\nStructured details (metadata):\n${JSON.stringify(meta, null, 2)}`;
     }
 
     /**
