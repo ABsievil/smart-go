@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { MomoService } from '@modules/payment/services/momo.service';
 import { VnpayService } from '@modules/payment/services/vnpay.service';
 import { PaymentCreateRequestDto } from '@modules/payment/dtos/request/payment-create.request.dto';
 import { PaymentUrlResponseDto } from '@modules/payment/dtos/response/payment-url.response.dto';
 import { PaymentResultResponseDto } from '@modules/payment/dtos/response/payment-result.response.dto';
+import { IMomoCallbackParams } from '@modules/payment/interfaces/momo-params.interface';
 import { IVnpayCallbackParams } from '@modules/payment/interfaces/vnpay-params.interface';
 import {
     VnpayIpnRspCode,
@@ -11,7 +13,10 @@ import {
 
 @Injectable()
 export class PaymentService {
-    constructor(private readonly vnpayService: VnpayService) {}
+    constructor(
+        private readonly vnpayService: VnpayService,
+        private readonly momoService: MomoService,
+    ) {}
 
     createPaymentUrl(
         dto: PaymentCreateRequestDto,
@@ -27,6 +32,22 @@ export class PaymentService {
             ipAddr,
             bankCode: dto.bankCode,
             locale: dto.locale,
+        });
+
+        return { paymentUrl, txnRef };
+    }
+
+    async createMomoPaymentUrl(
+        dto: PaymentCreateRequestDto,
+        ipAddr: string,
+    ): Promise<PaymentUrlResponseDto> {
+        const txnRef = this.generateTxnRef();
+        const paymentUrl = await this.momoService.createPaymentUrl({
+            amount: dto.amount,
+            orderDescription: dto.orderDescription,
+            orderType: dto.orderType,
+            txnRef,
+            ipAddr,
         });
 
         return { paymentUrl, txnRef };
@@ -73,6 +94,47 @@ export class PaymentService {
         return {
             RspCode: VnpayIpnRspCode.SUCCESS,
             Message: 'Confirm Success',
+        };
+    }
+
+    handleMomoReturn(params: IMomoCallbackParams): PaymentResultResponseDto {
+        const isValid = this.momoService.verifySignature(params);
+        const success = isValid && params.resultCode === 0;
+
+        return {
+            success,
+            responseCode: String(params.resultCode),
+            txnRef: params.orderId,
+            amount: Number(params.amount),
+            bankCode: params.payType,
+            transactionNo:
+                params.transId !== undefined
+                    ? String(params.transId)
+                    : undefined,
+            orderInfo: params.orderInfo,
+            payDate:
+                params.responseTime !== undefined
+                    ? String(params.responseTime)
+                    : undefined,
+        };
+    }
+
+    handleMomoIpn(params: IMomoCallbackParams): {
+        resultCode: number;
+        message: string;
+    } {
+        const isValid = this.momoService.verifySignature(params);
+
+        if (!isValid) {
+            return {
+                resultCode: 97,
+                message: 'Invalid signature',
+            };
+        }
+
+        return {
+            resultCode: 0,
+            message: 'Confirm Success',
         };
     }
 

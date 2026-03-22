@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import databaseConfig from '@common/configs/database.config';
 import appConfig from '@common/configs/app.config';
 import authConfig from '@common/configs/auth.config';
+import momoConfig from '@common/configs/momo.config';
 import vnpayConfig from '@common/configs/vnpay.config';
 import cloudinaryConfig from '@common/configs/cloudinary.config';
 import redisConfig from '@common/configs/redis.config';
@@ -29,6 +30,7 @@ import { RedisModule } from '@common/redis/redis.module';
                 databaseConfig,
                 appConfig,
                 authConfig,
+                momoConfig,
                 vnpayConfig,
                 cloudinaryConfig,
                 redisConfig,
