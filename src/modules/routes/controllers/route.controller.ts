@@ -19,7 +19,6 @@ import {
     ApiQuery,
     ApiBearerAuth,
 } from '@nestjs/swagger';
-import { PinoLogger } from 'nestjs-pino';
 import { RouteService } from '@modules/routes/services/route.service';
 import { StationService } from '@modules/stations/services/station.service';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
@@ -34,10 +33,7 @@ export class RouteController {
     constructor(
         private readonly routeService: RouteService,
         private readonly stationService: StationService,
-        private readonly pinoLogger: PinoLogger,
-    ) {
-        this.pinoLogger.setContext(RouteController.name);
-    }
+    ) {}
 
     @Get()
     @ApiBearerAuth()

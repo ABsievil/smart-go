@@ -19,7 +19,6 @@ import {
     ApiQuery,
     ApiBearerAuth,
 } from '@nestjs/swagger';
-import { PinoLogger } from 'nestjs-pino';
 import { StationService } from '@modules/stations/services/station.service';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { StationCreateRequestDto } from '@modules/stations/dtos/request/station-create.request.dto';
@@ -30,12 +29,7 @@ import { StationListResponseDto } from '@modules/stations/dtos/response/station-
 @ApiTags('Stations')
 @Controller('stations')
 export class StationController {
-    constructor(
-        private readonly stationService: StationService,
-        private readonly pinoLogger: PinoLogger,
-    ) {
-        this.pinoLogger.setContext(StationController.name);
-    }
+    constructor(private readonly stationService: StationService) {}
 
     @Get()
     @ApiBearerAuth()

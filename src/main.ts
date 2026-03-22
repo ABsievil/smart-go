@@ -1,17 +1,18 @@
 import { NestFactory } from '@nestjs/core';
-import { VersioningType } from '@nestjs/common';
+import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from '@app/app.module';
-import { Logger } from '@nestjs/common';
+import { AppLogger } from '@common/logger/app-logger.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LanguageResponseInterceptor } from '@common/language/interceptors/language-response.interceptor';
 import { LanguageExceptionFilter } from '@common/language/filters/language-exception.filter';
 import { Response } from 'express';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, { bufferLogs: true });
+    app.useLogger(app.get(AppLogger));
 
-    const logger = new Logger('NestJs-Main');
+    const logger = new Logger('Bootstrap');
 
     const config = app.get(ConfigService);
     const host = config.get<string>('app.host') ?? '0.0.0.0';
@@ -22,6 +23,14 @@ async function bootstrap() {
     const globalPrefix = config.get<string>('app.globalPrefix') ?? 'api';
 
     app.setGlobalPrefix(globalPrefix);
+
+    app.useGlobalPipes(
+        new ValidationPipe({
+            whitelist: true,
+            forbidNonWhitelisted: true,
+            transform: true,
+        }),
+    );
 
     app.enableVersioning({
         type: VersioningType.URI,
@@ -53,7 +62,7 @@ async function bootstrap() {
         res.redirect(`/${swaggerPath}`);
     });
 
-    logger.debug(`Server is running on ${host}:${port}`);
+    logger.log(`Listening on ${host}:${port} (tz=${timezone}, lang=${language})`);
 
     await app.listen(port, host);
 }

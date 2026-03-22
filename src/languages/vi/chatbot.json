@@ -1,0 +1,14 @@
+{
+    "success": {
+        "chat": "Đã tạo câu trả lời thành công",
+        "embed": "Đã nhúng kiến thức thành công",
+        "embedFile": "Đã nhúng kiến thức hàng loạt thành công"
+    },
+    "error": {
+        "chat": "Không thể tạo câu trả lời",
+        "embed": "Không thể nhúng kiến thức",
+        "embeddingFailed": "Không thể tạo vector embedding cho văn bản",
+        "searchFailed": "Không thể tìm kiếm trong vector database",
+        "modelUnavailable": "Mô hình AI hiện không khả dụng"
+    }
+}

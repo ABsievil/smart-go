@@ -72,6 +72,57 @@ export class EnvironmentVariablesDto {
     @IsString()
     JWT_REFRESH_EXPIRES_IN?: string;
 
+    // HuggingFace
+    @IsOptional()
+    @IsString()
+    HF_TOKEN?: string;
+
+    @IsOptional()
+    @IsString()
+    HF_CHAT_MODEL?: string;
+
+    @IsOptional()
+    @IsString()
+    HF_EMBEDDING_MODEL?: string;
+
+    @IsOptional()
+    @IsNumberString()
+    HF_MAX_NEW_TOKENS?: string;
+
+    @IsOptional()
+    @IsString()
+    HF_TEMPERATURE?: string;
+
+    @IsOptional()
+    @IsString()
+    HF_INFERENCE_PROVIDER?: string;
+
+    @IsOptional()
+    @IsString()
+    HF_ROUTER_BASE_URL?: string;
+
+    // Zilliz
+    @IsOptional()
+    @IsString()
+    ZILLIZ_URI?: string;
+
+    @IsOptional()
+    @IsString()
+    ZILLIZ_TOKEN?: string;
+
+    @IsOptional()
+    @IsString()
+    ZILLIZ_COLLECTION_NAME?: string;
+
+    @IsOptional()
+    @IsNumberString()
+    ZILLIZ_DIMENSION?: string;
+
+    // Chatbot
+    @IsOptional()
+    @IsNumberString()
+    CHATBOT_CONTEXT_LIMIT?: string;
+
     // VNPAY
     @IsOptional()
     @IsString()

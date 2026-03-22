@@ -12,7 +12,7 @@ import {
     ApiResponse,
     ApiBearerAuth,
 } from '@nestjs/swagger';
-import { Logger } from 'nestjs-pino';
+import { Logger } from '@nestjs/common';
 import { RoutingService } from '@modules/routing/services/routing.service';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { RoutingRequestDto } from '@modules/routing/dtos/request/routing.request.dto';
@@ -31,10 +31,9 @@ import {
 @ApiTags('Routing')
 @Controller('routing')
 export class RoutingController {
-    constructor(
-        private readonly routingService: RoutingService,
-        private readonly logger: Logger,
-    ) {}
+    private readonly logger = new Logger(RoutingController.name);
+
+    constructor(private readonly routingService: RoutingService) {}
     @Post('find-path')
     @ApiBearerAuth()
     @LanguageResponse({

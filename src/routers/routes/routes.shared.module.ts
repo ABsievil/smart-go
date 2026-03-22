@@ -10,6 +10,8 @@ import { RoutingModule } from '@modules/routing/routing.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { PaymentController } from '@modules/payment/controllers/payment.controller';
 import { PaymentModule } from '@modules/payment/payment.module';
+import { ChatbotController } from '@modules/chatbot/controllers/chatbot.controller';
+import { ChatbotModule } from '@modules/chatbot/chatbot.module';
 
 @Module({
     controllers: [
@@ -18,6 +20,7 @@ import { PaymentModule } from '@modules/payment/payment.module';
         StationController,
         RoutingController,
         PaymentController,
+        ChatbotController,
     ],
     imports: [
         AuthModule,
@@ -26,6 +29,7 @@ import { PaymentModule } from '@modules/payment/payment.module';
         StationModule,
         RoutingModule,
         PaymentModule,
+        ChatbotModule,
     ],
 })
 export class RoutesSharedModule {}
