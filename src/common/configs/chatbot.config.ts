@@ -27,5 +27,10 @@ export default registerAs(
             dimension: Number(process.env.ZILLIZ_DIMENSION ?? 384),
         },
         contextLimit: Number(process.env.CHATBOT_CONTEXT_LIMIT ?? 5),
+        /** Số item gộp mỗi lần gọi HF feature-extraction + một lần insert Zilliz (tối ưu bulk). */
+        embedFileBatchSize: Math.min(
+            256,
+            Math.max(1, Number(process.env.CHATBOT_EMBED_BATCH_SIZE ?? 64)),
+        ),
     }),
 );

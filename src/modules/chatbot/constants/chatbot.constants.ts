@@ -18,7 +18,7 @@ export const ZILLIZ_INDEX_FIELD = 'embedding';
 export const CHAT_MAX_HISTORY_TURNS = 10;
 
 // ─── Timeout ──────────────────────────────────────────────────────────────────
-export const EMBED_FILE_TIMEOUT_MS = 5 * 60 * 1000; // 5 phút — batch embed nhiều items
+export const EMBED_FILE_TIMEOUT_MS = 30 * 60 * 1000; // 30 phút — batch embed nhiều items
 
 const CHATBOT_SYSTEM_PROMPT_CORE = [
     'Bạn là Smart Go Assistant — trợ lý giao thông công cộng cho TP. Hồ Chí Minh.',

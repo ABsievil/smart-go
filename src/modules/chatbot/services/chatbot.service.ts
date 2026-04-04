@@ -1,4 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+    Injectable,
+    InternalServerErrorException,
+    Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HuggingFaceService } from '@modules/chatbot/services/huggingface.service';
 import { ZillizService } from '@modules/chatbot/services/zilliz.service';
@@ -22,6 +26,7 @@ import {
 @Injectable()
 export class ChatbotService {
     private readonly contextLimit: number;
+    private readonly embedFileBatchSize: number;
     private readonly logger = new Logger(ChatbotService.name);
 
     constructor(
@@ -31,6 +36,9 @@ export class ChatbotService {
     ) {
         this.contextLimit = this.configService.get<number>(
             'chatbot.contextLimit',
+        );
+        this.embedFileBatchSize = this.configService.get<number>(
+            'chatbot.embedFileBatchSize',
         );
     }
 
@@ -104,25 +112,65 @@ export class ChatbotService {
     }
 
     /**
-     * Nhúng hàng loạt kiến thức từ danh sách items (parse từ file JSON).
-     * Các item được xử lý tuần tự để tránh rate-limit từ HuggingFace.
+     * Nhúng hàng loạt từ file JSON: gộp embedding (một request HF / batch) và
+     * insert Zilliz theo lô để giảm số round-trip so với xử lý từng dòng.
      */
     async embedFromFile(
         items: EmbedRequestDto[],
     ): Promise<EmbedListResponseDto> {
         const data: EmbedGetResponseDto[] = [];
+        const batchSize = Math.max(1, this.embedFileBatchSize ?? 64);
+        const total = items.length;
+        const totalBatches = total ? Math.ceil(total / batchSize) : 0;
 
-        for (const item of items) {
-            const result = await this.embed(
-                item.text,
-                item.type,
-                item.metadata,
+        this.logger.log(
+            `Batch embed started: ${total} item(s), ${totalBatches} batch(es), batchSize=${batchSize}`,
+        );
+
+        let batchIndex = 0;
+        for (let i = 0; i < items.length; i += batchSize) {
+            batchIndex++;
+            const slice = items.slice(i, i + batchSize);
+            const texts = slice.map((item) => item.text);
+
+            const embeddings =
+                await this.huggingFaceService.generateEmbeddingsBatch(texts);
+
+            if (embeddings.length !== slice.length) {
+                throw new InternalServerErrorException(
+                    `Embedding batch size mismatch: expected ${slice.length}, got ${embeddings.length}`,
+                );
+            }
+
+            const rows = slice.map((item, j) => ({
+                embedding: embeddings[j],
+                text: item.text,
+                type: item.type,
+                metadata: item.metadata ?? {},
+            }));
+
+            const ids = await this.zillizService.insertBatch(rows);
+
+            for (let j = 0; j < slice.length; j++) {
+                data.push({
+                    _id: ids[j],
+                    text: slice[j].text,
+                    type: slice[j].type,
+                });
+            }
+
+            const processed = data.length;
+            const pct =
+                total > 0
+                    ? ((processed / total) * 100).toFixed(1)
+                    : '0.0';
+            this.logger.log(
+                `Batch embed progress: ${processed}/${total} (${pct}%) — batch ${batchIndex}/${totalBatches}`,
             );
-            data.push(result);
         }
 
         this.logger.log(
-            `Batch embed completed: ${data.length}/${items.length} items`,
+            `Batch embed completed: ${data.length}/${items.length} items (batchSize=${batchSize})`,
         );
 
         return { total: items.length, page: 1, limit: items.length, data };

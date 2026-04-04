@@ -164,6 +164,8 @@ Dành riêng cho Admin. Upload file JSON chứa mảng các mục kiến thức 
 \`\`\`
 
 **Loại nội dung hỗ trợ:** route, station, faq, general
+
+**Hiệu năng (bulk):** Mỗi lô gọi embedding HuggingFace một lần cho nhiều câu và insert Zilliz một lần cho cả lô. Điều chỉnh \`CHATBOT_EMBED_BATCH_SIZE\` (mặc định 64, tối đa 256) nếu cần cân bằng tốc độ / giới hạn API.
     `,
     })
     @ApiResponse({

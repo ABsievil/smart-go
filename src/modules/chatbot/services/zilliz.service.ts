@@ -131,6 +131,37 @@ export class ZillizService implements OnModuleInit {
     }
 
     /**
+     * Chèn nhiều vector trong một lần gọi Milvus (giảm round-trip khi sync hàng loạt).
+     */
+    async insertBatch(
+        rows: Array<{
+            embedding: number[];
+            text: string;
+            type: ChatbotEmbedType;
+            metadata: Record<string, any>;
+        }>,
+    ): Promise<string[]> {
+        if (!rows.length) {
+            return [];
+        }
+
+        const ids = rows.map(() => randomUUID());
+
+        await this.client.insert({
+            collection_name: this.collectionName,
+            data: rows.map((row, i) => ({
+                [ZILLIZ_FIELD_ID]: ids[i],
+                [ZILLIZ_FIELD_EMBEDDING]: row.embedding,
+                [ZILLIZ_FIELD_TEXT]: row.text,
+                [ZILLIZ_FIELD_TYPE]: row.type,
+                [ZILLIZ_FIELD_METADATA]: row.metadata,
+            })),
+        });
+
+        return ids;
+    }
+
+    /**
      * @description Tìm kiếm các vector gần nhất với embedding đầu vào.
      * Trả về danh sách kết quả kèm score độ tương đồng.
      */

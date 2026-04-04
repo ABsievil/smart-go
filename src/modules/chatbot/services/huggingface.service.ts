@@ -111,6 +111,111 @@ export class HuggingFaceService implements OnModuleInit {
     }
 
     /**
+     * Embedding hàng loạt (một request HF cho nhiều câu) — dùng cho sync file lớn.
+     */
+    async generateEmbeddingsBatch(texts: string[]): Promise<number[][]> {
+        if (!texts.length) {
+            return [];
+        }
+
+        for (const text of texts) {
+            if (!text?.trim()) {
+                throw new BadRequestException(
+                    'Embedding batch: every item must have non-empty text',
+                );
+            }
+        }
+
+        let output: unknown;
+
+        try {
+            output = await this.inferenceClient.featureExtraction({
+                model: this.embeddingModel,
+                inputs: texts,
+                provider: this.inferenceProvider as InferenceProvider,
+            });
+        } catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            this.logger.error(
+                `HuggingFace batch featureExtraction failed [model=${this.embeddingModel}, n=${texts.length}]: ${message}`,
+            );
+            throw new InternalServerErrorException(
+                `Embedding service error: ${message}`,
+            );
+        }
+
+        return this.normalizeBatchEmbeddingOutput(output, texts.length);
+    }
+
+    private meanPool(tokenVectors: number[][]): number[] {
+        if (!tokenVectors.length) {
+            throw new InternalServerErrorException(
+                'Cannot mean-pool empty token sequence',
+            );
+        }
+        const dim = tokenVectors[0].length;
+        const acc = new Array(dim).fill(0);
+        for (const vec of tokenVectors) {
+            for (let d = 0; d < dim; d++) {
+                acc[d] += vec[d];
+            }
+        }
+        const n = tokenVectors.length;
+        for (let d = 0; d < dim; d++) {
+            acc[d] /= n;
+        }
+        return acc;
+    }
+
+    private normalizeBatchEmbeddingOutput(
+        output: unknown,
+        expectedBatch: number,
+    ): number[][] {
+        if (!Array.isArray(output) || output.length === 0) {
+            throw new InternalServerErrorException(
+                'Empty or invalid batch embedding response from HuggingFace',
+            );
+        }
+
+        const rows: number[][] = [];
+
+        for (const item of output as unknown[]) {
+            if (typeof item === 'number') {
+                throw new InternalServerErrorException(
+                    'Unexpected scalar in batch embedding output',
+                );
+            }
+            if (!Array.isArray(item)) {
+                throw new InternalServerErrorException(
+                    'Unexpected batch embedding element type',
+                );
+            }
+            if (item.length === 0) {
+                throw new InternalServerErrorException(
+                    'Empty row in batch embedding output',
+                );
+            }
+            if (typeof item[0] === 'number') {
+                rows.push(item as number[]);
+            } else if (Array.isArray(item[0])) {
+                rows.push(this.meanPool(item as unknown as number[][]));
+            } else {
+                throw new InternalServerErrorException(
+                    'Unexpected nested shape in batch embedding output',
+                );
+            }
+        }
+
+        if (rows.length !== expectedBatch) {
+            this.logger.warn(
+                `Batch embedding count ${rows.length} !== input ${expectedBatch}`,
+            );
+        }
+
+        return rows;
+    }
+
+    /**
      * Chuyển đổi vai trò ChatMessageRole sang role của OpenAI SDK.
      */
     private toOpenAiChatRole(
