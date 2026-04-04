@@ -183,16 +183,17 @@ Dành riêng cho Admin. Upload file JSON chứa mảng các mục kiến thức 
 
         try {
             items = JSON.parse(file.buffer.toString('utf-8'));
-        } catch {
+
+            if (!Array.isArray(items) || !items.length) {
+                throw new BadRequestException(
+                    'File JSON phải chứa mảng các mục kiến thức không rỗng',
+                );
+            }
+
+            return this.chatbotService.embedFromFile(items);
+        } catch (error) {
+            this.logger.error(`Error parsing JSON file: ${error.message}`);
             throw new BadRequestException('File JSON không hợp lệ');
         }
-
-        if (!Array.isArray(items) || !items.length) {
-            throw new BadRequestException(
-                'File JSON phải chứa mảng các mục kiến thức không rỗng',
-            );
-        }
-
-        return this.chatbotService.embedFromFile(items);
     }
 }

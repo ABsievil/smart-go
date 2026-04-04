@@ -9,7 +9,7 @@ export const UPLOAD_FIELD = {
 } as const;
 
 export const UPLOAD_LIMIT = {
-    DEFAULT_MAX_FILE_SIZE: 5 * 1024 * 1024,
+    DEFAULT_MAX_FILE_SIZE: 10 * 1024 * 1024,
 } as const;
 
 export const UPLOAD_ALLOWED_MIME_TYPES = {
