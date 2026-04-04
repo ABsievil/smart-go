@@ -164,6 +164,8 @@ Dành riêng cho Admin. Upload file JSON chứa mảng các mục kiến thức 
 \`\`\`
 
 **Loại nội dung hỗ trợ:** route, station, faq, general
+
+**Hiệu năng (bulk):** Mỗi lô gọi embedding HuggingFace một lần cho nhiều câu và insert Zilliz một lần cho cả lô. Điều chỉnh \`CHATBOT_EMBED_BATCH_SIZE\` (mặc định 64, tối đa 256) nếu cần cân bằng tốc độ / giới hạn API.
     `,
     })
     @ApiResponse({
@@ -183,16 +185,17 @@ Dành riêng cho Admin. Upload file JSON chứa mảng các mục kiến thức 
 
         try {
             items = JSON.parse(file.buffer.toString('utf-8'));
-        } catch {
+
+            if (!Array.isArray(items) || !items.length) {
+                throw new BadRequestException(
+                    'File JSON phải chứa mảng các mục kiến thức không rỗng',
+                );
+            }
+
+            return this.chatbotService.embedFromFile(items);
+        } catch (error) {
+            this.logger.error(`Error parsing JSON file: ${error.message}`);
             throw new BadRequestException('File JSON không hợp lệ');
         }
-
-        if (!Array.isArray(items) || !items.length) {
-            throw new BadRequestException(
-                'File JSON phải chứa mảng các mục kiến thức không rỗng',
-            );
-        }
-
-        return this.chatbotService.embedFromFile(items);
     }
 }
