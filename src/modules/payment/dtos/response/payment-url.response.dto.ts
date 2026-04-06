@@ -9,3 +9,7 @@ export class PaymentUrlResponseDto {
     @ApiProperty({ description: 'Unique transaction reference code' })
     txnRef: string;
 }
+
+export type PaymentUrlCreateResponse = PaymentUrlResponseDto & {
+    paymentTransactionId: string;
+};

@@ -6,18 +6,19 @@ export interface IMomoCreatePaymentParams {
     ipAddr: string;
 }
 
+/** Query/body callback MoMo — các field số thường là string từ URL. */
 export interface IMomoCallbackParams {
     partnerCode: string;
     orderId: string;
     requestId: string;
-    amount: number;
+    amount: number | string;
     orderInfo: string;
     orderType?: string;
-    transId?: number;
-    resultCode: number;
+    transId?: number | string;
+    resultCode: number | string;
     message: string;
     payType?: string;
-    responseTime?: number;
+    responseTime?: number | string;
     extraData?: string;
     signature: string;
     [key: string]: string | number | undefined;

@@ -1,0 +1,12 @@
+{
+    "success": {
+        "findAll": "Payment transactions retrieved successfully",
+        "findOne": "Payment transaction retrieved successfully",
+        "update": "Payment transaction updated successfully"
+    },
+    "error": {
+        "findAll": "Failed to retrieve payment transactions",
+        "findOne": "Payment transaction not found",
+        "update": "Failed to update payment transaction"
+    }
+}

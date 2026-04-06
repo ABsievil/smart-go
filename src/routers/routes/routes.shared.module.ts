@@ -14,6 +14,8 @@ import { ChatbotController } from '@modules/chatbot/controllers/chatbot.controll
 import { ChatbotModule } from '@modules/chatbot/chatbot.module';
 import { MessageController } from '@modules/messages/controllers/message.controller';
 import { MessageModule } from '@modules/messages/message.module';
+import { PaymentTransactionController } from '@modules/payment-transactions/controllers/payment-transaction.controller';
+import { PaymentTransactionModule } from '@modules/payment-transactions/payment-transaction.module';
 
 @Module({
     controllers: [
@@ -24,6 +26,7 @@ import { MessageModule } from '@modules/messages/message.module';
         PaymentController,
         ChatbotController,
         MessageController,
+        PaymentTransactionController,
     ],
     imports: [
         AuthModule,
@@ -32,6 +35,7 @@ import { MessageModule } from '@modules/messages/message.module';
         StationModule,
         RoutingModule,
         PaymentModule,
+        PaymentTransactionModule,
         ChatbotModule,
         MessageModule,
     ],
