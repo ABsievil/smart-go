@@ -15,10 +15,14 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { Request } from 'express';
-import { Public } from '@modules/auth/decorators/auth.decorator';
+import { CurrentUser, Public } from '@modules/auth/decorators/auth.decorator';
 import { PaymentService } from '@modules/payment/services/payment.service';
+import { PaymentTransactionService } from '@modules/payment-transactions/services/payment-transaction.service';
 import { PaymentCreateRequestDto } from '@modules/payment/dtos/request/payment-create.request.dto';
-import { PaymentUrlResponseDto } from '@modules/payment/dtos/response/payment-url.response.dto';
+import {
+    PaymentUrlCreateResponse,
+    PaymentUrlResponseDto,
+} from '@modules/payment/dtos/response/payment-url.response.dto';
 import { PaymentResultResponseDto } from '@modules/payment/dtos/response/payment-result.response.dto';
 import { IMomoCallbackParams } from '@modules/payment/interfaces/momo-params.interface';
 import { IVnpayCallbackParams } from '@modules/payment/interfaces/vnpay-params.interface';
@@ -27,7 +31,10 @@ import { LanguageResponse } from '@common/language/decorators/language-response.
 @ApiTags('Payments')
 @Controller('payments')
 export class PaymentController {
-    constructor(private readonly paymentService: PaymentService) {}
+    constructor(
+        private readonly paymentService: PaymentService,
+        private readonly paymentTransactionService: PaymentTransactionService,
+    ) {}
 
     @Post('vnpay/create')
     @ApiBearerAuth()
@@ -39,16 +46,25 @@ export class PaymentController {
         description: 'Payment URL created successfully',
         type: PaymentUrlResponseDto,
     })
-    createPaymentUrl(
+    async createPaymentUrl(
+        @CurrentUser('_id') userId: string,
         @Body() dto: PaymentCreateRequestDto,
         @Req() request: Request,
-    ): PaymentUrlResponseDto {
+    ): Promise<PaymentUrlCreateResponse> {
         const ipAddr =
             (request.headers['x-forwarded-for'] as string) ||
             request.socket.remoteAddress ||
             '127.0.0.1';
 
-        return this.paymentService.createPaymentUrl(dto, ipAddr);
+        const result = this.paymentService.createPaymentUrl(dto, ipAddr);
+        const paymentTransactionId =
+            await this.paymentTransactionService.recordPendingVnpay(
+                userId,
+                dto,
+                result.txnRef,
+                ipAddr,
+            );
+        return { ...result, paymentTransactionId };
     }
 
     @Post('momo/create')
@@ -62,15 +78,27 @@ export class PaymentController {
         type: PaymentUrlResponseDto,
     })
     async createMomoPaymentUrl(
+        @CurrentUser('_id') userId: string,
         @Body() dto: PaymentCreateRequestDto,
         @Req() request: Request,
-    ): Promise<PaymentUrlResponseDto> {
+    ): Promise<PaymentUrlCreateResponse> {
         const ipAddr =
             (request.headers['x-forwarded-for'] as string) ||
             request.socket.remoteAddress ||
             '127.0.0.1';
 
-        return this.paymentService.createMomoPaymentUrl(dto, ipAddr);
+        const result = await this.paymentService.createMomoPaymentUrl(
+            dto,
+            ipAddr,
+        );
+        const paymentTransactionId =
+            await this.paymentTransactionService.recordPendingMomo(
+                userId,
+                dto,
+                result.txnRef,
+                ipAddr,
+            );
+        return { ...result, paymentTransactionId };
     }
 
     @Public()
@@ -78,7 +106,8 @@ export class PaymentController {
     @HttpCode(HttpStatus.OK)
     @LanguageResponse({ module: 'payment', successKey: 'return' })
     @ApiOperation({
-        summary: 'VNPAY return URL — displays payment result to customer',
+        summary:
+            '[Demo] VNPAY return — verify signature only; persist state via payment-transactions API',
     })
     @ApiResponse({
         status: HttpStatus.OK,
@@ -120,7 +149,8 @@ export class PaymentController {
     @HttpCode(HttpStatus.OK)
     @LanguageResponse({ module: 'payment', successKey: 'return' })
     @ApiOperation({
-        summary: 'MoMo return URL - displays payment result to customer',
+        summary:
+            '[Demo] MoMo return — verify signature only; persist state via payment-transactions API',
     })
     @ApiResponse({
         status: HttpStatus.OK,

@@ -1,0 +1,12 @@
+{
+    "success": {
+        "findAll": "Lấy danh sách giao dịch thanh toán thành công",
+        "findOne": "Lấy chi tiết giao dịch thanh toán thành công",
+        "update": "Cập nhật giao dịch thanh toán thành công"
+    },
+    "error": {
+        "findAll": "Không thể lấy danh sách giao dịch thanh toán",
+        "findOne": "Không tìm thấy giao dịch thanh toán",
+        "update": "Không thể cập nhật giao dịch thanh toán"
+    }
+}
