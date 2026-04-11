@@ -1,9 +1,31 @@
 /**
  * Constants cho routing module
+ * Request
+ * ↓
+ * Redis routing result cache (TTL 5 phút)
+ * ↓ miss
+ * In-memory graph cache (TTL 5 phút, per-instance)
+ * ↓ miss
+ * Redis raw data cache (TTL 10 phút, shared giữa instances)
+ * ↓ miss
+ * MongoDB (query thực sự — tối thiểu 1 lần / 10 phút)
  */
 
-// Cache
+// ─── Cache (in-memory) ────────────────────────────────────────────────────────
+// TTL cho graph đã build lưu trong bộ nhớ process (ms)
 export const GRAPH_CACHE_TTL = 5 * 60 * 1000; // 5 phút
+
+// ─── Cache (Redis) ────────────────────────────────────────────────────────────
+// TTL cho raw DB data (routes + stations) dùng để build graph
+// Phải ≥ GRAPH_CACHE_TTL để in-memory cache không rebuild liên tục từ DB
+export const GRAPH_DATA_REDIS_TTL_SECONDS = 10 * 60; // 10 phút
+
+// TTL cho kết quả routing đã tính — ổn định trong cùng traffic bucket
+export const ROUTING_RESULT_CACHE_TTL_SECONDS = 5 * 60; // 5 phút
+
+// ─── Redis keys ───────────────────────────────────────────────────────────────
+export const REDIS_KEY_GRAPH_ROUTES = 'routing:graph:routes';
+export const REDIS_KEY_GRAPH_STATIONS = 'routing:graph:stations';
 
 // ─── Tốc độ ───────────────────────────────────────────────────────────────────
 export const AVERAGE_BUS_SPEED = 20; // km/h
@@ -34,10 +56,10 @@ export const CONGESTION_MULTIPLIER = 1.3; // +30% thời gian giờ cao điểm
 export const NORMAL_TRAFFIC_MULTIPLIER = 1.0;
 
 // Giờ cao điểm TP.HCM (giờ địa phương)
-export const RUSH_HOUR_MORNING_START = 6;  // 6:00
-export const RUSH_HOUR_MORNING_END = 9;    // 9:00
+export const RUSH_HOUR_MORNING_START = 6; // 6:00
+export const RUSH_HOUR_MORNING_END = 9; // 9:00
 export const RUSH_HOUR_EVENING_START = 16; // 16:00
-export const RUSH_HOUR_EVENING_END = 20;   // 20:00 (kẹt xe kéo dài đến 8 PM)
+export const RUSH_HOUR_EVENING_END = 20; // 20:00 (kẹt xe kéo dài đến 8 PM)
 
 // ─── Weight configurations cho Multi-Objective A* ─────────────────────────────
 //

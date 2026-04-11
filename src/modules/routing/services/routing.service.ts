@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { GraphBuilderService } from './graph-builder.service';
 import { PriorityQueue } from './priority-queue';
+import { RedisService } from '@common/redis/redis.service';
 import { Graph, GraphNode } from '@modules/routing/interfaces/graph.interface';
 import { RoutePath } from '@modules/routing/interfaces/routing.interface';
 import {
@@ -35,6 +36,7 @@ import {
     CANDIDATE_STATIONS_COUNT,
     MAX_WALKING_DISTANCE_KM,
     MAX_WALKING_DISTANCE_KM_FALLBACK,
+    ROUTING_RESULT_CACHE_TTL_SECONDS,
 } from '@modules/routing/constants/routing.constants';
 import { CongestionFactors } from '@modules/routing/interfaces/congestion-factor.interface';
 import { MultiObjectiveWeights } from '@modules/routing/interfaces/multi-objective-weight.interface';
@@ -66,7 +68,57 @@ export class RoutingService {
         normal: NORMAL_TRAFFIC_MULTIPLIER,
     };
 
-    constructor(private readonly graphBuilder: GraphBuilderService) {}
+    constructor(
+        private readonly graphBuilder: GraphBuilderService,
+        private readonly redisService: RedisService,
+    ) {}
+
+    /**
+     * @description Tạo cache key cho kết quả routing.
+     *
+     * Nhóm timeOfDay theo traffic bucket để tăng cache hit rate:
+     *  - Trong cùng 1 bucket (rush / normal), kết quả routing là như nhau
+     *    vì congestion multiplier không thay đổi trong bucket đó.
+     * để phân biệt request mà vẫn gom được các request gần nhau.
+     */
+    private buildRoutingCacheKey(
+        from: {
+            stationCode?: string;
+            coordinates?: { latitude: number; longitude: number };
+        },
+        to: {
+            stationCode?: string;
+            coordinates?: { latitude: number; longitude: number };
+        },
+        weights: MultiObjectiveWeights,
+        numPaths: number,
+        maxTransfers?: number,
+        timeOfDay?: number,
+        congestionAware?: boolean,
+    ): string {
+        const fromKey =
+            from.stationCode ??
+            `${from.coordinates!.latitude.toFixed(4)}_${from.coordinates!.longitude.toFixed(4)}`;
+        const toKey =
+            to.stationCode ??
+            `${to.coordinates!.latitude.toFixed(4)}_${to.coordinates!.longitude.toFixed(4)}`;
+
+        const effectiveHour = timeOfDay ?? new Date().getHours();
+        const trafficBucket = !congestionAware
+            ? 'nc'
+            : effectiveHour >= RUSH_HOUR_MORNING_START &&
+                effectiveHour < RUSH_HOUR_MORNING_END
+              ? 'rm'
+              : effectiveHour >= RUSH_HOUR_EVENING_START &&
+                  effectiveHour < RUSH_HOUR_EVENING_END
+                ? 're'
+                : 'n';
+
+        const wKey = `${weights.timeWeight.toFixed(2)}.${weights.costWeight.toFixed(5)}.${weights.distanceWeight.toFixed(3)}`;
+        const mKey = maxTransfers !== undefined ? `m${maxTransfers}` : 'ma';
+
+        return `routing:result:${fromKey}:${toKey}:${wKey}:n${numPaths}:${mKey}:${trafficBucket}`;
+    }
 
     /**
      * Lấy hoặc build graph (có cache)
@@ -912,6 +964,33 @@ export class RoutingService {
         congestionAware: boolean = true,
     ): Promise<RoutingResponseData> {
         const startTime = Date.now();
+
+        // ── Redis cache check ──────────────────────────────────────────────────
+        const cacheKey = this.buildRoutingCacheKey(
+            from,
+            to,
+            weights,
+            numPaths,
+            maxTransfers,
+            timeOfDay,
+            congestionAware,
+        );
+
+        const cached = await this.redisService.get(cacheKey);
+        if (cached) {
+            const result = JSON.parse(cached) as RoutingResponseData;
+            this.logger.debug(
+                `Routing result cache HIT: ${cacheKey} (${Date.now() - startTime}ms)`,
+            );
+            result.metrics = {
+                ...result.metrics,
+                cacheHit: true,
+                executionTimeMs: Date.now() - startTime,
+            };
+            return result;
+        }
+        // ──────────────────────────────────────────────────────────────────────
+
         const graph = await this.getGraph();
         const cacheHit = this.graphCache !== null;
 
@@ -1086,7 +1165,7 @@ export class RoutingService {
                 `${fromCandidates.length}×${toCandidates.length} station pairs`,
         );
 
-        return {
+        const result: RoutingResponseData = {
             paths: finalPaths,
             metrics: {
                 algorithm: 'MOA*-Unified',
@@ -1098,11 +1177,24 @@ export class RoutingService {
                         : 0,
                 heuristicUsed: true,
                 hasFallback: false,
-                cacheHit,
+                cacheHit: false,
             },
             congestionApplied: congestionAware && congestionFactor !== 1.0,
             timeOfDay: timeOfDay ?? new Date().getHours(),
         };
+
+        // Lưu kết quả vào Redis (fire-and-forget, không block response)
+        this.redisService
+            .set(
+                cacheKey,
+                JSON.stringify(result),
+                ROUTING_RESULT_CACHE_TTL_SECONDS,
+            )
+            .catch((err) =>
+                this.logger.warn(`Failed to cache routing result: ${err}`),
+            );
+
+        return result;
     }
 
     mapGet(routingData: RoutingResponseData): RoutingResponseDto {
