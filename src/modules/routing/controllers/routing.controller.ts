@@ -17,10 +17,7 @@ import { RoutingService } from '@modules/routing/services/routing.service';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { RoutingRequestDto } from '@modules/routing/dtos/request/routing.request.dto';
 import { RoutingResponseDto } from '@modules/routing/dtos/response/routing.response.dto';
-import {
-    ENUM_WALKING_LEG_TYPE,
-    RoutingCriteria,
-} from '@modules/routing/enums/routing.enum';
+import { RoutingCriteria } from '@modules/routing/enums/routing.enum';
 import {
     WEIGHT_CONFIG_FASTEST,
     WEIGHT_CONFIG_CHEAPEST,
@@ -103,156 +100,29 @@ Sử dụng Multi-Objective A* (MOA*) để tìm 3-5 lộ trình tối ưu Paret
 
         const weights = this.mapCriteriaToWeights(criteria);
 
-        // ── Case 1: Cả hai đầu đều là tọa độ ─────────────────────────────────
-        // Dùng multi-station selection: xem xét top-N trạm gần nhất ở mỗi đầu,
-        // chạy MOA* cho mọi tổ hợp, tính cả đoạn đi bộ vào tổng chi phí,
-        // trả về lộ trình tốt nhất toàn cục kèm walking legs đầy đủ.
-        if (
-            coordinates?.from &&
-            coordinates?.to &&
-            !stationCode?.from &&
-            !stationCode?.to
-        ) {
-            const routingData =
-                await this.routingService.findPathsFromCoordinates(
-                    coordinates.from.latitude,
-                    coordinates.from.longitude,
-                    coordinates.to.latitude,
-                    coordinates.to.longitude,
-                    weights,
-                    numPaths,
-                    maxTransfers,
-                    timeOfDay,
-                    congestionAware,
-                );
-            return this.routingService.mapGet(routingData);
-        }
-
-        // ── Case 2: Mixed hoặc cả hai stationCode ────────────────────────────
-        // Resolve station codes (song song), sau đó chạy findPaths thông thường.
-        // Nếu một bên là tọa độ, thêm walking leg tương ứng vào kết quả.
-        const findFromStationPromise = stationCode?.from
-            ? Promise.resolve(stationCode.from)
-            : this.routingService
-                  .findNearestStation(
-                      coordinates!.from!.latitude,
-                      coordinates!.from!.longitude,
-                  )
-                  .then((station) => {
-                      if (!station) {
-                          throw new BadRequestException(
-                              `No station found near coordinates.from (${coordinates!.from!.latitude}, ${coordinates!.from!.longitude})`,
-                          );
-                      }
-                      return station;
-                  });
-
-        const findToStationPromise = stationCode?.to
-            ? Promise.resolve(stationCode.to)
-            : this.routingService
-                  .findNearestStation(
-                      coordinates!.to!.latitude,
-                      coordinates!.to!.longitude,
-                  )
-                  .then((station) => {
-                      if (!station) {
-                          throw new BadRequestException(
-                              `No station found near coordinates.to (${coordinates!.to!.latitude}, ${coordinates!.to!.longitude})`,
-                          );
-                      }
-                      return station;
-                  });
-
-        const [finalFromStationCode, finalToStationCode] = await Promise.all([
-            findFromStationPromise,
-            findToStationPromise,
-        ]);
-
+        // Tất cả cases (coord-coord, station-station, mixed) đều qua findPathsUnified.
+        // Service tự xét top-N trạm gần nhất cho phía dùng tọa độ và tính walking legs.
         this.logger.debug(
-            `Station codes resolved: from=${finalFromStationCode}, to=${finalToStationCode}`,
+            `Routing request: from=${stationCode?.from ?? coordinates?.from?.latitude + ',' + coordinates?.from?.longitude}, ` +
+                `to=${stationCode?.to ?? coordinates?.to?.latitude + ',' + coordinates?.to?.longitude}, ` +
+                `criteria=${criteria}`,
         );
 
-        const routingData = await this.routingService.findPaths(
-            finalFromStationCode,
-            finalToStationCode,
+        const routingData = await this.routingService.findPathsUnified(
+            {
+                stationCode: stationCode?.from,
+                coordinates: coordinates?.from,
+            },
+            {
+                stationCode: stationCode?.to,
+                coordinates: coordinates?.to,
+            },
             weights,
             numPaths,
             maxTransfers,
             timeOfDay,
             congestionAware,
         );
-
-        // Tính walking legs cho bên nào dùng tọa độ (mixed case)
-        const walkingLegPromises: Array<Promise<void>> = [];
-
-        if (coordinates?.from && !stationCode?.from) {
-            walkingLegPromises.push(
-                this.routingService
-                    .buildWalkingLeg(
-                        ENUM_WALKING_LEG_TYPE.TO_FIRST_STATION,
-                        coordinates.from,
-                        finalFromStationCode,
-                    )
-                    .then((leg) => {
-                        if (leg) {
-                            routingData.paths.forEach((path) => {
-                                path.walkingLegs = [
-                                    ...(path.walkingLegs ?? []),
-                                    leg,
-                                ];
-                            });
-                        }
-                    }),
-            );
-        }
-
-        if (coordinates?.to && !stationCode?.to) {
-            walkingLegPromises.push(
-                this.routingService
-                    .buildWalkingLeg(
-                        ENUM_WALKING_LEG_TYPE.FROM_LAST_STATION,
-                        coordinates.to,
-                        finalToStationCode,
-                    )
-                    .then((leg) => {
-                        if (leg) {
-                            routingData.paths.forEach((path) => {
-                                path.walkingLegs = [
-                                    ...(path.walkingLegs ?? []),
-                                    leg,
-                                ];
-                            });
-                        }
-                    }),
-            );
-        }
-
-        if (walkingLegPromises.length > 0) {
-            await Promise.all(walkingLegPromises);
-
-            routingData.paths = routingData.paths.map((path) => {
-                if (!path.walkingLegs?.length) return path;
-
-                const walkingDist = path.walkingLegs.reduce(
-                    (s, l) => s + l.distanceKm,
-                    0,
-                );
-                const walkingTime = path.walkingLegs.reduce(
-                    (s, l) => s + l.estimatedTimeMinutes,
-                    0,
-                );
-
-                return {
-                    ...path,
-                    transitDistanceKm: path.totalDistance,
-                    transitTimeMinutes: path.totalTime,
-                    totalWalkingDistanceKm: walkingDist,
-                    totalWalkingTimeMinutes: walkingTime,
-                    totalDistance: path.totalDistance + walkingDist,
-                    totalTime: path.totalTime + walkingTime,
-                };
-            });
-        }
 
         return this.routingService.mapGet(routingData);
     }

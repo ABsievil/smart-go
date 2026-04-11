@@ -156,23 +156,23 @@ export class GraphBuilderService {
                 });
             }
 
-            // Tạo edge
             const edge: GraphEdge = {
                 from: fromCode,
                 to: toCode,
                 routeCode: route.routeCode,
                 route,
                 distance,
-                weight: distance, // Mặc định weight = distance
+                weight: distance,
             };
 
-            // Thêm edge vào neighbors (có thể có nhiều routes giữa 2 stations)
             const fromNode = graph.nodes.get(fromCode)!;
-            const existingEdge = fromNode.neighbors.get(toCode);
-
-            // Chỉ giữ edge có distance nhỏ nhất nếu có nhiều routes
-            if (!existingEdge || edge.distance < existingEdge.distance) {
-                fromNode.neighbors.set(toCode, edge);
+            const existingEdges = fromNode.neighbors.get(toCode);
+            if (!existingEdges) {
+                fromNode.neighbors.set(toCode, [edge]);
+            } else if (
+                !existingEdges.some((e) => e.routeCode === edge.routeCode)
+            ) {
+                existingEdges.push(edge);
             }
         }
     }

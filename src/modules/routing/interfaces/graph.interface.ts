@@ -4,7 +4,7 @@ import { StationEntity } from '@modules/stations/repositories/entities/station.e
 export interface GraphNode {
     stationCode: string;
     station: StationEntity;
-    neighbors: Map<string, GraphEdge>;
+    neighbors: Map<string, GraphEdge[]>;
 }
 
 export interface GraphEdge {

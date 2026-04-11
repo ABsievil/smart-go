@@ -56,10 +56,13 @@ export const WEIGHT_CONFIG_FASTEST = {
     distanceWeight: 0.0,
 };
 
+// CHEAPEST: ưu tiên số lần lên xe (cost), nhưng thêm distanceWeight nhỏ để:
+//   1. Heuristic ≠ 0 → A* có hướng thay vì trở thành BFS không định hướng
+//   2. Các cạnh trong cùng tuyến có weight > 0 → tránh đi vòng vô hạn
 export const WEIGHT_CONFIG_CHEAPEST = {
     timeWeight: 0.0,
     costWeight: 1.0,
-    distanceWeight: 0.0,
+    distanceWeight: 0.001,
 };
 
 export const WEIGHT_CONFIG_SHORTEST = {
@@ -76,10 +79,14 @@ export const CANDIDATE_STATIONS_COUNT = 3; // top-N trạm gần nhất xem xét
 export const MAX_WALKING_DISTANCE_KM = 1.0; // km (~12 phút đi bộ)
 export const MAX_WALKING_DISTANCE_KM_FALLBACK = 3.0; // km — dùng khi không có trạm nào ≤ 1km
 
-// Balanced: ưu tiên thời gian, phạt nhẹ số lần chuyển tuyến và khoảng cách
-// costWeight nhỏ để bù cho đơn vị VND lớn hơn nhiều so với phút và km
+// BALANCED: cân bằng thực sự giữa 3 chiều.
+// Phân tích đơn vị (hành trình điển hình: 30 phút, 2 lần lên xe × 6000 VND, 10 km):
+//   - timeWeight=0.5  → 0.5 × 30 = 15
+//   - costWeight=0.00008 → 0.00008 × 12000 = 0.96  (~6% của time)
+//   - distanceWeight=0.1 → 0.1 × 10 = 1.0  (~7% của time)
+// Cost đủ để phân biệt 1 vs 3 lần lên xe mà không áp đảo time.
 export const WEIGHT_CONFIG_BALANCED = {
     timeWeight: 0.5,
-    costWeight: 0.00003,
-    distanceWeight: 0.02,
+    costWeight: 0.00008,
+    distanceWeight: 0.1,
 };
