@@ -1,9 +1,31 @@
 /**
  * Constants cho routing module
+ * Request
+ * ↓
+ * Redis routing result cache (TTL 5 phút)
+ * ↓ miss
+ * In-memory graph cache (TTL 5 phút, per-instance)
+ * ↓ miss
+ * Redis raw data cache (TTL 10 phút, shared giữa instances)
+ * ↓ miss
+ * MongoDB (query thực sự — tối thiểu 1 lần / 10 phút)
  */
 
-// Cache
+// ─── Cache (in-memory) ────────────────────────────────────────────────────────
+// TTL cho graph đã build lưu trong bộ nhớ process (ms)
 export const GRAPH_CACHE_TTL = 5 * 60 * 1000; // 5 phút
+
+// ─── Cache (Redis) ────────────────────────────────────────────────────────────
+// TTL cho raw DB data (routes + stations) dùng để build graph
+// Phải ≥ GRAPH_CACHE_TTL để in-memory cache không rebuild liên tục từ DB
+export const GRAPH_DATA_REDIS_TTL_SECONDS = 10 * 60; // 10 phút
+
+// TTL cho kết quả routing đã tính — ổn định trong cùng traffic bucket
+export const ROUTING_RESULT_CACHE_TTL_SECONDS = 5 * 60; // 5 phút
+
+// ─── Redis keys ───────────────────────────────────────────────────────────────
+export const REDIS_KEY_GRAPH_ROUTES = 'routing:graph:routes';
+export const REDIS_KEY_GRAPH_STATIONS = 'routing:graph:stations';
 
 // ─── Tốc độ ───────────────────────────────────────────────────────────────────
 export const AVERAGE_BUS_SPEED = 20; // km/h
@@ -34,10 +56,10 @@ export const CONGESTION_MULTIPLIER = 1.3; // +30% thời gian giờ cao điểm
 export const NORMAL_TRAFFIC_MULTIPLIER = 1.0;
 
 // Giờ cao điểm TP.HCM (giờ địa phương)
-export const RUSH_HOUR_MORNING_START = 6;  // 6:00
-export const RUSH_HOUR_MORNING_END = 9;    // 9:00
+export const RUSH_HOUR_MORNING_START = 6; // 6:00
+export const RUSH_HOUR_MORNING_END = 9; // 9:00
 export const RUSH_HOUR_EVENING_START = 16; // 16:00
-export const RUSH_HOUR_EVENING_END = 20;   // 20:00 (kẹt xe kéo dài đến 8 PM)
+export const RUSH_HOUR_EVENING_END = 20; // 20:00 (kẹt xe kéo dài đến 8 PM)
 
 // ─── Weight configurations cho Multi-Objective A* ─────────────────────────────
 //
@@ -56,10 +78,13 @@ export const WEIGHT_CONFIG_FASTEST = {
     distanceWeight: 0.0,
 };
 
+// CHEAPEST: ưu tiên số lần lên xe (cost), nhưng thêm distanceWeight nhỏ để:
+//   1. Heuristic ≠ 0 → A* có hướng thay vì trở thành BFS không định hướng
+//   2. Các cạnh trong cùng tuyến có weight > 0 → tránh đi vòng vô hạn
 export const WEIGHT_CONFIG_CHEAPEST = {
     timeWeight: 0.0,
     costWeight: 1.0,
-    distanceWeight: 0.0,
+    distanceWeight: 0.001,
 };
 
 export const WEIGHT_CONFIG_SHORTEST = {
@@ -76,10 +101,14 @@ export const CANDIDATE_STATIONS_COUNT = 3; // top-N trạm gần nhất xem xét
 export const MAX_WALKING_DISTANCE_KM = 1.0; // km (~12 phút đi bộ)
 export const MAX_WALKING_DISTANCE_KM_FALLBACK = 3.0; // km — dùng khi không có trạm nào ≤ 1km
 
-// Balanced: ưu tiên thời gian, phạt nhẹ số lần chuyển tuyến và khoảng cách
-// costWeight nhỏ để bù cho đơn vị VND lớn hơn nhiều so với phút và km
+// BALANCED: cân bằng thực sự giữa 3 chiều.
+// Phân tích đơn vị (hành trình điển hình: 30 phút, 2 lần lên xe × 6000 VND, 10 km):
+//   - timeWeight=0.5  → 0.5 × 30 = 15
+//   - costWeight=0.00008 → 0.00008 × 12000 = 0.96  (~6% của time)
+//   - distanceWeight=0.1 → 0.1 × 10 = 1.0  (~7% của time)
+// Cost đủ để phân biệt 1 vs 3 lần lên xe mà không áp đảo time.
 export const WEIGHT_CONFIG_BALANCED = {
     timeWeight: 0.5,
-    costWeight: 0.00003,
-    distanceWeight: 0.02,
+    costWeight: 0.00008,
+    distanceWeight: 0.1,
 };

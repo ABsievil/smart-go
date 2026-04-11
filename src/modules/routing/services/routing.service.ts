@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { GraphBuilderService } from './graph-builder.service';
 import { PriorityQueue } from './priority-queue';
+import { RedisService } from '@common/redis/redis.service';
 import { Graph, GraphNode } from '@modules/routing/interfaces/graph.interface';
 import { RoutePath } from '@modules/routing/interfaces/routing.interface';
 import {
@@ -35,6 +36,7 @@ import {
     CANDIDATE_STATIONS_COUNT,
     MAX_WALKING_DISTANCE_KM,
     MAX_WALKING_DISTANCE_KM_FALLBACK,
+    ROUTING_RESULT_CACHE_TTL_SECONDS,
 } from '@modules/routing/constants/routing.constants';
 import { CongestionFactors } from '@modules/routing/interfaces/congestion-factor.interface';
 import { MultiObjectiveWeights } from '@modules/routing/interfaces/multi-objective-weight.interface';
@@ -66,7 +68,57 @@ export class RoutingService {
         normal: NORMAL_TRAFFIC_MULTIPLIER,
     };
 
-    constructor(private readonly graphBuilder: GraphBuilderService) {}
+    constructor(
+        private readonly graphBuilder: GraphBuilderService,
+        private readonly redisService: RedisService,
+    ) {}
+
+    /**
+     * @description Tạo cache key cho kết quả routing.
+     *
+     * Nhóm timeOfDay theo traffic bucket để tăng cache hit rate:
+     *  - Trong cùng 1 bucket (rush / normal), kết quả routing là như nhau
+     *    vì congestion multiplier không thay đổi trong bucket đó.
+     * để phân biệt request mà vẫn gom được các request gần nhau.
+     */
+    private buildRoutingCacheKey(
+        from: {
+            stationCode?: string;
+            coordinates?: { latitude: number; longitude: number };
+        },
+        to: {
+            stationCode?: string;
+            coordinates?: { latitude: number; longitude: number };
+        },
+        weights: MultiObjectiveWeights,
+        numPaths: number,
+        maxTransfers?: number,
+        timeOfDay?: number,
+        congestionAware?: boolean,
+    ): string {
+        const fromKey =
+            from.stationCode ??
+            `${from.coordinates!.latitude.toFixed(4)}_${from.coordinates!.longitude.toFixed(4)}`;
+        const toKey =
+            to.stationCode ??
+            `${to.coordinates!.latitude.toFixed(4)}_${to.coordinates!.longitude.toFixed(4)}`;
+
+        const effectiveHour = timeOfDay ?? new Date().getHours();
+        const trafficBucket = !congestionAware
+            ? 'nc'
+            : effectiveHour >= RUSH_HOUR_MORNING_START &&
+                effectiveHour < RUSH_HOUR_MORNING_END
+              ? 'rm'
+              : effectiveHour >= RUSH_HOUR_EVENING_START &&
+                  effectiveHour < RUSH_HOUR_EVENING_END
+                ? 're'
+                : 'n';
+
+        const wKey = `${weights.timeWeight.toFixed(2)}.${weights.costWeight.toFixed(5)}.${weights.distanceWeight.toFixed(3)}`;
+        const mKey = maxTransfers !== undefined ? `m${maxTransfers}` : 'ma';
+
+        return `routing:result:${fromKey}:${toKey}:${wKey}:n${numPaths}:${mKey}:${trafficBucket}`;
+    }
 
     /**
      * Lấy hoặc build graph (có cache)
@@ -153,8 +205,10 @@ export class RoutingService {
                 // Tạo segment
                 if (prev.node) {
                     const fromNode = graph.nodes.get(prev.node)!;
-                    const toNode = graph.nodes.get(current)!;
-                    const edge = fromNode.neighbors.get(current);
+                    const edges = fromNode.neighbors.get(current);
+                    const edge =
+                        edges?.find((e) => e.routeCode === prev.routeCode) ??
+                        edges?.[0];
 
                     if (edge) {
                         segments.unshift({
@@ -167,7 +221,7 @@ export class RoutingService {
                                 edge,
                                 RoutingCriteria.TIME,
                             ),
-                            cost: 0, // sẽ được tính lại sau khi có đủ thứ tự segments
+                            cost: 0,
                         });
                     }
                 }
@@ -277,12 +331,9 @@ export class RoutingService {
             ? this.getCongestionFactor(timeOfDay)
             : NORMAL_TRAFFIC_MULTIPLIER;
 
-        // Normalize weights và lấy weight configs
+        // Normalize weights và lấy tất cả weight configs
         const normalizedWeights = this.normalizeWeights(weights);
-        const configsToUse = this.getWeightConfigsToUse(
-            numPaths,
-            normalizedWeights,
-        );
+        const configsToUse = this.getWeightConfigsToUse(normalizedWeights);
 
         const paths: ParetoOptimalPathDto[] = [];
         let nodesExplored = 0;
@@ -325,11 +376,10 @@ export class RoutingService {
             }
         }
 
-        // Loại bỏ duplicates (paths giống nhau)
+        // Loại bỏ duplicates, sort theo score, lấy top numPaths
         const uniquePaths = this.removeDuplicatePaths(paths);
-
-        // Sort theo optimization score
         uniquePaths.sort((a, b) => a.optimizationScore - b.optimizationScore);
+        const finalPaths = uniquePaths.slice(0, numPaths);
 
         const executionTime = Date.now() - startTime;
 
@@ -344,11 +394,11 @@ export class RoutingService {
         };
 
         this.logger.debug(
-            `MOA* found ${uniquePaths.length} Pareto-optimal paths in ${executionTime}ms, explored ${nodesExplored} nodes`,
+            `MOA* found ${finalPaths.length} Pareto-optimal paths in ${executionTime}ms, explored ${nodesExplored} nodes`,
         );
 
         return {
-            paths: uniquePaths,
+            paths: finalPaths,
             metrics,
             congestionApplied: congestionAware && congestionFactor !== 1.0,
             timeOfDay: timeOfDay ?? new Date().getHours(),
@@ -484,65 +534,54 @@ export class RoutingService {
 
             for (const [
                 neighborCode,
-                edge,
+                edges,
             ] of currentNode.neighbors.entries()) {
                 if (closedSet.has(neighborCode)) continue;
 
                 const neighbor = graph.nodes.get(neighborCode)!;
-
-                // Tính edge weight đa tiêu chí — model xe buýt Việt Nam
-                const edgeDistance = edge.distance;
-
-                // Xác định đây có phải lần lên xe mới không
                 const previousRouteCode = cameFrom.get(currentCode)?.routeCode;
-                const isTransfer =
-                    previousRouteCode !== undefined &&
-                    previousRouteCode !== edge.routeCode;
-                const isFirstBoarding = previousRouteCode === undefined;
-                const isNewBoarding = isFirstBoarding || isTransfer;
 
-                // Thời gian di chuyển + thời gian chờ khi chuyển tuyến (chỉ khi transfer, không phải lần đầu)
-                const edgeTime =
-                    (edgeDistance / AVERAGE_BUS_SPEED) *
-                        MINUTES_PER_HOUR *
-                        congestionFactor +
-                    (isTransfer ? TRANSFER_WAIT_TIME : 0);
+                for (const edge of edges) {
+                    const isTransfer =
+                        previousRouteCode !== undefined &&
+                        previousRouteCode !== edge.routeCode;
+                    const isFirstBoarding = previousRouteCode === undefined;
+                    const isNewBoarding = isFirstBoarding || isTransfer;
 
-                // Chi phí: CỐ ĐỊNH mỗi lần lên xe mới (không tính theo km)
-                const edgeCost = isNewBoarding ? FARE_PER_BOARDING : 0;
+                    const edgeDistance = edge.distance;
+                    const edgeTime =
+                        (edgeDistance / AVERAGE_BUS_SPEED) *
+                            MINUTES_PER_HOUR *
+                            congestionFactor +
+                        (isTransfer ? TRANSFER_WAIT_TIME : 0);
+                    const edgeCost = isNewBoarding ? FARE_PER_BOARDING : 0;
 
-                const edgeWeight =
-                    weights.timeWeight * edgeTime +
-                    weights.costWeight * edgeCost +
-                    weights.distanceWeight * edgeDistance;
+                    const edgeWeight =
+                        weights.timeWeight * edgeTime +
+                        weights.costWeight * edgeCost +
+                        weights.distanceWeight * edgeDistance;
 
-                const tentativeGScore =
-                    (gScore.get(currentCode) ?? Infinity) + edgeWeight;
+                    const tentativeGScore =
+                        (gScore.get(currentCode) ?? Infinity) + edgeWeight;
 
-                const neighborGScore = gScore.get(neighborCode) ?? Infinity;
+                    const neighborGScore = gScore.get(neighborCode) ?? Infinity;
 
-                if (tentativeGScore < neighborGScore) {
-                    cameFrom.set(neighborCode, {
-                        node: currentCode,
-                        routeCode: edge.routeCode,
-                    });
-                    gScore.set(neighborCode, tentativeGScore);
+                    if (tentativeGScore < neighborGScore) {
+                        cameFrom.set(neighborCode, {
+                            node: currentCode,
+                            routeCode: edge.routeCode,
+                        });
+                        gScore.set(neighborCode, tentativeGScore);
 
-                    const h = multiObjectiveHeuristic(neighbor, goalNode);
-                    const f = tentativeGScore + h;
-                    fScore.set(neighborCode, f);
+                        const h = multiObjectiveHeuristic(neighbor, goalNode);
+                        const f = tentativeGScore + h;
+                        fScore.set(neighborCode, f);
 
-                    if (!openSetMap.has(neighborCode)) {
                         openSet.insert({
                             stationCode: neighborCode,
                             fScore: f,
                         });
                         openSetMap.set(neighborCode, true);
-                    } else {
-                        openSet.insert({
-                            stationCode: neighborCode,
-                            fScore: f,
-                        });
                     }
                 }
             }
@@ -766,13 +805,7 @@ export class RoutingService {
 
         const normalizedWeights = this.normalizeWeights(weights);
 
-        // Dùng tất cả weight configs (không giới hạn numPaths ở đây)
-        // để đảm bảo khám phá đầy đủ rồi mới chọn top-numPaths cuối cùng
-        const allDefaultConfigs = this.getDefaultWeightConfigs();
-        const customConfig = this.createCustomWeightConfig(normalizedWeights);
-        const allConfigs = customConfig
-            ? [...allDefaultConfigs, customConfig]
-            : allDefaultConfigs;
+        const allConfigs = this.getWeightConfigsToUse(normalizedWeights);
 
         const fromCandidates = await this.findTopNNearestStations(
             fromLat,
@@ -909,6 +942,261 @@ export class RoutingService {
         };
     }
 
+    /**
+     * Phương thức thống nhất cho tất cả input types (tọa độ, mã trạm, mixed).
+     *
+     * Mỗi đầu có thể là stationCode (đã biết) hoặc tọa độ (cần tìm top-N gần nhất).
+     * Chạy MOA* cho tất cả tổ hợp, tính walking leg khi cần, trả về top numPaths.
+     */
+    async findPathsUnified(
+        from: {
+            stationCode?: string;
+            coordinates?: { latitude: number; longitude: number };
+        },
+        to: {
+            stationCode?: string;
+            coordinates?: { latitude: number; longitude: number };
+        },
+        weights: MultiObjectiveWeights,
+        numPaths: number = 3,
+        maxTransfers?: number,
+        timeOfDay?: number,
+        congestionAware: boolean = true,
+    ): Promise<RoutingResponseData> {
+        const startTime = Date.now();
+
+        // ── Redis cache check ──────────────────────────────────────────────────
+        const cacheKey = this.buildRoutingCacheKey(
+            from,
+            to,
+            weights,
+            numPaths,
+            maxTransfers,
+            timeOfDay,
+            congestionAware,
+        );
+
+        const cached = await this.redisService.get(cacheKey);
+        if (cached) {
+            const result = JSON.parse(cached) as RoutingResponseData;
+            this.logger.debug(
+                `Routing result cache HIT: ${cacheKey} (${Date.now() - startTime}ms)`,
+            );
+            result.metrics = {
+                ...result.metrics,
+                cacheHit: true,
+                executionTimeMs: Date.now() - startTime,
+            };
+            return result;
+        }
+        // ──────────────────────────────────────────────────────────────────────
+
+        const graph = await this.getGraph();
+        const cacheHit = this.graphCache !== null;
+
+        const congestionFactor = congestionAware
+            ? this.getCongestionFactor(timeOfDay)
+            : NORMAL_TRAFFIC_MULTIPLIER;
+
+        const normalizedWeights = this.normalizeWeights(weights);
+        const allConfigs = this.getWeightConfigsToUse(normalizedWeights);
+
+        // Resolve candidates cho mỗi đầu
+        const fromCandidates: Array<{
+            stationCode: string;
+            stationName: string;
+            distanceKm: number;
+            latitude: number;
+            longitude: number;
+        }> = from.stationCode
+            ? (() => {
+                  const node = graph.nodes.get(from.stationCode!);
+                  return [
+                      {
+                          stationCode: from.stationCode!,
+                          stationName: node?.station.stationName ?? '',
+                          distanceKm: 0,
+                          latitude: node?.station.latitude ?? 0,
+                          longitude: node?.station.longitude ?? 0,
+                      },
+                  ];
+              })()
+            : await this.findTopNNearestStations(
+                  from.coordinates!.latitude,
+                  from.coordinates!.longitude,
+              );
+
+        const toCandidates: Array<{
+            stationCode: string;
+            stationName: string;
+            distanceKm: number;
+            latitude: number;
+            longitude: number;
+        }> = to.stationCode
+            ? (() => {
+                  const node = graph.nodes.get(to.stationCode!);
+                  return [
+                      {
+                          stationCode: to.stationCode!,
+                          stationName: node?.station.stationName ?? '',
+                          distanceKm: 0,
+                          latitude: node?.station.latitude ?? 0,
+                          longitude: node?.station.longitude ?? 0,
+                      },
+                  ];
+              })()
+            : await this.findTopNNearestStations(
+                  to.coordinates!.latitude,
+                  to.coordinates!.longitude,
+              );
+
+        if (fromCandidates.length === 0) {
+            throw new NotFoundException(
+                'Không tìm thấy trạm nào gần điểm xuất phát',
+            );
+        }
+        if (toCandidates.length === 0) {
+            throw new NotFoundException(
+                'Không tìm thấy trạm nào gần điểm đích',
+            );
+        }
+
+        const allPaths: ParetoOptimalPathDto[] = [];
+        let totalNodesExplored = 0;
+
+        for (const fromCandidate of fromCandidates) {
+            for (const toCandidate of toCandidates) {
+                if (fromCandidate.stationCode === toCandidate.stationCode)
+                    continue;
+
+                // Walking leg chỉ tạo khi phía đó dùng tọa độ (không phải stationCode cố định)
+                const walkingFromLeg =
+                    from.coordinates && !from.stationCode
+                        ? this.buildWalkingLegInternal(
+                              ENUM_WALKING_LEG_TYPE.TO_FIRST_STATION,
+                              from.coordinates,
+                              fromCandidate,
+                          )
+                        : null;
+
+                const walkingToLeg =
+                    to.coordinates && !to.stationCode
+                        ? this.buildWalkingLegInternal(
+                              ENUM_WALKING_LEG_TYPE.FROM_LAST_STATION,
+                              to.coordinates,
+                              toCandidate,
+                          )
+                        : null;
+
+                const totalWalkingDistanceKm =
+                    (walkingFromLeg?.distanceKm ?? 0) +
+                    (walkingToLeg?.distanceKm ?? 0);
+                const totalWalkingTimeMinutes =
+                    (walkingFromLeg?.estimatedTimeMinutes ?? 0) +
+                    (walkingToLeg?.estimatedTimeMinutes ?? 0);
+
+                for (const config of allConfigs) {
+                    const path = await this.findPathWithMultiObjectiveWeights(
+                        fromCandidate.stationCode,
+                        toCandidate.stationCode,
+                        config.weights,
+                        maxTransfers,
+                        congestionFactor,
+                        graph,
+                    );
+
+                    if (path) {
+                        totalNodesExplored += path.nodesExplored ?? 0;
+
+                        const totalDistance =
+                            path.totalDistance + totalWalkingDistanceKm;
+                        const totalTime =
+                            path.totalTime + totalWalkingTimeMinutes;
+
+                        const optimizationScore =
+                            this.calculateOptimizationScore(
+                                config.weights,
+                                totalTime,
+                                path.totalCost,
+                                totalDistance,
+                            );
+
+                        const walkingLegs = [
+                            ...(walkingFromLeg ? [walkingFromLeg] : []),
+                            ...(walkingToLeg ? [walkingToLeg] : []),
+                        ];
+
+                        allPaths.push({
+                            stations: path.stations.map((s) =>
+                                this.mapStationInfo(s),
+                            ),
+                            routes: path.routes,
+                            totalDistance,
+                            totalTime,
+                            totalCost: path.totalCost,
+                            transfers: this.countTransfersFromSegments(
+                                path.segments,
+                            ),
+                            segments: path.segments,
+                            optimizationScore,
+                            optimizationType: config.type,
+                            ...(walkingLegs.length > 0 && { walkingLegs }),
+                            ...(totalWalkingDistanceKm > 0 && {
+                                totalWalkingDistanceKm,
+                                totalWalkingTimeMinutes,
+                                transitDistanceKm: path.totalDistance,
+                                transitTimeMinutes: path.totalTime,
+                            }),
+                        });
+                    }
+                }
+            }
+        }
+
+        const uniquePaths = this.removeDuplicatePaths(allPaths);
+        uniquePaths.sort((a, b) => a.optimizationScore - b.optimizationScore);
+        const finalPaths = uniquePaths.slice(0, numPaths);
+
+        const executionTime = Date.now() - startTime;
+
+        this.logger.debug(
+            `MOA* unified: ${finalPaths.length} paths in ${executionTime}ms, ` +
+                `${totalNodesExplored} nodes, ` +
+                `${fromCandidates.length}×${toCandidates.length} station pairs`,
+        );
+
+        const result: RoutingResponseData = {
+            paths: finalPaths,
+            metrics: {
+                algorithm: 'MOA*-Unified',
+                executionTimeMs: executionTime,
+                nodesExplored: totalNodesExplored,
+                explorationRatePercent:
+                    graph.nodes.size > 0
+                        ? (totalNodesExplored / graph.nodes.size) * 100
+                        : 0,
+                heuristicUsed: true,
+                hasFallback: false,
+                cacheHit: false,
+            },
+            congestionApplied: congestionAware && congestionFactor !== 1.0,
+            timeOfDay: timeOfDay ?? new Date().getHours(),
+        };
+
+        // Lưu kết quả vào Redis (fire-and-forget, không block response)
+        this.redisService
+            .set(
+                cacheKey,
+                JSON.stringify(result),
+                ROUTING_RESULT_CACHE_TTL_SECONDS,
+            )
+            .catch((err) =>
+                this.logger.warn(`Failed to cache routing result: ${err}`),
+            );
+
+        return result;
+    }
+
     mapGet(routingData: RoutingResponseData): RoutingResponseDto {
         return plainToInstance(RoutingResponseDto, routingData);
     }
@@ -998,10 +1286,9 @@ export class RoutingService {
     }
 
     /**
-     * Tạo danh sách weight configs để sử dụng
+     * Tạo danh sách weight configs để sử dụng.
      */
     private getWeightConfigsToUse(
-        numPaths: number,
         customWeights?: MultiObjectiveWeights,
     ): Array<{
         weights: MultiObjectiveWeights;
@@ -1018,7 +1305,7 @@ export class RoutingService {
             }
         }
 
-        return configs.slice(0, numPaths);
+        return configs;
     }
 
     /**

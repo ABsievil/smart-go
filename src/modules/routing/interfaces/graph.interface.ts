@@ -1,19 +1,30 @@
-import { RouteEntity } from '@modules/routes/repositories/entities/route.entity';
-import { StationEntity } from '@modules/stations/repositories/entities/station.entity';
+/**
+ * @description Chỉ giữ các field cần thiết cho thuật toán routing.
+ * Không lưu full RouteEntity / StationEntity để giảm bộ nhớ.
+ */
+export interface GraphStationLite {
+    stationName?: string;
+    latitude: number;
+    longitude: number;
+}
+
+export interface GraphRouteLite {
+    routeName?: string;
+}
 
 export interface GraphNode {
     stationCode: string;
-    station: StationEntity;
-    neighbors: Map<string, GraphEdge>;
+    station: GraphStationLite;
+    neighbors: Map<string, GraphEdge[]>;
 }
 
 export interface GraphEdge {
     from: string;
     to: string;
     routeCode: string;
-    route: RouteEntity;
-    distance: number; // km
-    weight: number; // có thể là distance, time, hoặc cost
+    route: GraphRouteLite;
+    distance: number;
+    weight: number;
 }
 
 export interface Graph {
