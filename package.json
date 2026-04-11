@@ -32,6 +32,7 @@
         "clean-route-csv": "ts-node -r tsconfig-paths/register refs/scripts/clean-routes-csv.ts",
         "sync-route-v2": "ts-node -r tsconfig-paths/register refs/sync-data-v2/scripts/sync-routes-v2.ts",
         "sync-route-detail-v2": "ts-node -r tsconfig-paths/register refs/sync-data-v2/scripts/sync-route-detail-v2.ts",
+        "sync-route-detail-v3": "ts-node -r tsconfig-paths/register refs/sync-data-v3/scripts/sync-route-detail-v3.ts",
         "merge-station-lat-lng": "ts-node -r tsconfig-paths/register refs/sync-data-v2/scripts/merge-station-lat-lng.ts",
         "sync-stations-v2": "ts-node -r tsconfig-paths/register refs/sync-data-v2/scripts/sync-stations-v2.ts"
     },
