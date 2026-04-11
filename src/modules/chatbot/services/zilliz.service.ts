@@ -24,6 +24,7 @@ export class ZillizService implements OnModuleInit {
     private client: MilvusClient;
     private collectionName: string;
     private dimension: number;
+    private minScore: number;
 
     constructor(private readonly configService: ConfigService) {}
 
@@ -36,9 +37,14 @@ export class ZillizService implements OnModuleInit {
         this.dimension = this.configService.get<number>(
             'chatbot.zilliz.dimension',
         );
+        this.minScore = this.configService.get<number>(
+            'chatbot.zilliz.minScore',
+        );
 
         this.client = new MilvusClient({ address: uri, token });
-        this.logger.log(`ZillizService connecting to: ${uri}`);
+        this.logger.log(
+            `ZillizService connecting to: ${uri} (minScore=${this.minScore})`,
+        );
 
         await this.ensureCollection();
     }
@@ -180,12 +186,22 @@ export class ZillizService implements OnModuleInit {
             ],
         });
 
-        return (results.results ?? []).map((hit) => ({
+        const hits = (results.results ?? []).map((hit) => ({
             id: String(hit.id),
             score: hit.score,
             text: hit[ZILLIZ_FIELD_TEXT] as string,
             type: hit[ZILLIZ_FIELD_TYPE] as ChatbotEmbedType,
             metadata: hit[ZILLIZ_FIELD_METADATA] as Record<string, any>,
         }));
+
+        const filtered = hits.filter((h) => h.score >= this.minScore);
+
+        if (hits.length !== filtered.length) {
+            this.logger.debug(
+                `Score filter: kept ${filtered.length}/${hits.length} hits (minScore=${this.minScore})`,
+            );
+        }
+
+        return filtered;
     }
 }

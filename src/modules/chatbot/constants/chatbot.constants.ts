@@ -13,6 +13,7 @@ export const ZILLIZ_TYPE_MAX_LENGTH = 32;
 export const ZILLIZ_INDEX_TYPE = 'AUTOINDEX';
 export const ZILLIZ_METRIC_TYPE = 'COSINE';
 export const ZILLIZ_INDEX_FIELD = 'embedding';
+export const ZILLIZ_DEFAULT_MIN_SCORE = 0.35;
 
 // ─── Chat ─────────────────────────────────────────────────────────────────────
 export const CHAT_MAX_HISTORY_TURNS = 10;
@@ -45,3 +46,5 @@ export const CHATBOT_SYSTEM_PROMPT_WITH_CONTEXT = [
     '- Không bịa đặt chi tiết không có trong ngữ cảnh. Không suy diễn mạnh từ một phần dữ liệu mỏng.',
     '- Giữ giọng điệu chuyên nghiệp, thân thiện; trả lời súc tích trừ khi người dùng cần chi tiết.',
 ].join('\n');
+
+export const EMBEDDING_API_BATCH_LIMIT = 10;

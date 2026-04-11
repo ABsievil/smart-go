@@ -6,6 +6,7 @@ import {
     HttpStatus,
     BadRequestException,
     Logger,
+    Query,
 } from '@nestjs/common';
 import {
     ApiTags,
@@ -165,7 +166,7 @@ Dành riêng cho Admin. Upload file JSON chứa mảng các mục kiến thức 
 
 **Loại nội dung hỗ trợ:** route, station, faq, general
 
-**Hiệu năng (bulk):** Mỗi lô gọi embedding HuggingFace một lần cho nhiều câu và insert Zilliz một lần cho cả lô. Điều chỉnh \`CHATBOT_EMBED_BATCH_SIZE\` (mặc định 64, tối đa 256) nếu cần cân bằng tốc độ / giới hạn API.
+**Hiệu năng (bulk):** Mỗi lô gọi embedding DashScope (text-embedding-v4) một lần cho nhiều câu và insert Zilliz một lần cho cả lô. Điều chỉnh \`CHATBOT_EMBED_BATCH_SIZE\` (mặc định 64, tối đa 256) nếu cần cân bằng tốc độ / giới hạn API.
     `,
     })
     @ApiResponse({
@@ -180,7 +181,9 @@ Dành riêng cho Admin. Upload file JSON chứa mảng các mục kiến thức 
             allowedMimeTypes: [...UPLOAD_ALLOWED_MIME_TYPES.TEXT_AND_DOCUMENT],
         })
         file: Express.Multer.File,
+        @Query('offset') rawOffset?: string,
     ): Promise<EmbedListResponseDto> {
+        const offset = Math.max(0, parseInt(rawOffset ?? '0', 10) || 0);
         let items: EmbedRequestDto[];
 
         try {
@@ -192,7 +195,7 @@ Dành riêng cho Admin. Upload file JSON chứa mảng các mục kiến thức 
                 );
             }
 
-            return this.chatbotService.embedFromFile(items);
+            return this.chatbotService.embedFromFile(items, offset);
         } catch (error) {
             this.logger.error(`Error parsing JSON file: ${error.message}`);
             throw new BadRequestException('File JSON không hợp lệ');

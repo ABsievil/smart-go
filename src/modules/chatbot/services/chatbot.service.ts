@@ -4,7 +4,7 @@ import {
     Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { HuggingFaceService } from '@modules/chatbot/services/huggingface.service';
+import { DashScopeService } from '@modules/chatbot/services/dashscope.service';
 import { ZillizService } from '@modules/chatbot/services/zilliz.service';
 import { IChatMessage } from '@modules/chatbot/interfaces/chat-message.interface';
 import { IVectorSearchResult } from '@modules/chatbot/interfaces/vector-search-result.interface';
@@ -31,7 +31,7 @@ export class ChatbotService {
 
     constructor(
         private readonly configService: ConfigService,
-        private readonly huggingFaceService: HuggingFaceService,
+        private readonly dashScopeService: DashScopeService,
         private readonly zillizService: ZillizService,
     ) {
         this.contextLimit = this.configService.get<number>(
@@ -43,23 +43,22 @@ export class ChatbotService {
     }
 
     /**
-     * Xử lý tin nhắn chat: tìm context liên quan từ vector DB,
-     * sau đó gọi LLM để sinh câu trả lời có chất lượng.
+     * @description Xử lý tin nhắn chat: tìm context liên quan từ vector DB,
+     * sau đó gọi LLM Model để sinh câu trả lời.
+     *
      * **Luồng xử lý:**
-     * 1. Embed tin nhắn thành vector bằng HuggingFace
-     * 2. Tìm kiếm tài liệu liên quan trong Zilliz vector DB
+     * 1. Embed tin nhắn thành vector bằng text-embedding-v4
+     * 2. Tìm kiếm tài liệu liên quan trong Zilliz (có lọc score)
      * 3. Gắn context vào system prompt
-     * 4. Gọi LLM (HuggingFace) để sinh câu trả lời
+     * 4. Gọi LLM model để sinh câu trả lời
      */
     async chat(
         message: string,
         history: ChatHistoryItemDto[] = [],
     ): Promise<Omit<ChatResponseDto, 'conversationId'>> {
-        // Bước 1: Embed tin nhắn người dùng để tìm context liên quan
         const embedding =
-            await this.huggingFaceService.generateEmbedding(message);
+            await this.dashScopeService.generateEmbedding(message);
 
-        // Bước 2: Tìm tài liệu tương đồng trong Zilliz vector DB
         const contextDocs = await this.zillizService.search(
             embedding,
             this.contextLimit,
@@ -74,15 +73,13 @@ export class ChatbotService {
             `RAG ${contextDocs.length} hit(s)\n${JSON.stringify(ragHits, null, 2)}`,
         );
 
-        // Bước 3: Gắn context RAG vào system prompt hằng số
         const enrichedSystemPrompt =
             this.buildSystemPromptWithContext(contextDocs);
         this.logger.debug(`Enriched system prompt: ${enrichedSystemPrompt}`);
-        // Bước 4: Chuẩn bị lịch sử hội thoại (giới hạn số turn để tránh vượt context window)
+
         const messages = this.buildMessageHistory(history, message);
-        this.logger.debug(`Messages: ${JSON.stringify(messages, null, 2)}`);
-        // Bước 5: Gọi LLM sinh câu trả lời
-        const reply = await this.huggingFaceService.chatCompletion(
+
+        const reply = await this.dashScopeService.chatCompletion(
             messages,
             enrichedSystemPrompt,
         );
@@ -92,13 +89,20 @@ export class ChatbotService {
 
     /**
      * Nhúng một đoạn văn bản kiến thức vào Zilliz vector DB.
+     *
+     * **Fix #1 — rich embedding:** Vector được sinh từ chuỗi kết hợp `text` + tất cả
+     * các trường trong `metadata`, giúp tìm kiếm chính xác khi người dùng hỏi về các
+     * thuộc tính cụ thể (giá vé, giờ hoạt động, tần suất…) mà chỉ nằm trong metadata.
+     * Trường `text` gốc vẫn được lưu riêng để hiển thị cho LLM.
      */
     async embed(
         text: string,
         type: ChatbotEmbedType,
         metadata: Record<string, any> = {},
     ): Promise<EmbedGetResponseDto> {
-        const embedding = await this.huggingFaceService.generateEmbedding(text);
+        const embeddingText = this.buildEmbeddingText(text, type, metadata);
+        const embedding =
+            await this.dashScopeService.generateEmbedding(embeddingText);
         const id = await this.zillizService.insert(
             embedding,
             text,
@@ -106,35 +110,50 @@ export class ChatbotService {
             metadata,
         );
 
-        this.logger.log(`Embedded knowledge [${type}] with id: ${id}`);
+        this.logger.log(`Embedded knowledge [${type}] id=${id}`);
 
         return { _id: id, text, type };
     }
 
     /**
-     * Nhúng hàng loạt từ file JSON: gộp embedding (một request HF / batch) và
-     * insert Zilliz theo lô để giảm số round-trip so với xử lý từng dòng.
+     * Nhúng hàng loạt từ file JSON: gộp embedding và insert Zilliz theo lô.
+     * @param offset Bỏ qua N items đầu — dùng để resume khi bị ngắt giữa chừng.
      */
     async embedFromFile(
         items: EmbedRequestDto[],
+        offset = 0,
     ): Promise<EmbedListResponseDto> {
         const data: EmbedGetResponseDto[] = [];
         const batchSize = Math.max(1, this.embedFileBatchSize ?? 64);
         const total = items.length;
-        const totalBatches = total ? Math.ceil(total / batchSize) : 0;
+
+        const pending = offset > 0 ? items.slice(offset) : items;
+        const totalBatches = pending.length
+            ? Math.ceil(pending.length / batchSize)
+            : 0;
 
         this.logger.log(
-            `Batch embed started: ${total} item(s), ${totalBatches} batch(es), batchSize=${batchSize}`,
+            `Batch embed started: ${pending.length}/${total} item(s) (offset=${offset}), ${totalBatches} batch(es), batchSize=${batchSize}`,
         );
 
         let batchIndex = 0;
-        for (let i = 0; i < items.length; i += batchSize) {
+        for (let i = 0; i < pending.length; i += batchSize) {
             batchIndex++;
-            const slice = items.slice(i, i + batchSize);
-            const texts = slice.map((item) => item.text);
+            const slice = pending.slice(i, i + batchSize);
+
+            // Xây dựng rich embedding text cho từng item trong batch
+            const embeddingTexts = slice.map((item) =>
+                this.buildEmbeddingText(
+                    item.text,
+                    item.type,
+                    item.metadata ?? {},
+                ),
+            );
 
             const embeddings =
-                await this.huggingFaceService.generateEmbeddingsBatch(texts);
+                await this.dashScopeService.generateEmbeddingsBatch(
+                    embeddingTexts,
+                );
 
             if (embeddings.length !== slice.length) {
                 throw new InternalServerErrorException(
@@ -161,24 +180,59 @@ export class ChatbotService {
 
             const processed = data.length;
             const pct =
-                total > 0
-                    ? ((processed / total) * 100).toFixed(1)
-                    : '0.0';
+                total > 0 ? ((processed / total) * 100).toFixed(1) : '0.0';
             this.logger.log(
                 `Batch embed progress: ${processed}/${total} (${pct}%) — batch ${batchIndex}/${totalBatches}`,
             );
         }
 
         this.logger.log(
-            `Batch embed completed: ${data.length}/${items.length} items (batchSize=${batchSize})`,
+            `Batch embed completed: ${data.length}/${pending.length} items embedded (offset=${offset}, batchSize=${batchSize})`,
         );
 
-        return { total: items.length, page: 1, limit: items.length, data };
+        return { total, page: 1, limit: pending.length, data };
+    }
+
+    // ─── Private helpers ────────────────────────────────────────────────────────
+
+    /**
+     * @description Xây dựng chuỗi văn bản giàu thông tin để sinh embedding vector.
+     *
+     * Bao gồm ba tầng thông tin:
+     *  1. `[type]` prefix  — giúp vector phân biệt loại nội dung (faq/route/station/general)
+     *  2. `text`           — mô tả tự nhiên, thường là câu hỏi hoặc tên tuyến/trạm
+     *  3. metadata fields  — các thuộc tính có cấu trúc (giá vé, giờ chạy, câu trả lời FAQ…)
+     */
+    private buildEmbeddingText(
+        text: string,
+        type: ChatbotEmbedType,
+        metadata: Record<string, any> = {},
+    ): string {
+        const base = `[${type}] ${text}`;
+
+        const keys = Object.keys(metadata);
+        if (!keys.length) return base;
+
+        const metaParts = keys
+            .filter((k) => {
+                const v = metadata[k];
+                return v !== null && v !== undefined && v !== '';
+            })
+            .map((k) => {
+                const v = metadata[k];
+                const valStr = Array.isArray(v)
+                    ? v.filter(Boolean).join(', ')
+                    : String(v);
+                return `${k}: ${valStr}`;
+            });
+
+        if (!metaParts.length) return base;
+        return `${base}\n${metaParts.join('. ')}`;
     }
 
     /**
-     * Ghép context RAG vào system prompt để LLM có thêm thông tin thực tế.
-     * Vector search trả về `text` (đoạn đã embed, thường ngắn) và `metadata` (chi tiết có cấu trúc).
+     * Ghép context RAG vào system prompt.
+     * Vector search trả về `text` (đoạn gốc) và `metadata` (chi tiết có cấu trúc).
      */
     private buildSystemPromptWithContext(
         contextDocs: IVectorSearchResult[],
@@ -197,7 +251,9 @@ export class ChatbotService {
         );
     }
 
-    /** Format chunk context: phần text để embed + metadata chi tiết (JSON) nếu có. */
+    /**
+     * @description Format từng chunk context: text gốc + metadata JSON nếu có.
+     */
     private formatContextChunk(
         doc: IVectorSearchResult,
         index: number,
@@ -216,7 +272,7 @@ export class ChatbotService {
     }
 
     /**
-     * Chuẩn bị danh sách message cho LLM, cắt giới hạn số turn lịch sử.
+     * @description Chuẩn bị danh sách message cho LLM, cắt giới hạn số turn lịch sử.
      */
     private buildMessageHistory(
         history: ChatHistoryItemDto[],

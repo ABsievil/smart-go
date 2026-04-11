@@ -72,34 +72,37 @@ export class EnvironmentVariablesDto {
     @IsString()
     JWT_REFRESH_EXPIRES_IN?: string;
 
-    // HuggingFace
     @IsOptional()
     @IsString()
-    HF_TOKEN?: string;
+    DASHSCOPE_API_KEY?: string;
 
     @IsOptional()
     @IsString()
-    HF_CHAT_MODEL?: string;
+    DASHSCOPE_BASE_URL?: string;
 
     @IsOptional()
     @IsString()
-    HF_EMBEDDING_MODEL?: string;
+    DASHSCOPE_CHAT_MODEL?: string;
+
+    @IsOptional()
+    @IsString()
+    DASHSCOPE_EMBEDDING_MODEL?: string;
 
     @IsOptional()
     @IsNumberString()
-    HF_MAX_NEW_TOKENS?: string;
+    DASHSCOPE_EMBEDDING_DIMENSION?: string;
+
+    @IsOptional()
+    @IsNumberString()
+    DASHSCOPE_MAX_NEW_TOKENS?: string;
 
     @IsOptional()
     @IsString()
-    HF_TEMPERATURE?: string;
+    DASHSCOPE_TEMPERATURE?: string;
 
     @IsOptional()
     @IsString()
-    HF_INFERENCE_PROVIDER?: string;
-
-    @IsOptional()
-    @IsString()
-    HF_ROUTER_BASE_URL?: string;
+    DASHSCOPE_ENABLE_THINKING?: string;
 
     // Zilliz
     @IsOptional()
@@ -117,6 +120,10 @@ export class EnvironmentVariablesDto {
     @IsOptional()
     @IsNumberString()
     ZILLIZ_DIMENSION?: string;
+
+    @IsOptional()
+    @IsNumberString()
+    ZILLIZ_MIN_SCORE?: string;
 
     // Chatbot
     @IsOptional()
