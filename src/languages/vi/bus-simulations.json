@@ -1,0 +1,14 @@
+{
+    "success": {
+        "findTripSchedule": "Lấy lịch chạy trong ngày thành công",
+        "findActivePositions": "Lấy vị trí các xe đang chạy thành công",
+        "findTripPosition": "Lấy vị trí chuyến xe thành công",
+        "findStationEta": "Lấy thời gian dự kiến đến trạm thành công"
+    },
+    "error": {
+        "findTripSchedule": "Không thể lấy lịch chạy trong ngày",
+        "findActivePositions": "Không thể lấy vị trí các xe đang chạy",
+        "findTripPosition": "Không tìm thấy chuyến xe",
+        "findStationEta": "Không thể lấy thời gian dự kiến đến trạm"
+    }
+}

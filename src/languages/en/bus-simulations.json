@@ -1,0 +1,14 @@
+{
+    "success": {
+        "findTripSchedule": "Trip schedule retrieved successfully",
+        "findActivePositions": "Active bus positions retrieved successfully",
+        "findTripPosition": "Trip position retrieved successfully",
+        "findStationEta": "Station ETAs retrieved successfully"
+    },
+    "error": {
+        "findTripSchedule": "Failed to retrieve trip schedule",
+        "findActivePositions": "Failed to retrieve active bus positions",
+        "findTripPosition": "Bus trip not found",
+        "findStationEta": "Failed to retrieve station ETAs"
+    }
+}
