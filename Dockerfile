@@ -10,16 +10,18 @@ RUN yarn build
 
 FROM node:20-alpine AS production
 WORKDIR /app
+
 ENV NODE_ENV=production
+ENV APP_PORT=8000
 
 COPY package.json yarn.lock ./
 
-# Bỏ || true để lộ lỗi nếu install thất bại
-RUN yarn install --frozen-lockfile --production && yarn cache clean
+RUN yarn install --frozen-lockfile --production && yarn cache clean && chown -R node:node /app
 
-# Copy compiled app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/src/languages ./dist/languages
+COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/src/languages ./dist/languages
+
+USER node
 
 EXPOSE 8000
 
