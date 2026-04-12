@@ -88,9 +88,8 @@ export class BusSimulationController {
     async getActivePositions(
         @Param('routeId') routeId: string,
     ): Promise<BusPositionResponseDto[]> {
-        return this.busSimulationService
-            .getActiveBusPositions(routeId)
-            .map((pos) => this.busSimulationService.mapPositionToDto(pos));
+        const positions = await this.busSimulationService.getActiveBusPositions(routeId);
+        return positions.map((pos) => this.busSimulationService.mapPositionToDto(pos));
     }
 
     @Get('trips/:tripId/position')

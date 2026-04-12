@@ -1,6 +1,6 @@
 import { Injectable, Logger, MessageEvent } from '@nestjs/common';
 import { Observable, timer } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { randomUUID } from 'crypto';
 import { RouteEntity } from '@modules/routes/repositories/entities/route.entity';
 import { StationEntity } from '@modules/stations/repositories/entities/station.entity';
@@ -10,14 +10,15 @@ import { IBusPosition } from '@modules/bus-simulations/interfaces/bus-position.i
 import { IStationEta } from '@modules/bus-simulations/interfaces/station-eta.interface';
 import { BusTripResponseDto } from '@modules/bus-simulations/dtos/response/bus-trip.response.dto';
 import { BusPositionResponseDto } from '@modules/bus-simulations/dtos/response/bus-position.response.dto';
-import { SSE_INTERVAL_MS } from '@modules/bus-simulations/constants/bus-simulations.constants';
-export interface IUpcomingBusAtStation {
-    tripId: string;
-    routeId: string;
-    routeCode: string;
-    routeName: string;
-    eta: IStationEta;
-}
+import {
+    SSE_INTERVAL_MS,
+    POSITION_CACHE_TTL_S,
+    ETA_CACHE_TTL_S,
+    BusRedisKey,
+} from '@modules/bus-simulations/constants/bus-simulations.constants';
+import { RedisService } from '@common/redis/redis.service';
+import { dateReviver } from '@modules/bus-simulations/constants/bus-simulations.constants';
+import { IUpcomingBusAtStation } from '@modules/bus-simulations/interfaces/upcomming-bus-station.interface';
 
 @Injectable()
 export class BusSimulationService {
@@ -28,7 +29,12 @@ export class BusSimulationService {
     private readonly tripsByRoute = new Map<string, IBusTripInstance[]>();
     private readonly tripIndex = new Map<string, IBusTripInstance>();
 
-    initializeRoutes(routes: RouteEntity[], stations: StationEntity[]): void {
+    constructor(private readonly redisService: RedisService) {}
+
+    async initializeRoutes(
+        routes: RouteEntity[],
+        stations: StationEntity[],
+    ): Promise<void> {
         this.stationMap.clear();
         this.routeMap.clear();
         this.tripsByRoute.clear();
@@ -61,7 +67,7 @@ export class BusSimulationService {
         );
     }
 
-    // ─── Schedule builders ───────────────────────────────────────────────────
+    // ─── Schedule builders ────────────────────────────────────────────────────
 
     private buildTripSchedule(route: RouteEntity): IBusTripInstance[] {
         const today = new Date();
@@ -98,7 +104,7 @@ export class BusSimulationService {
         return trips;
     }
 
-    // ─── Position computation ────────────────────────────────────────────────
+    // ─── Position computation ─────────────────────────────────────────────────
 
     private computePosition(trip: IBusTripInstance): IBusPosition {
         const now = new Date();
@@ -111,9 +117,8 @@ export class BusSimulationService {
             trip.tripDurationMinutes,
         );
 
-        const stationIds = trip.stationIds;
-        const numStations = stationIds.length;
-        const segmentCount = Math.max(numStations - 1, 1);
+        const { stationIds } = trip;
+        const segmentCount = Math.max(stationIds.length - 1, 1);
         const timePerSegmentMinutes = trip.tripDurationMinutes / segmentCount;
 
         const progressRatio = Math.max(
@@ -226,23 +231,72 @@ export class BusSimulationService {
 
     // ─── Public query methods ─────────────────────────────────────────────────
 
-    getActiveBusPositions(routeId: string): IBusPosition[] {
+    /**
+     * @description Trả về vị trí tất cả xe đang hoạt động trên tuyến.
+     * Cache Redis TTL = 5s: mọi SSE subscriber cùng tuyến trong cùng chu kỳ
+     */
+    async getActiveBusPositions(routeId: string): Promise<IBusPosition[]> {
+        const cacheKey = BusRedisKey.routePositions(routeId);
+
+        const cached = await this.redisService.get(cacheKey);
+        if (cached) {
+            return JSON.parse(cached, dateReviver) as IBusPosition[];
+        }
+
         const now = new Date();
-        return (this.tripsByRoute.get(routeId) ?? [])
+        const positions = (this.tripsByRoute.get(routeId) ?? [])
             .filter((trip) => this.isWithinActiveWindow(trip, now))
             .map((trip) => this.computePosition(trip));
+
+        await this.redisService.set(
+            cacheKey,
+            JSON.stringify(positions),
+            POSITION_CACHE_TTL_S,
+        );
+
+        return positions;
     }
 
     getTripSchedule(routeId: string): IBusTripInstance[] {
         return this.tripsByRoute.get(routeId) ?? [];
     }
 
+    /**
+     * @description Vị trí của một chuyến cụ thể — tính toán trực tiếp, không cần cache
+     */
     getTripPosition(tripId: string): IBusPosition | null {
         const trip = this.tripIndex.get(tripId);
         return trip ? this.computePosition(trip) : null;
     }
 
-    getUpcomingBusesAtStation(stationId: string): IUpcomingBusAtStation[] {
+    /**
+     * @description Trả về các xe sắp đến một trạm trong 90 phút tới.
+     * Cache Redis TTL = 5s để tránh lặp tính cho mọi subscriber cùng trạm.
+     */
+    async getUpcomingBusesAtStation(
+        stationId: string,
+    ): Promise<IUpcomingBusAtStation[]> {
+        const cacheKey = BusRedisKey.stationEtas(stationId);
+
+        const cached = await this.redisService.get(cacheKey);
+        if (cached) {
+            return JSON.parse(cached, dateReviver) as IUpcomingBusAtStation[];
+        }
+
+        const results = this.computeUpcomingBusesAtStation(stationId);
+
+        await this.redisService.set(
+            cacheKey,
+            JSON.stringify(results),
+            ETA_CACHE_TTL_S,
+        );
+
+        return results;
+    }
+
+    private computeUpcomingBusesAtStation(
+        stationId: string,
+    ): IUpcomingBusAtStation[] {
         const now = new Date();
         const results: IUpcomingBusAtStation[] = [];
 
@@ -262,7 +316,6 @@ export class BusSimulationService {
                 const etaMs =
                     trip.departureTime.getTime() +
                     stationIndex * timePerSegment * 60_000;
-                const eta = new Date(etaMs);
                 const minutesAway = (etaMs - now.getTime()) / 60_000;
 
                 if (minutesAway < 0 || minutesAway > 90) continue;
@@ -278,7 +331,7 @@ export class BusSimulationService {
                         stationName: station?.stationName,
                         latitude: station?.latitude ?? 0,
                         longitude: station?.longitude ?? 0,
-                        eta,
+                        eta: new Date(etaMs),
                         minutesAway: Math.round(minutesAway * 10) / 10,
                         isReached: false,
                     },
@@ -290,43 +343,34 @@ export class BusSimulationService {
     }
 
     // ─── SSE Observables ──────────────────────────────────────────────────────
-    // timer(0, N) sử dụng async scheduler cho emission đầu tiên (t=0 via setTimeout),
-    // điều này cho NestJS thời gian để flush SSE headers trước khi event data đầu tiên đến.
-    // Mỗi subscriber có timer riêng biệt (không mất sync-emission do shared-subject).
+    // switchMap được dùng thay map để xử lý async: nếu tick mới đến trước
+    // khi tick cũ hoàn thành, tick cũ sẽ bị huỷ (tránh backpressure).
+
     streamRoutePositions(routeId: string): Observable<MessageEvent> {
         return timer(0, SSE_INTERVAL_MS).pipe(
-            map(
-                () =>
-                    ({
-                        data: this.getActiveBusPositions(routeId),
-                    }) as MessageEvent,
-            ),
+            switchMap(async () => {
+                const data = await this.getActiveBusPositions(routeId);
+                return { data } as MessageEvent;
+            }),
         );
     }
 
     streamTripPosition(tripId: string): Observable<MessageEvent> {
         return timer(0, SSE_INTERVAL_MS).pipe(
-            map(
-                () =>
-                    ({
-                        data: this.getTripPosition(tripId),
-                    }) as MessageEvent,
-            ),
+            map(() => ({ data: this.getTripPosition(tripId) }) as MessageEvent),
         );
     }
 
     streamStationEtas(stationId: string): Observable<MessageEvent> {
         return timer(0, SSE_INTERVAL_MS).pipe(
-            map(
-                () =>
-                    ({
-                        data: this.getUpcomingBusesAtStation(stationId),
-                    }) as MessageEvent,
-            ),
+            switchMap(async () => {
+                const data = await this.getUpcomingBusesAtStation(stationId);
+                return { data } as MessageEvent;
+            }),
         );
     }
 
-    // ─── Mappers ─────────────────────────────────────────────────────────────
+    // ─── Mappers ──────────────────────────────────────────────────────────────
 
     mapTripToDto(trip: IBusTripInstance): BusTripResponseDto {
         const now = new Date();

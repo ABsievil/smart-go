@@ -27,7 +27,7 @@ export class BusSchedulerService implements OnModuleInit {
                 this.stationService.findAll({}),
             ]);
 
-            this.busSimulationService.initializeRoutes(
+            await this.busSimulationService.initializeRoutes(
                 routeResult.data as RouteEntity[],
                 stationResult.data as StationEntity[],
             );
