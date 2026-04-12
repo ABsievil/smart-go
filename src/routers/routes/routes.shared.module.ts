@@ -16,6 +16,8 @@ import { MessageController } from '@modules/messages/controllers/message.control
 import { MessageModule } from '@modules/messages/message.module';
 import { PaymentTransactionController } from '@modules/payment-transactions/controllers/payment-transaction.controller';
 import { PaymentTransactionModule } from '@modules/payment-transactions/payment-transaction.module';
+import { BusSimulationController } from '@modules/bus-simulations/controllers/bus-simulation.controller';
+import { BusSimulationModule } from '@modules/bus-simulations/bus-simulation.module';
 
 @Module({
     controllers: [
@@ -27,6 +29,7 @@ import { PaymentTransactionModule } from '@modules/payment-transactions/payment-
         ChatbotController,
         MessageController,
         PaymentTransactionController,
+        BusSimulationController,
     ],
     imports: [
         AuthModule,
@@ -38,6 +41,7 @@ import { PaymentTransactionModule } from '@modules/payment-transactions/payment-
         PaymentTransactionModule,
         ChatbotModule,
         MessageModule,
+        BusSimulationModule,
     ],
 })
 export class RoutesSharedModule {}
