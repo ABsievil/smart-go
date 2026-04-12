@@ -1,6 +1,6 @@
 import { Injectable, Logger, MessageEvent } from '@nestjs/common';
-import { Observable, interval } from 'rxjs';
-import { map, share, startWith } from 'rxjs/operators';
+import { Observable, timer } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { randomUUID } from 'crypto';
 import { RouteEntity } from '@modules/routes/repositories/entities/route.entity';
 import { StationEntity } from '@modules/stations/repositories/entities/station.entity';
@@ -10,7 +10,7 @@ import { IBusPosition } from '@modules/bus-simulations/interfaces/bus-position.i
 import { IStationEta } from '@modules/bus-simulations/interfaces/station-eta.interface';
 import { BusTripResponseDto } from '@modules/bus-simulations/dtos/response/bus-trip.response.dto';
 import { BusPositionResponseDto } from '@modules/bus-simulations/dtos/response/bus-position.response.dto';
-
+import { SSE_INTERVAL_MS } from '@modules/bus-simulations/constants/bus-simulations.constants';
 export interface IUpcomingBusAtStation {
     tripId: string;
     routeId: string;
@@ -28,8 +28,6 @@ export class BusSimulationService {
     private readonly tripsByRoute = new Map<string, IBusTripInstance[]>();
     private readonly tripIndex = new Map<string, IBusTripInstance>();
 
-    private readonly ticker$ = interval(5_000).pipe(startWith(0), share());
-
     initializeRoutes(routes: RouteEntity[], stations: StationEntity[]): void {
         this.stationMap.clear();
         this.routeMap.clear();
@@ -42,7 +40,11 @@ export class BusSimulationService {
 
         let totalTrips = 0;
         for (const route of routes) {
-            if (!route.operatingTimeStart || !route.operatingTimeEnd || !route.tripTime) {
+            if (
+                !route.operatingTimeStart ||
+                !route.operatingTimeEnd ||
+                !route.tripTime
+            ) {
                 continue;
             }
             this.routeMap.set(route._id, route);
@@ -64,7 +66,9 @@ export class BusSimulationService {
     private buildTripSchedule(route: RouteEntity): IBusTripInstance[] {
         const today = new Date();
         const tripDurationMinutes = this.parseDurationMinutes(route.tripTime);
-        const frequencyMinutes = this.parseFrequencyMinutes(route.frequency ?? '15 phút');
+        const frequencyMinutes = this.parseFrequencyMinutes(
+            route.frequency ?? '15 phút',
+        );
         const startTime = this.parseTimeToDate(route.operatingTimeStart, today);
         const endTime = this.parseTimeToDate(route.operatingTimeEnd, today);
 
@@ -72,7 +76,9 @@ export class BusSimulationService {
         let departure = new Date(startTime);
 
         while (departure <= endTime) {
-            const arrival = new Date(departure.getTime() + tripDurationMinutes * 60_000);
+            const arrival = new Date(
+                departure.getTime() + tripDurationMinutes * 60_000,
+            );
             trips.push({
                 tripId: randomUUID(),
                 routeId: route._id,
@@ -84,7 +90,9 @@ export class BusSimulationService {
                 stationIds: route.stationIds ?? [],
                 tripDurationMinutes,
             });
-            departure = new Date(departure.getTime() + frequencyMinutes * 60_000);
+            departure = new Date(
+                departure.getTime() + frequencyMinutes * 60_000,
+            );
         }
 
         return trips;
@@ -98,16 +106,25 @@ export class BusSimulationService {
         const elapsedMinutes = elapsedMs / 60_000;
         const remainingMinutes = trip.tripDurationMinutes - elapsedMinutes;
 
-        const status = this.resolveTripStatus(elapsedMinutes, trip.tripDurationMinutes);
+        const status = this.resolveTripStatus(
+            elapsedMinutes,
+            trip.tripDurationMinutes,
+        );
 
         const stationIds = trip.stationIds;
         const numStations = stationIds.length;
         const segmentCount = Math.max(numStations - 1, 1);
         const timePerSegmentMinutes = trip.tripDurationMinutes / segmentCount;
 
-        const progressRatio = Math.max(0, Math.min(1, elapsedMinutes / trip.tripDurationMinutes));
+        const progressRatio = Math.max(
+            0,
+            Math.min(1, elapsedMinutes / trip.tripDurationMinutes),
+        );
         const rawSegment = progressRatio * segmentCount;
-        const currentSegment = Math.min(Math.floor(rawSegment), segmentCount - 1);
+        const currentSegment = Math.min(
+            Math.floor(rawSegment),
+            segmentCount - 1,
+        );
         const segmentProgress = rawSegment - currentSegment;
 
         const currentStationId = stationIds[currentSegment] ?? stationIds[0];
@@ -119,7 +136,11 @@ export class BusSimulationService {
             segmentProgress,
         );
 
-        const stationEtas = this.buildStationEtas(trip, timePerSegmentMinutes, now);
+        const stationEtas = this.buildStationEtas(
+            trip,
+            timePerSegmentMinutes,
+            now,
+        );
 
         return {
             tripId: trip.tripId,
@@ -147,7 +168,8 @@ export class BusSimulationService {
         tripDurationMinutes: number,
     ): BusTripStatus {
         if (elapsedMinutes < 0) return BusTripStatus.SCHEDULED;
-        if (elapsedMinutes >= tripDurationMinutes) return BusTripStatus.COMPLETED;
+        if (elapsedMinutes >= tripDurationMinutes)
+            return BusTripStatus.COMPLETED;
         return BusTripStatus.RUNNING;
     }
 
@@ -164,7 +186,8 @@ export class BusSimulationService {
 
         return {
             latitude: from.latitude + (to.latitude - from.latitude) * progress,
-            longitude: from.longitude + (to.longitude - from.longitude) * progress,
+            longitude:
+                from.longitude + (to.longitude - from.longitude) * progress,
         };
     }
 
@@ -176,7 +199,8 @@ export class BusSimulationService {
         return trip.stationIds.map((stationId, idx) => {
             const station = this.stationMap.get(stationId);
             const etaMs =
-                trip.departureTime.getTime() + idx * timePerSegmentMinutes * 60_000;
+                trip.departureTime.getTime() +
+                idx * timePerSegmentMinutes * 60_000;
             const eta = new Date(etaMs);
             const minutesAway = (etaMs - now.getTime()) / 60_000;
 
@@ -236,7 +260,8 @@ export class BusSimulationService {
 
             for (const trip of trips) {
                 const etaMs =
-                    trip.departureTime.getTime() + stationIndex * timePerSegment * 60_000;
+                    trip.departureTime.getTime() +
+                    stationIndex * timePerSegment * 60_000;
                 const eta = new Date(etaMs);
                 const minutesAway = (etaMs - now.getTime()) / 60_000;
 
@@ -265,28 +290,39 @@ export class BusSimulationService {
     }
 
     // ─── SSE Observables ──────────────────────────────────────────────────────
-
+    // timer(0, N) sử dụng async scheduler cho emission đầu tiên (t=0 via setTimeout),
+    // điều này cho NestJS thời gian để flush SSE headers trước khi event data đầu tiên đến.
+    // Mỗi subscriber có timer riêng biệt (không mất sync-emission do shared-subject).
     streamRoutePositions(routeId: string): Observable<MessageEvent> {
-        return this.ticker$.pipe(
-            map(() => ({
-                data: this.getActiveBusPositions(routeId),
-            } as MessageEvent)),
+        return timer(0, SSE_INTERVAL_MS).pipe(
+            map(
+                () =>
+                    ({
+                        data: this.getActiveBusPositions(routeId),
+                    }) as MessageEvent,
+            ),
         );
     }
 
     streamTripPosition(tripId: string): Observable<MessageEvent> {
-        return this.ticker$.pipe(
-            map(() => ({
-                data: this.getTripPosition(tripId),
-            } as MessageEvent)),
+        return timer(0, SSE_INTERVAL_MS).pipe(
+            map(
+                () =>
+                    ({
+                        data: this.getTripPosition(tripId),
+                    }) as MessageEvent,
+            ),
         );
     }
 
     streamStationEtas(stationId: string): Observable<MessageEvent> {
-        return this.ticker$.pipe(
-            map(() => ({
-                data: this.getUpcomingBusesAtStation(stationId),
-            } as MessageEvent)),
+        return timer(0, SSE_INTERVAL_MS).pipe(
+            map(
+                () =>
+                    ({
+                        data: this.getUpcomingBusesAtStation(stationId),
+                    }) as MessageEvent,
+            ),
         );
     }
 
