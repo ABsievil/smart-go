@@ -13,6 +13,7 @@ import {
     ApiOperation,
     ApiParam,
     ApiProduces,
+    ApiQuery,
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
@@ -22,7 +23,7 @@ import { BusSimulationService } from '@modules/bus-simulations/services/bus-simu
 import { BusTripResponseDto } from '@modules/bus-simulations/dtos/response/bus-trip.response.dto';
 import { BusPositionResponseDto } from '@modules/bus-simulations/dtos/response/bus-position.response.dto';
 import { UpcomingBusAtStationResponseDto } from '@modules/bus-simulations/dtos/response/upcoming-bus-at-station.response.dto';
-import { Public } from '@modules/auth/decorators/auth.decorator';
+import { ACCESS_TOKEN_QUERY_PARAM } from '@modules/auth/constants/auth.constants';
 
 @ApiTags('Bus Simulations')
 @Controller('bus-simulations')
@@ -88,8 +89,11 @@ export class BusSimulationController {
     async getActivePositions(
         @Param('routeId') routeId: string,
     ): Promise<BusPositionResponseDto[]> {
-        const positions = await this.busSimulationService.getActiveBusPositions(routeId);
-        return positions.map((pos) => this.busSimulationService.mapPositionToDto(pos));
+        const positions =
+            await this.busSimulationService.getActiveBusPositions(routeId);
+        return positions.map((pos) =>
+            this.busSimulationService.mapPositionToDto(pos),
+        );
     }
 
     @Get('trips/:tripId/position')
@@ -162,15 +166,22 @@ export class BusSimulationController {
     }
 
     @Sse('routes/:routeId/stream')
-    @Public()
+    @ApiBearerAuth()
     @ApiProduces('text/event-stream')
     @ApiOperation({
         summary:
             'SSE — vị trí realtime của tất cả xe trên một tuyến (mỗi 5 giây)',
         description:
+            'EventSource không gửi được Authorization header; truyền JWT qua query `token=`. ' +
             'Kết nối Server-Sent Events liên tục. Server đẩy mảng BusPositionResponseDto mỗi 5 giây. ' +
-            'Sử dụng: `const es = new EventSource("/api/v1/bus-simulations/routes/{routeId}/stream"); ' +
+            'Ví dụ: `const es = new EventSource(`/api/v1/bus-simulations/routes/{routeId}/stream?token==${encodeURIComponent(token)}`); ' +
             'es.onmessage = (e) => console.log(JSON.parse(e.data));`',
+    })
+    @ApiQuery({
+        name: ACCESS_TOKEN_QUERY_PARAM,
+        required: true,
+        type: String,
+        description: 'JWT access token (thay cho Bearer header)',
     })
     @ApiParam({
         name: 'routeId',
@@ -191,14 +202,21 @@ export class BusSimulationController {
     }
 
     @Sse('trips/:tripId/stream')
-    @Public()
+    @ApiBearerAuth()
     @ApiProduces('text/event-stream')
     @ApiOperation({
         summary: 'SSE — vị trí realtime của một chuyến xe cụ thể (mỗi 5 giây)',
         description:
+            'EventSource không gửi được Authorization header; truyền JWT qua query `token=`. ' +
             'Kết nối Server-Sent Events liên tục. Server đẩy BusPositionResponseDto mỗi 5 giây. ' +
-            'Sử dụng: `const es = new EventSource("/api/v1/bus-simulations/trips/{tripId}/stream"); ' +
+            'Ví dụ: `const es = new EventSource(`/api/v1/bus-simulations/trips/{tripId}/stream?token==${encodeURIComponent(token)}`); ' +
             'es.onmessage = (e) => console.log(JSON.parse(e.data));`',
+    })
+    @ApiQuery({
+        name: ACCESS_TOKEN_QUERY_PARAM,
+        required: true,
+        type: String,
+        description: 'JWT access token (thay cho Bearer header)',
     })
     @ApiParam({
         name: 'tripId',
@@ -220,15 +238,22 @@ export class BusSimulationController {
     }
 
     @Sse('stations/:stationId/eta/stream')
-    @Public()
+    @ApiBearerAuth()
     @ApiProduces('text/event-stream')
     @ApiOperation({
         summary:
             'SSE — ETA realtime của các chuyến xe tại một trạm (mỗi 5 giây)',
         description:
+            'EventSource không gửi được Authorization header; truyền JWT qua query `token=`. ' +
             'Kết nối Server-Sent Events liên tục. Server đẩy danh sách UpcomingBusAtStationResponseDto mỗi 5 giây. ' +
-            'Sử dụng: `const es = new EventSource("/api/v1/bus-simulations/stations/{stationId}/eta/stream"); ' +
+            'Ví dụ: `const es = new EventSource(`/api/v1/bus-simulations/stations/{stationId}/eta/stream?token==${encodeURIComponent(token)}`); ' +
             'es.onmessage = (e) => console.log(JSON.parse(e.data));`',
+    })
+    @ApiQuery({
+        name: ACCESS_TOKEN_QUERY_PARAM,
+        required: true,
+        type: String,
+        description: 'JWT access token (thay cho Bearer header)',
     })
     @ApiParam({
         name: 'stationId',
