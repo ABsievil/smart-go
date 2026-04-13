@@ -128,7 +128,8 @@ export class BusSimulationController {
     async getTripPosition(
         @Param('tripId') tripId: string,
     ): Promise<BusPositionResponseDto> {
-        const position = this.busSimulationService.getTripPosition(tripId);
+        const position =
+            await this.busSimulationService.getTripPosition(tripId);
         if (!position) throw new NotFoundException(`Trip ${tripId} not found`);
         return this.busSimulationService.mapPositionToDto(position);
     }

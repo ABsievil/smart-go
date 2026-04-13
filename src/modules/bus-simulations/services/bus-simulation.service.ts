@@ -1,6 +1,6 @@
 import { Injectable, Logger, MessageEvent } from '@nestjs/common';
 import { Observable, timer } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { randomUUID } from 'crypto';
 import { RouteEntity } from '@modules/routes/repositories/entities/route.entity';
 import { StationEntity } from '@modules/stations/repositories/entities/station.entity';
@@ -14,10 +14,11 @@ import {
     SSE_INTERVAL_MS,
     POSITION_CACHE_TTL_S,
     ETA_CACHE_TTL_S,
+    TRIP_POSITION_CACHE_TTL_S,
     BusRedisKey,
+    dateReviver,
 } from '@modules/bus-simulations/constants/bus-simulations.constants';
 import { RedisService } from '@common/redis/redis.service';
-import { dateReviver } from '@modules/bus-simulations/constants/bus-simulations.constants';
 import { IUpcomingBusAtStation } from '@modules/bus-simulations/interfaces/upcomming-bus-station.interface';
 
 @Injectable()
@@ -28,6 +29,7 @@ export class BusSimulationService {
     private readonly stationMap = new Map<string, StationEntity>();
     private readonly tripsByRoute = new Map<string, IBusTripInstance[]>();
     private readonly tripIndex = new Map<string, IBusTripInstance>();
+    private readonly inflight = new Map<string, Promise<unknown>>();
 
     constructor(private readonly redisService: RedisService) {}
 
@@ -229,6 +231,42 @@ export class BusSimulationService {
         return elapsed >= -10 && elapsed <= trip.tripDurationMinutes + 5;
     }
 
+    // ─── Cache helper ─────────────────────────────────────────────────────────
+
+    /**
+     * @description Cache-aside + single-flight: đọc Redis trước; nếu miss, chỉ chạy compute()
+     * một lần dù nhiều subscriber miss cùng lúc — các request khác chờ cùng Promise.
+     */
+    private async withSingleFlight<T>(
+        cacheKey: string,
+        ttl: number,
+        compute: () => T | Promise<T>,
+    ): Promise<T> {
+        const cached = await this.redisService.get(cacheKey);
+        if (cached) return JSON.parse(cached, dateReviver) as T;
+
+        const existing = this.inflight.get(cacheKey);
+        if (existing) return existing as Promise<T>;
+
+        const promise = Promise.resolve(compute())
+            .then(async (result) => {
+                await this.redisService.set(
+                    cacheKey,
+                    JSON.stringify(result),
+                    ttl,
+                );
+                this.inflight.delete(cacheKey);
+                return result;
+            })
+            .catch((err) => {
+                this.inflight.delete(cacheKey);
+                throw err;
+            });
+
+        this.inflight.set(cacheKey, promise);
+        return promise as Promise<T>;
+    }
+
     // ─── Public query methods ─────────────────────────────────────────────────
 
     /**
@@ -236,25 +274,16 @@ export class BusSimulationService {
      * Cache Redis TTL = 5s: mọi SSE subscriber cùng tuyến trong cùng chu kỳ
      */
     async getActiveBusPositions(routeId: string): Promise<IBusPosition[]> {
-        const cacheKey = BusRedisKey.routePositions(routeId);
-
-        const cached = await this.redisService.get(cacheKey);
-        if (cached) {
-            return JSON.parse(cached, dateReviver) as IBusPosition[];
-        }
-
-        const now = new Date();
-        const positions = (this.tripsByRoute.get(routeId) ?? [])
-            .filter((trip) => this.isWithinActiveWindow(trip, now))
-            .map((trip) => this.computePosition(trip));
-
-        await this.redisService.set(
-            cacheKey,
-            JSON.stringify(positions),
+        return this.withSingleFlight(
+            BusRedisKey.routePositions(routeId),
             POSITION_CACHE_TTL_S,
+            () => {
+                const now = new Date();
+                return (this.tripsByRoute.get(routeId) ?? [])
+                    .filter((trip) => this.isWithinActiveWindow(trip, now))
+                    .map((trip) => this.computePosition(trip));
+            },
         );
-
-        return positions;
     }
 
     getTripSchedule(routeId: string): IBusTripInstance[] {
@@ -262,36 +291,32 @@ export class BusSimulationService {
     }
 
     /**
-     * @description Vị trí của một chuyến cụ thể — tính toán trực tiếp, không cần cache
+     * @description Vị trí của một chuyến cụ thể.
+     * Cache Redis TTL = 5s: đồng bộ pattern với routePositions và stationEtas.
      */
-    getTripPosition(tripId: string): IBusPosition | null {
-        const trip = this.tripIndex.get(tripId);
-        return trip ? this.computePosition(trip) : null;
+    async getTripPosition(tripId: string): Promise<IBusPosition | null> {
+        return this.withSingleFlight(
+            BusRedisKey.tripPosition(tripId),
+            TRIP_POSITION_CACHE_TTL_S,
+            () => {
+                const trip = this.tripIndex.get(tripId);
+                return trip ? this.computePosition(trip) : null;
+            },
+        );
     }
 
     /**
      * @description Trả về các xe sắp đến một trạm trong 90 phút tới.
-     * Cache Redis TTL = 5s để tránh lặp tính cho mọi subscriber cùng trạm.
+     * Cache Redis TTL = 5s: mọi SSE subscriber cùng trạm trong cùng chu kỳ
      */
     async getUpcomingBusesAtStation(
         stationId: string,
     ): Promise<IUpcomingBusAtStation[]> {
-        const cacheKey = BusRedisKey.stationEtas(stationId);
-
-        const cached = await this.redisService.get(cacheKey);
-        if (cached) {
-            return JSON.parse(cached, dateReviver) as IUpcomingBusAtStation[];
-        }
-
-        const results = this.computeUpcomingBusesAtStation(stationId);
-
-        await this.redisService.set(
-            cacheKey,
-            JSON.stringify(results),
+        return this.withSingleFlight(
+            BusRedisKey.stationEtas(stationId),
             ETA_CACHE_TTL_S,
+            () => this.computeUpcomingBusesAtStation(stationId),
         );
-
-        return results;
     }
 
     private computeUpcomingBusesAtStation(
@@ -357,7 +382,10 @@ export class BusSimulationService {
 
     streamTripPosition(tripId: string): Observable<MessageEvent> {
         return timer(0, SSE_INTERVAL_MS).pipe(
-            map(() => ({ data: this.getTripPosition(tripId) }) as MessageEvent),
+            switchMap(async () => {
+                const data = await this.getTripPosition(tripId);
+                return { data } as MessageEvent;
+            }),
         );
     }
 

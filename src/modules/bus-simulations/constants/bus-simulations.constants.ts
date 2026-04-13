@@ -1,10 +1,9 @@
 export const SSE_INTERVAL_MS = 5_000;
 
-// TTL (giây) cho cache vị trí xe trên một tuyến — khớp với chu kỳ SSE
+// TTL (giây) khớp với chu kỳ SSE — mọi subscriber trong cùng chu kỳ dùng chung 1 bản tính
 export const POSITION_CACHE_TTL_S = 5;
-
-// TTL (giây) cho cache ETA tại một trạm — khớp với chu kỳ SSE
 export const ETA_CACHE_TTL_S = 5;
+export const TRIP_POSITION_CACHE_TTL_S = 5;
 
 /**
  * Redis key factory cho module bus-simulations.
@@ -14,6 +13,7 @@ export const ETA_CACHE_TTL_S = 5;
 export const BusRedisKey = {
     routePositions: (routeId: string) => `bus:pos:${routeId}`,
     stationEtas: (stationId: string) => `bus:eta:${stationId}`,
+    tripPosition: (tripId: string) => `bus:trip:${tripId}`,
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
