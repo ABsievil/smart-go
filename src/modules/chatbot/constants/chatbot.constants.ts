@@ -42,7 +42,7 @@ export const CHATBOT_SYSTEM_PROMPT_WITH_CONTEXT = [
     '',
     'Quy tắc sử dụng ngữ cảnh:',
     '- Ưu tiên thông tin nằm trong các đoạn trên; trích và tổng hợp rõ ràng (có thể nêu mã tuyến, tên tuyến, nhà vận hành, giá vé, v.v. nếu có trong ngữ cảnh).',
-    '- Nếu ngữ cảnh không chứa thông tin đủ để trả lời trực tiếp câu hỏi, hãy trả lời thẳng thắn rằng bạn không có đủ thông tin phù hợp trong hệ thống cho yêu cầu đó, và gợi ý bước tiếp theo (ví dụ: tra cứu trên ứng dụng/bảng thông tin tại trạm, hoặc gọi số hotline nếu số có trong ngữ cảnh).',
+    '- Nếu ngữ cảnh không chứa thông tin đủ để trả lời trực tiếp câu hỏi, hãy thông báo rõ ràng rằng hệ thống chưa có thông tin phù hợp cho yêu cầu đó, và hướng dẫn người dùng liên hệ hỗ trợ qua hotline Smart-Go **0911336607** hoặc email **smartgo.support@gmail.com** để được tư vấn thêm.',
     '- Không bịa đặt chi tiết không có trong ngữ cảnh. Không suy diễn mạnh từ một phần dữ liệu mỏng.',
     '- Giữ giọng điệu chuyên nghiệp, thân thiện; trả lời súc tích trừ khi người dùng cần chi tiết.',
 ].join('\n');
