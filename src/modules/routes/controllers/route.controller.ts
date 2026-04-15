@@ -26,6 +26,7 @@ import { RouteCreateRequestDto } from '@modules/routes/dtos/request/route-create
 import { RouteUpdateRequestDto } from '@modules/routes/dtos/request/route-update.request.dto';
 import { RouteGetResponseDto } from '@modules/routes/dtos/response/route-get.response.dto';
 import { RouteListResponseDto } from '@modules/routes/dtos/response/route-list.response.dto';
+import { RouteSummaryResponseDto } from '@modules/routes/dtos/response/route-summary.response.dto';
 
 @ApiTags('Routes')
 @Controller('routes')
@@ -76,6 +77,31 @@ export class RouteController {
             limit,
             routes: this.routeService.mapList(data),
             stations: this.stationService.mapList(stations),
+        };
+    }
+
+    @Get('summary')
+    @ApiBearerAuth()
+    @LanguageResponse({
+        module: 'routes',
+        successKey: 'summary',
+    })
+    @ApiOperation({ summary: 'Get current routes and stations summary' })
+    @ApiResponse({
+        status: 200,
+        description: 'Summary of outbound routes and stations',
+        type: RouteSummaryResponseDto,
+    })
+    async getSummary(): Promise<RouteSummaryResponseDto> {
+        const [{ total: routeCount }, { total: stationCount }] =
+            await Promise.all([
+                this.routeService.findAll({}),
+                this.stationService.findAll({}),
+            ]);
+
+        return {
+            routeCount,
+            stationCount,
         };
     }
 

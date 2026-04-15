@@ -3,6 +3,7 @@
         "create": "Route created successfully",
         "findAll": "Routes retrieved successfully",
         "findOne": "Route retrieved successfully",
+        "summary": "Route and station summary retrieved successfully",
         "update": "Route updated successfully",
         "remove": "Route deleted successfully"
     },
