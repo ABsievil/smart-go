@@ -38,6 +38,7 @@ import {
     MAX_WALKING_DISTANCE_KM_FALLBACK,
     ROUTING_RESULT_CACHE_TTL_SECONDS,
     WALKING_TRANSFER_ROUTE_CODE,
+    MAX_TOTAL_WALKING_DISTANCE_KM,
 } from '@modules/routing/constants/routing.constants';
 import { CongestionFactors } from '@modules/routing/interfaces/congestion-factor.interface';
 import { MultiObjectiveWeights } from '@modules/routing/interfaces/multi-objective-weight.interface';
@@ -275,6 +276,16 @@ export class RoutingService {
         // Kiểm tra maxTransfers dựa trên bus-to-bus route changes (không tính walking)
         const transfers = this.countTransfersFromSegments(busSegments);
         if (maxTransfers !== undefined && transfers > maxTransfers) {
+            return null;
+        }
+
+        // Lọc sớm nếu tổng walking transfer vượt ngưỡng cho phép.
+        // Caller sẽ cộng thêm walking đầu/cuối và kiểm tra lần nữa nếu cần.
+        const transferWalkingTotal = transferWalkingLegs.reduce(
+            (sum, leg) => sum + leg.distanceKm,
+            0,
+        );
+        if (transferWalkingTotal > MAX_TOTAL_WALKING_DISTANCE_KM) {
             return null;
         }
 
@@ -994,6 +1005,11 @@ export class RoutingService {
                         const allWalkingTimeMinutes =
                             totalWalkingTimeMinutes + inPathWalkingTimeMinutes;
 
+                        // Loại bỏ lộ trình có tổng đi bộ vượt ngưỡng cho phép
+                        if (allWalkingDistanceKm > MAX_TOTAL_WALKING_DISTANCE_KM) {
+                            continue;
+                        }
+
                         const totalDistance =
                             path.totalDistance + allWalkingDistanceKm;
                         const totalTime =
@@ -1258,6 +1274,11 @@ export class RoutingService {
                             totalWalkingDistanceKm + inPathWalkingDistanceKm;
                         const allWalkingTimeMinutes =
                             totalWalkingTimeMinutes + inPathWalkingTimeMinutes;
+
+                        // Loại bỏ lộ trình có tổng đi bộ vượt ngưỡng cho phép
+                        if (allWalkingDistanceKm > MAX_TOTAL_WALKING_DISTANCE_KM) {
+                            continue;
+                        }
 
                         const totalDistance =
                             path.totalDistance + allWalkingDistanceKm;
