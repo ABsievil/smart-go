@@ -53,10 +53,12 @@ export class RouteController {
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
         @Query() query: Record<string, any>,
+        @Query('routeCode') routeCode?: string,
     ): Promise<any> {
         const { page: _, limit: __, ...filter } = query;
+        const find = routeCode ? { ...filter, routeCode } : filter;
         const { data, total } = await this.routeService.findAll(
-            filter,
+            find,
             page,
             limit,
         );
