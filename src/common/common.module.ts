@@ -24,6 +24,7 @@ import { RedisModule } from '@common/redis/redis.module';
         RedisModule,
         ConfigModule.forRoot({
             isGlobal: true,
+            expandVariables: true,
             envFilePath: '.env',
                 load: [
                 databaseConfig,

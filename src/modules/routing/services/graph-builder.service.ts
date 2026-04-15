@@ -18,6 +18,9 @@ import {
     GRAPH_DATA_REDIS_TTL_SECONDS,
     REDIS_KEY_GRAPH_ROUTES,
     REDIS_KEY_GRAPH_STATIONS,
+    MAX_TRANSFER_WALKING_DISTANCE_KM,
+    WALKING_TRANSFER_ROUTE_CODE,
+    WALKING_SPEED_KMH,
 } from '@modules/routing/constants/routing.constants';
 import {
     RouteLite,
@@ -143,6 +146,8 @@ export class GraphBuilderService {
     /**
      * @description Xây dựng đồ thị từ tất cả routes và stations.
      * Sử dụng Redis cache cho raw data để tránh query MongoDB mỗi lần.
+     * Sau khi build bus edges, bổ sung walking transfer edges giữa các
+     * cặp trạm gần nhau không có bus trực tiếp.
      */
     async buildGraph(): Promise<Graph> {
         const graph: Graph = {
@@ -160,7 +165,105 @@ export class GraphBuilderService {
             this.processStationIds(route, route.stationIds, graph, stationMap);
         }
 
+        this.addWalkingTransferEdges(graph);
+
         return graph;
+    }
+
+    /**
+     * Thêm cạnh đi bộ chuyển tuyến giữa các cặp trạm trong bán kính
+     * MAX_TRANSFER_WALKING_DISTANCE_KM và chưa có bus trực tiếp.
+     *
+     * Cho phép A* chọn đi bộ ngắn sang trạm gần thay vì đi thêm nhiều
+     * trạm xe buýt để đến điểm giao nhau giữa 2 tuyến.
+     *
+     * Heuristic vẫn admissible vì walking speed < bus speed:
+     *   cost_walk ≥ h(n) luôn đúng (heuristic dùng bus speed để ước tính).
+     */
+    private addWalkingTransferEdges(graph: Graph): void {
+        const stations = Array.from(graph.nodes.values());
+
+        for (let i = 0; i < stations.length; i++) {
+            const nodeA = stations[i];
+            if (!nodeA.station.latitude || !nodeA.station.longitude) continue;
+
+            for (let j = i + 1; j < stations.length; j++) {
+                const nodeB = stations[j];
+                if (!nodeB.station.latitude || !nodeB.station.longitude)
+                    continue;
+
+                const distance = this.calculateDistance(
+                    nodeA.station.latitude,
+                    nodeA.station.longitude,
+                    nodeB.station.latitude,
+                    nodeB.station.longitude,
+                );
+
+                if (distance > MAX_TRANSFER_WALKING_DISTANCE_KM) continue;
+
+                const codeA = nodeA.stationCode;
+                const codeB = nodeB.stationCode;
+
+                // Bỏ qua nếu 2 trạm đã có bus trực tiếp theo cả 2 chiều
+                const hasBusAtoB =
+                    nodeA.neighbors.has(codeB) &&
+                    nodeA.neighbors
+                        .get(codeB)!
+                        .some((e) => !e.isWalkingEdge);
+                const hasBusBtoA =
+                    nodeB.neighbors.has(codeA) &&
+                    nodeB.neighbors
+                        .get(codeA)!
+                        .some((e) => !e.isWalkingEdge);
+
+                if (hasBusAtoB && hasBusBtoA) continue;
+
+                const walkingTime =
+                    (distance / WALKING_SPEED_KMH) * MINUTES_PER_HOUR;
+
+                const edgeAtoB: GraphEdge = {
+                    from: codeA,
+                    to: codeB,
+                    routeCode: WALKING_TRANSFER_ROUTE_CODE,
+                    route: { routeName: 'Đi bộ chuyển tuyến' },
+                    distance,
+                    weight: walkingTime,
+                    isWalkingEdge: true,
+                };
+
+                const edgeBtoA: GraphEdge = {
+                    from: codeB,
+                    to: codeA,
+                    routeCode: WALKING_TRANSFER_ROUTE_CODE,
+                    route: { routeName: 'Đi bộ chuyển tuyến' },
+                    distance,
+                    weight: walkingTime,
+                    isWalkingEdge: true,
+                };
+
+                if (!hasBusAtoB) {
+                    const existing = nodeA.neighbors.get(codeB);
+                    if (!existing) {
+                        nodeA.neighbors.set(codeB, [edgeAtoB]);
+                    } else if (!existing.some((e) => e.isWalkingEdge)) {
+                        existing.push(edgeAtoB);
+                    }
+                }
+
+                if (!hasBusBtoA) {
+                    const existing = nodeB.neighbors.get(codeA);
+                    if (!existing) {
+                        nodeB.neighbors.set(codeA, [edgeBtoA]);
+                    } else if (!existing.some((e) => e.isWalkingEdge)) {
+                        existing.push(edgeBtoA);
+                    }
+                }
+            }
+        }
+
+        this.logger.debug(
+            `Walking transfer edges added (radius: ${MAX_TRANSFER_WALKING_DISTANCE_KM}km)`,
+        );
     }
 
     /**

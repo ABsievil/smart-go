@@ -37,10 +37,14 @@ import {
     MAX_WALKING_DISTANCE_KM,
     MAX_WALKING_DISTANCE_KM_FALLBACK,
     ROUTING_RESULT_CACHE_TTL_SECONDS,
+    WALKING_TRANSFER_ROUTE_CODE,
 } from '@modules/routing/constants/routing.constants';
 import { CongestionFactors } from '@modules/routing/interfaces/congestion-factor.interface';
 import { MultiObjectiveWeights } from '@modules/routing/interfaces/multi-objective-weight.interface';
-import { StationInfo } from '@modules/routing/interfaces/routing.interface';
+import {
+    StationInfo,
+    TransferWalkingLeg,
+} from '@modules/routing/interfaces/routing.interface';
 
 /**
  * Service chứa thuật toán Multi-Objective A* (MOA*)
@@ -177,45 +181,72 @@ export class RoutingService {
     }
 
     /**
-     * Tái tạo đường đi từ cameFrom/previous map
+     * Tái tạo đường đi từ cameFrom map.
+     *
+     * Tách biệt bus segments và walking transfer legs:
+     * - segments: chỉ chứa các đoạn xe buýt
+     * - transferWalkingLegs: các đoạn đi bộ chuyển tuyến giữa 2 trạm
+     *
+     * totalTime/totalDistance trong RoutePath trả về chỉ là phần xe buýt
+     * (chưa có congestion). Caller sẽ cộng thêm walking và áp dụng congestion.
      */
     private reconstructPath(
         graph: Graph,
-        cameFrom: Map<string, { node: string; routeCode?: string }>,
+        cameFrom: Map<
+            string,
+            { node: string; routeCode?: string; isWalkingEdge?: boolean }
+        >,
         currentCode: string,
         startCode: string,
         criteria: RoutingCriteria,
         maxTransfers?: number,
     ): RoutePath | null {
-        const path: string[] = [];
-        const routeCodes: string[] = [];
-        const segments: RoutePath['segments'] = [];
+        const fullPath: string[] = [];
+        const busSegments: RoutePath['segments'] = [];
+        const transferWalkingLegs: TransferWalkingLeg[] = [];
 
         let current = currentCode;
 
         // Xây dựng path ngược từ goal về start
         while (current) {
-            path.unshift(current);
+            fullPath.unshift(current);
             const prev = cameFrom.get(current);
-            if (prev) {
-                if (prev.routeCode && !routeCodes.includes(prev.routeCode)) {
-                    routeCodes.unshift(prev.routeCode);
-                }
 
-                // Tạo segment
-                if (prev.node) {
-                    const fromNode = graph.nodes.get(prev.node)!;
-                    const edges = fromNode.neighbors.get(current);
-                    const edge =
-                        edges?.find((e) => e.routeCode === prev.routeCode) ??
-                        edges?.[0];
+            if (prev?.node) {
+                const fromNode = graph.nodes.get(prev.node)!;
+                const edges = fromNode.neighbors.get(current);
+                const edge =
+                    edges?.find((e) => e.routeCode === prev.routeCode) ??
+                    edges?.[0];
 
-                    if (edge) {
-                        segments.unshift({
+                if (edge) {
+                    if (edge.isWalkingEdge) {
+                        const toNode = graph.nodes.get(current)!;
+                        transferWalkingLegs.unshift({
+                            fromStationCode: prev.node,
+                            fromStationName:
+                                fromNode.station.stationName ?? '',
+                            toStationCode: current,
+                            toStationName: toNode.station.stationName ?? '',
+                            fromCoordinates: {
+                                latitude: fromNode.station.latitude,
+                                longitude: fromNode.station.longitude,
+                            },
+                            toCoordinates: {
+                                latitude: toNode.station.latitude,
+                                longitude: toNode.station.longitude,
+                            },
+                            distanceKm: edge.distance,
+                            estimatedTimeMinutes:
+                                (edge.distance / WALKING_SPEED_KMH) *
+                                MINUTES_PER_HOUR,
+                        });
+                    } else {
+                        busSegments.unshift({
                             from: prev.node,
                             to: current,
                             routeCode: edge.routeCode,
-                            routeName: edge.route.routeName,
+                            routeName: edge.route.routeName ?? '',
                             distance: edge.distance,
                             time: this.graphBuilder.calculateWeight(
                                 edge,
@@ -225,36 +256,39 @@ export class RoutingService {
                         });
                     }
                 }
-
-                current = prev.node;
-            } else {
-                break;
             }
+
+            const prev2 = cameFrom.get(current);
+            if (!prev2) break;
+            current = prev2.node;
         }
 
         // Tính chi phí theo model xe buýt Việt Nam:
-        // Giá vé CỐ ĐỊNH mỗi lần lên xe (FARE_PER_BOARDING), không tính theo km.
-        // Chỉ tính tiền khi routeCode thay đổi (chuyển tuyến) hoặc là segment đầu tiên.
+        // Giá vé CỐ ĐỊNH mỗi lần lên xe, chỉ tính khi routeCode thay đổi.
         let currentRouteCode: string | undefined = undefined;
-        for (const segment of segments) {
+        for (const segment of busSegments) {
             const isNewBoarding = segment.routeCode !== currentRouteCode;
             segment.cost = isNewBoarding ? FARE_PER_BOARDING : 0;
             currentRouteCode = segment.routeCode;
         }
 
-        // Tính tổng distance, time, cost
+        // Kiểm tra maxTransfers dựa trên bus-to-bus route changes (không tính walking)
+        const transfers = this.countTransfersFromSegments(busSegments);
+        if (maxTransfers !== undefined && transfers > maxTransfers) {
+            return null;
+        }
+
+        // Tổng hợp chỉ từ bus segments (walking sẽ được cộng thêm bởi caller)
         let totalDistance = 0;
         let totalTime = 0;
         let totalCost = 0;
-
-        for (const segment of segments) {
-            totalDistance += segment.distance;
-            totalTime += segment.time;
-            totalCost += segment.cost;
+        for (const seg of busSegments) {
+            totalDistance += seg.distance;
+            totalTime += seg.time;
+            totalCost += seg.cost;
         }
 
-        // Lấy thông tin stations và routes
-        const stations = path.map((code) => {
+        const stations = fullPath.map((code) => {
             const node = graph.nodes.get(code)!;
             return {
                 stationCode: node.stationCode,
@@ -266,30 +300,25 @@ export class RoutingService {
             };
         });
 
-        const routes = routeCodes.map((code) => {
-            // Tìm route từ segments
-            const segment = segments.find((s) => s.routeCode === code);
-            return {
-                routeCode: code,
-                routeName: segment?.routeName || code,
-            };
-        });
-
-        // Đếm số lần chuyển tuyến (số lần đổi routeCode)
-        const transfers = this.countTransfersFromSegments(segments);
-        if (maxTransfers !== undefined && transfers > maxTransfers) {
-            return null;
+        // Routes chỉ từ bus segments
+        const routeMap = new Map<string, { routeCode: string; routeName: string }>();
+        for (const seg of busSegments) {
+            if (!routeMap.has(seg.routeCode)) {
+                routeMap.set(seg.routeCode, {
+                    routeCode: seg.routeCode,
+                    routeName: seg.routeName,
+                });
+            }
         }
 
         return {
             stations,
-            routes: Array.from(
-                new Map(routes.map((r) => [r.routeCode, r])).values(),
-            ),
+            routes: Array.from(routeMap.values()),
             totalDistance,
             totalTime,
             totalCost,
-            segments,
+            segments: busSegments,
+            transferWalkingLegs,
         };
     }
 
@@ -358,12 +387,25 @@ export class RoutingService {
                     path.totalDistance,
                 );
 
-                const mappedStations = path.stations.map((station) =>
-                    this.mapStationInfo(station),
-                );
+                const transferWalkingDtos = (
+                    path.transferWalkingLegs ?? []
+                ).map((leg) => this.transferWalkingLegToDto(leg));
+
+                const totalWalkingDistanceKm =
+                    path.transferWalkingLegs?.reduce(
+                        (sum, l) => sum + l.distanceKm,
+                        0,
+                    ) ?? 0;
+                const totalWalkingTimeMinutes =
+                    path.transferWalkingLegs?.reduce(
+                        (sum, l) => sum + l.estimatedTimeMinutes,
+                        0,
+                    ) ?? 0;
 
                 paths.push({
-                    stations: mappedStations,
+                    stations: path.stations.map((s) =>
+                        this.mapStationInfo(s),
+                    ),
                     routes: path.routes,
                     totalDistance: path.totalDistance,
                     totalTime: path.totalTime,
@@ -372,6 +414,15 @@ export class RoutingService {
                     segments: path.segments,
                     optimizationScore,
                     optimizationType: config.type,
+                    ...(transferWalkingDtos.length > 0 && {
+                        walkingLegs: transferWalkingDtos,
+                        totalWalkingDistanceKm,
+                        totalWalkingTimeMinutes,
+                        transitDistanceKm:
+                            path.totalDistance - totalWalkingDistanceKm,
+                        transitTimeMinutes:
+                            path.totalTime - totalWalkingTimeMinutes,
+                    }),
                 });
             }
         }
@@ -406,7 +457,14 @@ export class RoutingService {
     }
 
     /**
-     *  Helper method để tìm path với multi-objective weights cụ thể
+     * Helper tìm path với multi-objective weights cụ thể.
+     *
+     * Xử lý 2 loại cạnh trong đồ thị:
+     * - Bus edge: tính theo bus speed, congestion, fare khi lên xe
+     * - Walking edge (isWalkingEdge): tính theo walking speed, không có fare,
+     *   không có congestion — cho phép chuyển tuyến qua đi bộ ngắn
+     *
+     * Ràng buộc: không đi bộ liên tiếp 2 lần (phải lên xe trước khi đi bộ tiếp).
      */
     private async findPathWithMultiObjectiveWeights(
         fromStationCode: string,
@@ -419,7 +477,7 @@ export class RoutingService {
         const startNode = graph.nodes.get(fromStationCode)!;
         const goalNode = graph.nodes.get(toStationCode)!;
 
-        // Tính heuristic đa tiêu chí
+        // Heuristic đa tiêu chí — admissible vì dùng bus speed (nhanh hơn walking)
         const multiObjectiveHeuristic = (
             from: GraphNode,
             to: GraphNode,
@@ -440,12 +498,8 @@ export class RoutingService {
                 to.station.longitude,
             );
 
-            // Heuristic thời gian: đường chim bay / tốc độ (không nhân congestion → admissible)
+            // Dùng bus speed để ước tính → lower bound → admissible
             const time = (distance / AVERAGE_BUS_SPEED) * MINUTES_PER_HOUR;
-
-            // Heuristic chi phí = 0 (admissible lower bound):
-            // không thể biết trước sẽ chuyển tuyến bao nhiêu lần trên đoạn còn lại
-
             return (
                 weights.timeWeight * time + weights.distanceWeight * distance
             );
@@ -468,7 +522,7 @@ export class RoutingService {
 
         const cameFrom = new Map<
             string,
-            { node: string; routeCode?: string }
+            { node: string; routeCode?: string; isWalkingEdge?: boolean }
         >();
 
         openSet.insert({
@@ -511,19 +565,33 @@ export class RoutingService {
                 );
 
                 if (path) {
-                    // Apply congestion factor to time
+                    // Tính tổng thời gian và khoảng cách walking transfer
+                    const walkTransferTime =
+                        path.transferWalkingLegs?.reduce(
+                            (sum, leg) => sum + leg.estimatedTimeMinutes,
+                            0,
+                        ) ?? 0;
+                    const walkTransferDistance =
+                        path.transferWalkingLegs?.reduce(
+                            (sum, leg) => sum + leg.distanceKm,
+                            0,
+                        ) ?? 0;
+
                     const adjustedPath: RoutePath & { nodesExplored?: number } =
                         {
                             ...path,
-                            totalTime: path.totalTime * congestionFactor,
+                            // Bus time với congestion + walking time không chịu congestion
+                            totalTime:
+                                path.totalTime * congestionFactor +
+                                walkTransferTime,
+                            totalDistance:
+                                path.totalDistance + walkTransferDistance,
+                            segments: path.segments.map((seg) => ({
+                                ...seg,
+                                time: seg.time * congestionFactor,
+                            })),
                             nodesExplored,
                         };
-
-                    // Update segments with congestion
-                    adjustedPath.segments = path.segments.map((seg) => ({
-                        ...seg,
-                        time: seg.time * congestionFactor,
-                    }));
 
                     return adjustedPath;
                 }
@@ -532,6 +600,10 @@ export class RoutingService {
             closedSet.add(currentCode);
             nodesExplored++;
 
+            const previousRouteCode = cameFrom.get(currentCode)?.routeCode;
+            const previousIsWalking =
+                previousRouteCode === WALKING_TRANSFER_ROUTE_CODE;
+
             for (const [
                 neighborCode,
                 edges,
@@ -539,22 +611,40 @@ export class RoutingService {
                 if (closedSet.has(neighborCode)) continue;
 
                 const neighbor = graph.nodes.get(neighborCode)!;
-                const previousRouteCode = cameFrom.get(currentCode)?.routeCode;
 
                 for (const edge of edges) {
-                    const isTransfer =
-                        previousRouteCode !== undefined &&
-                        previousRouteCode !== edge.routeCode;
-                    const isFirstBoarding = previousRouteCode === undefined;
-                    const isNewBoarding = isFirstBoarding || isTransfer;
+                    // Không cho đi bộ liên tiếp 2 lần — phải lên xe giữa 2 đoạn đi bộ
+                    if (edge.isWalkingEdge && previousIsWalking) continue;
 
                     const edgeDistance = edge.distance;
-                    const edgeTime =
-                        (edgeDistance / AVERAGE_BUS_SPEED) *
-                            MINUTES_PER_HOUR *
-                            congestionFactor +
-                        (isTransfer ? TRANSFER_WAIT_TIME : 0);
-                    const edgeCost = isNewBoarding ? FARE_PER_BOARDING : 0;
+                    let edgeTime: number;
+                    let edgeCost: number;
+
+                    if (edge.isWalkingEdge) {
+                        // Đi bộ: walking speed, không có congestion, không có fare
+                        edgeTime =
+                            (edgeDistance / WALKING_SPEED_KMH) *
+                            MINUTES_PER_HOUR;
+                        edgeCost = 0;
+                    } else {
+                        // Xe buýt: phát hiện chuyển tuyến (bus-to-bus hoặc sau walking)
+                        const isBusToBusTransfer =
+                            !previousIsWalking &&
+                            previousRouteCode !== undefined &&
+                            previousRouteCode !== edge.routeCode;
+                        const isFirstBoarding = previousRouteCode === undefined;
+                        const isNewBoarding =
+                            isFirstBoarding ||
+                            isBusToBusTransfer ||
+                            previousIsWalking;
+
+                        edgeTime =
+                            (edgeDistance / AVERAGE_BUS_SPEED) *
+                                MINUTES_PER_HOUR *
+                                congestionFactor +
+                            (isBusToBusTransfer ? TRANSFER_WAIT_TIME : 0);
+                        edgeCost = isNewBoarding ? FARE_PER_BOARDING : 0;
+                    }
 
                     const edgeWeight =
                         weights.timeWeight * edgeTime +
@@ -564,12 +654,11 @@ export class RoutingService {
                     const tentativeGScore =
                         (gScore.get(currentCode) ?? Infinity) + edgeWeight;
 
-                    const neighborGScore = gScore.get(neighborCode) ?? Infinity;
-
-                    if (tentativeGScore < neighborGScore) {
+                    if (tentativeGScore < (gScore.get(neighborCode) ?? Infinity)) {
                         cameFrom.set(neighborCode, {
                             node: currentCode,
                             routeCode: edge.routeCode,
+                            isWalkingEdge: edge.isWalkingEdge,
                         });
                         gScore.set(neighborCode, tentativeGScore);
 
@@ -588,6 +677,24 @@ export class RoutingService {
         }
 
         return null;
+    }
+
+    /**
+     * Chuyển TransferWalkingLeg (internal interface) thành WalkingLegDto
+     * để đưa vào response
+     */
+    private transferWalkingLegToDto(leg: TransferWalkingLeg): WalkingLegDto {
+        return {
+            type: ENUM_WALKING_LEG_TYPE.TRANSFER,
+            fromCoordinates: leg.fromCoordinates,
+            toCoordinates: leg.toCoordinates,
+            stationCode: leg.toStationCode,
+            stationName: leg.toStationName,
+            fromStationCode: leg.fromStationCode,
+            fromStationName: leg.fromStationName,
+            distanceKm: leg.distanceKm,
+            estimatedTimeMinutes: leg.estimatedTimeMinutes,
+        };
     }
 
     /**
@@ -867,12 +974,30 @@ export class RoutingService {
                     if (path) {
                         totalNodesExplored += path.nodesExplored ?? 0;
 
-                        const transitDistanceKm = path.totalDistance;
-                        const transitTimeMinutes = path.totalTime;
+                        const transferWalkingDtos = (
+                            path.transferWalkingLegs ?? []
+                        ).map((leg) => this.transferWalkingLegToDto(leg));
+
+                        const inPathWalkingDistanceKm =
+                            path.transferWalkingLegs?.reduce(
+                                (sum, l) => sum + l.distanceKm,
+                                0,
+                            ) ?? 0;
+                        const inPathWalkingTimeMinutes =
+                            path.transferWalkingLegs?.reduce(
+                                (sum, l) => sum + l.estimatedTimeMinutes,
+                                0,
+                            ) ?? 0;
+
+                        const allWalkingDistanceKm =
+                            totalWalkingDistanceKm + inPathWalkingDistanceKm;
+                        const allWalkingTimeMinutes =
+                            totalWalkingTimeMinutes + inPathWalkingTimeMinutes;
+
                         const totalDistance =
-                            transitDistanceKm + totalWalkingDistanceKm;
+                            path.totalDistance + allWalkingDistanceKm;
                         const totalTime =
-                            transitTimeMinutes + totalWalkingTimeMinutes;
+                            path.totalTime + allWalkingTimeMinutes;
 
                         const optimizationScore =
                             this.calculateOptimizationScore(
@@ -882,12 +1007,16 @@ export class RoutingService {
                                 totalDistance,
                             );
 
-                        const mappedStations = path.stations.map((s) =>
-                            this.mapStationInfo(s),
-                        );
+                        const allWalkingLegs: WalkingLegDto[] = [
+                            walkingFromLeg,
+                            ...transferWalkingDtos,
+                            walkingToLeg,
+                        ];
 
                         allPaths.push({
-                            stations: mappedStations,
+                            stations: path.stations.map((s) =>
+                                this.mapStationInfo(s),
+                            ),
                             routes: path.routes,
                             totalDistance,
                             totalTime,
@@ -898,11 +1027,11 @@ export class RoutingService {
                             segments: path.segments,
                             optimizationScore,
                             optimizationType: config.type,
-                            walkingLegs: [walkingFromLeg, walkingToLeg],
-                            totalWalkingDistanceKm,
-                            totalWalkingTimeMinutes,
-                            transitDistanceKm,
-                            transitTimeMinutes,
+                            walkingLegs: allWalkingLegs,
+                            totalWalkingDistanceKm: allWalkingDistanceKm,
+                            totalWalkingTimeMinutes: allWalkingTimeMinutes,
+                            transitDistanceKm: path.totalDistance,
+                            transitTimeMinutes: path.totalTime,
                         });
                     }
                 }
@@ -1108,10 +1237,32 @@ export class RoutingService {
                     if (path) {
                         totalNodesExplored += path.nodesExplored ?? 0;
 
+                        // Walking transfer legs trong hành trình (giữa các trạm)
+                        const transferWalkingDtos = (
+                            path.transferWalkingLegs ?? []
+                        ).map((leg) => this.transferWalkingLegToDto(leg));
+
+                        const inPathWalkingDistanceKm =
+                            path.transferWalkingLegs?.reduce(
+                                (sum, l) => sum + l.distanceKm,
+                                0,
+                            ) ?? 0;
+                        const inPathWalkingTimeMinutes =
+                            path.transferWalkingLegs?.reduce(
+                                (sum, l) => sum + l.estimatedTimeMinutes,
+                                0,
+                            ) ?? 0;
+
+                        // Tổng walking = đầu + giữa hành trình + cuối
+                        const allWalkingDistanceKm =
+                            totalWalkingDistanceKm + inPathWalkingDistanceKm;
+                        const allWalkingTimeMinutes =
+                            totalWalkingTimeMinutes + inPathWalkingTimeMinutes;
+
                         const totalDistance =
-                            path.totalDistance + totalWalkingDistanceKm;
+                            path.totalDistance + allWalkingDistanceKm;
                         const totalTime =
-                            path.totalTime + totalWalkingTimeMinutes;
+                            path.totalTime + allWalkingTimeMinutes;
 
                         const optimizationScore =
                             this.calculateOptimizationScore(
@@ -1121,8 +1272,10 @@ export class RoutingService {
                                 totalDistance,
                             );
 
-                        const walkingLegs = [
+                        // Merge: walking đầu → walking chuyển tuyến → walking cuối
+                        const allWalkingLegs: WalkingLegDto[] = [
                             ...(walkingFromLeg ? [walkingFromLeg] : []),
+                            ...transferWalkingDtos,
                             ...(walkingToLeg ? [walkingToLeg] : []),
                         ];
 
@@ -1140,10 +1293,12 @@ export class RoutingService {
                             segments: path.segments,
                             optimizationScore,
                             optimizationType: config.type,
-                            ...(walkingLegs.length > 0 && { walkingLegs }),
-                            ...(totalWalkingDistanceKm > 0 && {
-                                totalWalkingDistanceKm,
-                                totalWalkingTimeMinutes,
+                            ...(allWalkingLegs.length > 0 && {
+                                walkingLegs: allWalkingLegs,
+                            }),
+                            ...(allWalkingDistanceKm > 0 && {
+                                totalWalkingDistanceKm: allWalkingDistanceKm,
+                                totalWalkingTimeMinutes: allWalkingTimeMinutes,
                                 transitDistanceKm: path.totalDistance,
                                 transitTimeMinutes: path.totalTime,
                             }),

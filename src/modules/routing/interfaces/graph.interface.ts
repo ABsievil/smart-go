@@ -25,6 +25,7 @@ export interface GraphEdge {
     route: GraphRouteLite;
     distance: number;
     weight: number;
+    isWalkingEdge?: boolean;
 }
 
 export interface Graph {
