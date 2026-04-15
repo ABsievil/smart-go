@@ -3,6 +3,7 @@
         "create": "Tạo tuyến đường thành công",
         "findAll": "Lấy danh sách tuyến đường thành công",
         "findOne": "Lấy thông tin tuyến đường thành công",
+        "summary": "Lấy thống kê tuyến đường và trạm dừng thành công",
         "update": "Cập nhật tuyến đường thành công",
         "remove": "Xóa tuyến đường thành công"
     },
