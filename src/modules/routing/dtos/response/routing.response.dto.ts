@@ -4,8 +4,10 @@ import { RoutingMetricsDto } from './routing-metrics.dto';
 import { ENUM_WALKING_LEG_TYPE } from '@modules/routing/enums/routing.enum';
 
 /**
- * Chặng đi bộ từ vị trí người dùng đến trạm đầu tiên,
- * hoặc từ trạm cuối đến điểm đích
+ * Chặng đi bộ trong lộ trình:
+ * - TO_FIRST_STATION: từ vị trí người dùng đến trạm đầu tiên
+ * - FROM_LAST_STATION: từ trạm cuối đến điểm đích người dùng
+ * - TRANSFER: đi bộ giữa 2 trạm gần nhau để chuyển sang tuyến khác
  */
 export class WalkingLegDto {
     @ApiProperty({
@@ -31,15 +33,30 @@ export class WalkingLegDto {
     toCoordinates: { latitude: number; longitude: number };
 
     @ApiProperty({
-        description: 'Mã trạm (điểm lên/xuống xe buýt)',
+        description:
+            'Mã trạm liên quan (trạm lên xe cho TO_FIRST_STATION/TRANSFER, trạm xuống xe cho FROM_LAST_STATION)',
         example: 'BX_MienTay',
     })
     @Expose()
     stationCode: string;
 
-    @ApiProperty({ description: 'Tên trạm', example: 'Bến xe Miền Tây' })
+    @ApiProperty({ description: 'Tên trạm liên quan', example: 'Bến xe Miền Tây' })
     @Expose()
     stationName: string;
+
+    @ApiPropertyOptional({
+        description: 'Mã trạm xuất phát (chỉ có khi type = TRANSFER)',
+        example: 'TramA',
+    })
+    @Expose()
+    fromStationCode?: string;
+
+    @ApiPropertyOptional({
+        description: 'Tên trạm xuất phát (chỉ có khi type = TRANSFER)',
+        example: 'Trạm A',
+    })
+    @Expose()
+    fromStationName?: string;
 
     @ApiProperty({ description: 'Khoảng cách đi bộ (km)', example: 0.35 })
     @Expose()

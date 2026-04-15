@@ -101,6 +101,12 @@ export const CANDIDATE_STATIONS_COUNT = 3; // top-N trạm gần nhất xem xét
 export const MAX_WALKING_DISTANCE_KM = 1.0; // km (~12 phút đi bộ)
 export const MAX_WALKING_DISTANCE_KM_FALLBACK = 3.0; // km — dùng khi không có trạm nào ≤ 1km
 
+// Khoảng cách đi bộ tối đa khi chuyển tuyến giữa 2 trạm khác nhau (walking transfer edge).
+export const MAX_TRANSFER_WALKING_DISTANCE_KM = 1; // km (~6 phút đi bộ)
+
+// Route code đặc biệt đánh dấu cạnh đi bộ chuyển tuyến trong đồ thị
+export const WALKING_TRANSFER_ROUTE_CODE = '__WALKING__';
+
 // BALANCED: cân bằng thực sự giữa 3 chiều.
 // Phân tích đơn vị (hành trình điển hình: 30 phút, 2 lần lên xe × 6000 VND, 10 km):
 //   - timeWeight=0.5  → 0.5 × 30 = 15
