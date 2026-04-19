@@ -27,10 +27,19 @@ export default registerAs(
             dimension: Number(process.env.ZILLIZ_DIMENSION ?? 1536),
             minScore: Number(process.env.ZILLIZ_MIN_SCORE ?? 0.35),
         },
-        contextLimit: Number(process.env.CHATBOT_CONTEXT_LIMIT ?? 5),
+        contextLimit: Number(process.env.CHATBOT_CONTEXT_LIMIT ?? 3),
         embedFileBatchSize: Math.min(
             256,
             Math.max(1, Number(process.env.CHATBOT_EMBED_BATCH_SIZE ?? 64)),
         ),
+        cache: {
+            enabled: (process.env.CHATBOT_CACHE_ENABLED ?? 'true') === 'true',
+            embeddingTtlSeconds: Number(
+                process.env.CHATBOT_CACHE_EMBEDDING_TTL ?? 7 * 24 * 3600,
+            ),
+            replyTtlSeconds: Number(
+                process.env.CHATBOT_CACHE_REPLY_TTL ?? 10 * 60,
+            ),
+        },
     }),
 );

@@ -50,3 +50,27 @@ export const CHATBOT_SYSTEM_PROMPT_WITH_CONTEXT = [
 ].join('\n');
 
 export const EMBEDDING_API_BATCH_LIMIT = 10;
+
+// ─── Cache ────────────────────────────────────────────────────────────────────
+// Namespace prefix dùng cho Redis key của chatbot.
+// `v1` trong prefix cho phép "bump" version (đổi v1 → v2) để invalidate cache
+// khi format key hoặc payload thay đổi mà không cần flush Redis thủ công.
+export const CACHE_KEY_EMBEDDING_PREFIX = 'chatbot:emb:v1:';
+export const CACHE_KEY_REPLY_PREFIX = 'chatbot:reply:v1:';
+
+// ─── Streaming ────────────────────────────────────────────────────────────────
+// Tên các SSE event emit cho client khi streaming chat reply.
+export const CHAT_STREAM_EVENT = {
+    META: 'meta',
+    CHUNK: 'chunk',
+    DONE: 'done',
+    ERROR: 'error',
+} as const;
+
+/**
+ * Giới hạn độ dài `message` cho endpoint streaming (GET + EventSource).
+ * Vì message đi qua query string, ta giới hạn khiêm tốn để tổng URL nằm
+ * trong ngưỡng an toàn của đa số browser/reverse-proxy (~2048 bytes) sau
+ * khi URL-encode (tiếng Việt UTF-8 encode ~3 bytes/char).
+ */
+export const CHAT_STREAM_MESSAGE_MAX_LENGTH = 500;

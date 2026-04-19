@@ -1,12 +1,9 @@
-// import { DynamicModule, Global, Module } from '@nestjs/common';
-// import { MongooseModule } from '@nestjs/mongoose';
-// import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Global, Module } from '@nestjs/common';
+import { DatabaseIndexService } from '@common/database/services/database-index.service';
 
-// @Module({})
-// export class DatabaseModule {
-//     static forRoot(): DynamicModule {
-//         return {
-//             module: DatabaseModule,
-//         };
-//     }
-// }
+@Global()
+@Module({
+    providers: [DatabaseIndexService],
+    exports: [DatabaseIndexService],
+})
+export class DatabaseModule {}

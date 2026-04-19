@@ -6,6 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { DashScopeService } from '@modules/chatbot/services/dashscope.service';
 import { ZillizService } from '@modules/chatbot/services/zilliz.service';
+import { ChatbotCacheService } from '@modules/chatbot/services/chatbot-cache.service';
 import { IChatMessage } from '@modules/chatbot/interfaces/chat-message.interface';
 import { IVectorSearchResult } from '@modules/chatbot/interfaces/vector-search-result.interface';
 import {
@@ -22,7 +23,7 @@ import {
     CHATBOT_SYSTEM_PROMPT,
     CHATBOT_SYSTEM_PROMPT_WITH_CONTEXT,
 } from '@modules/chatbot/constants/chatbot.constants';
-
+import { ChatStreamEvent } from '@modules/chatbot/interfaces/chat-message.interface';
 @Injectable()
 export class ChatbotService {
     private readonly contextLimit: number;
@@ -33,6 +34,7 @@ export class ChatbotService {
         private readonly configService: ConfigService,
         private readonly dashScopeService: DashScopeService,
         private readonly zillizService: ZillizService,
+        private readonly cacheService: ChatbotCacheService,
     ) {
         this.contextLimit = this.configService.get<number>(
             'chatbot.contextLimit',
@@ -43,36 +45,57 @@ export class ChatbotService {
     }
 
     /**
+     * @description Wrapper có cache cho embedding — dùng nội bộ bởi cả `chat` và `chatStream`
+     */
+    private async embedWithCache(text: string): Promise<number[]> {
+        const cached = await this.cacheService.getEmbedding(text);
+        if (cached) return cached;
+
+        const fresh = await this.dashScopeService.generateEmbedding(text);
+        void this.cacheService.setEmbedding(text, fresh);
+        return fresh;
+    }
+
+    /**
      * @description Xử lý tin nhắn chat: tìm context liên quan từ vector DB,
      * sau đó gọi LLM Model để sinh câu trả lời.
      *
      * **Luồng xử lý:**
-     * 1. Embed tin nhắn thành vector bằng embedding model
+     * 1. Song song: embed message (DashScope) + resolve history (Mongo)
      * 2. Tìm kiếm tài liệu liên quan trong Zilliz (có lọc score)
      * 3. Gắn context vào system prompt
      * 4. Gọi LLM model để sinh câu trả lời
+     *
+     * Caller có thể truyền `history` dưới dạng `Promise` để cho phép
+     * embedding chạy song song với query Mongo — giảm ~150-400ms/lượt.
      */
     async chat(
         message: string,
-        history: ChatHistoryItemDto[] = [],
+        historyInput: ChatHistoryItemDto[] | Promise<ChatHistoryItemDto[]> = [],
     ): Promise<Omit<ChatResponseDto, 'conversationId'>> {
-        const embedding =
-            await this.dashScopeService.generateEmbedding(message);
+        const [embedding, history] = await Promise.all([
+            this.embedWithCache(message),
+            Promise.resolve(historyInput),
+        ]);
+
+        if (history.length === 0) {
+            const cachedReply = await this.cacheService.getReply(message);
+            if (cachedReply) {
+                return {
+                    reply: cachedReply.reply,
+                    contextCount: cachedReply.contextCount,
+                };
+            }
+        }
 
         const contextDocs = await this.zillizService.search(
             embedding,
             this.contextLimit,
         );
 
-        const ragHits = contextDocs.map((d) => ({
-            score: Number(d.score.toFixed(4)),
-            type: d.type,
-            metadata: d.metadata ?? {},
-        }));
         // this.logger.debug(
         //     `RAG ${contextDocs.length} hit(s)\n${JSON.stringify(ragHits, null, 2)}`,
         // );
-
         const enrichedSystemPrompt =
             this.buildSystemPromptWithContext(contextDocs);
         // this.logger.debug(`Enriched system prompt: ${enrichedSystemPrompt}`);
@@ -84,7 +107,83 @@ export class ChatbotService {
             enrichedSystemPrompt,
         );
 
+        if (history.length === 0 && reply) {
+            void this.cacheService.setReply(message, {
+                reply,
+                contextCount: contextDocs.length,
+            });
+        }
+
         return { reply, contextCount: contextDocs.length };
+    }
+
+    /**
+     * @description Phiên bản streaming của `chat` — yield từng event:
+     *  1. Embed message (có cache) + resolve history song song.
+     *  2. Nếu history rỗng và reply có trong cache → emit 1 `meta` +
+     *     1 `token` với toàn bộ reply + kết thúc. UX gần như tức thời.
+     *  3. Ngược lại: search Zilliz → emit `meta` → stream token từ LLM,
+     *     đồng thời gom full reply để controller lưu DB + cache.
+     *
+     * `signal` cho phép controller huỷ stream khi client đóng kết nối.
+     */
+    async *chatStream(
+        message: string,
+        historyInput: ChatHistoryItemDto[] | Promise<ChatHistoryItemDto[]> = [],
+        signal?: AbortSignal,
+    ): AsyncGenerator<ChatStreamEvent, { fullReply: string }, void> {
+        const [embedding, history] = await Promise.all([
+            this.embedWithCache(message),
+            Promise.resolve(historyInput),
+        ]);
+
+        if (history.length === 0) {
+            const cachedReply = await this.cacheService.getReply(message);
+            if (cachedReply) {
+                yield {
+                    type: 'meta',
+                    contextCount: cachedReply.contextCount,
+                    cached: true,
+                };
+                yield { type: 'token', content: cachedReply.reply };
+                return { fullReply: cachedReply.reply };
+            }
+        }
+
+        const contextDocs = await this.zillizService.search(
+            embedding,
+            this.contextLimit,
+        );
+
+        yield {
+            type: 'meta',
+            contextCount: contextDocs.length,
+            cached: false,
+        };
+
+        const enrichedSystemPrompt =
+            this.buildSystemPromptWithContext(contextDocs);
+        const messages = this.buildMessageHistory(history, message);
+
+        let fullReply = '';
+        for await (const token of this.dashScopeService.chatCompletionStream(
+            messages,
+            enrichedSystemPrompt,
+            signal,
+        )) {
+            if (signal?.aborted) break;
+            fullReply += token;
+            yield { type: 'token', content: token };
+        }
+
+        if (!signal?.aborted && history.length === 0 && fullReply) {
+            void this.cacheService.setReply(message, {
+                reply: fullReply,
+                contextCount: contextDocs.length,
+            });
+        }
+
+        return { fullReply };
     }
 
     /**
@@ -268,7 +367,7 @@ export class ChatbotService {
             return textLine;
         }
 
-        return `${textLine}\nStructured details (metadata):\n${JSON.stringify(meta, null, 2)}`;
+        return `${textLine}\nStructured details (metadata):\n${JSON.stringify(meta)}`;
     }
 
     /**

@@ -5,7 +5,7 @@ import { UserRole } from '@modules/users/enums/user-role.enum';
 
 @Schema({ collection: 'messages', timestamps: true })
 export class MessageEntity extends DBEntityBase {
-    @Prop({ required: true, index: true, trim: true })
+    @Prop({ required: true, trim: true })
     conversationId: string;
 
     @Prop({ required: true, index: true })

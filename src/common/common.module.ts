@@ -15,6 +15,7 @@ import { LoggerModule } from '@common/logger/logger.module';
 import { LanguageModule } from '@common/language/language.module';
 import { UploadModule } from '@common/upload/upload.module';
 import { RedisModule } from '@common/redis/redis.module';
+import { DatabaseModule } from '@common/database/database.module';
 
 @Global()
 @Module({
@@ -59,6 +60,7 @@ import { RedisModule } from '@common/redis/redis.module';
             },
             inject: [ConfigService],
         }),
+        DatabaseModule,
     ],
 })
 export class CommonModule {}
