@@ -197,6 +197,87 @@ export class DashScopeService implements OnModuleInit {
         }
     }
 
+    /**
+     * @description Streaming version của `chatCompletion`.
+     *
+     * Trả về một async generator phát từng mẩu token (delta) do Qwen sinh ra
+     * ngay khi có. Client (qua SSE) nhận được token đầu tiên sau ~500-1500ms
+     * thay vì chờ toàn bộ reply hoàn chỉnh (~2-8s) — cảm nhận nhanh hơn nhiều
+     * dù tổng thời gian không đổi.
+     *
+     * Khi `enableThinking=true`, phần `reasoning_content` (quá trình suy luận)
+     * bị bỏ qua, chỉ yield content thực sự.
+     *
+     * @param signal Tuỳ chọn — `AbortSignal` để huỷ stream khi client disconnect,
+     *               giúp giải phóng kết nối DashScope ngay lập tức.
+     */
+    async *chatCompletionStream(
+        messages: IChatMessage[],
+        systemPrompt: string,
+        signal?: AbortSignal,
+    ): AsyncGenerator<string, void, void> {
+        const payload: OpenAI.Chat.ChatCompletionMessageParam[] = [
+            {
+                role: 'system',
+                content: systemPrompt,
+            },
+            ...messages.map((m) => ({
+                role: this.toChatRole(m.role),
+                content: m.content,
+            })),
+        ];
+
+        const createParams = {
+            model: this.chatModel,
+            messages: payload,
+            max_tokens: this.maxNewTokens,
+            temperature: this.temperature,
+            stream: true as const,
+            ...(this.enableThinking && { enable_thinking: true }),
+        };
+
+        let stream: AsyncIterable<OpenAI.Chat.ChatCompletionChunk>;
+        try {
+            stream = (await (
+                this.client.chat.completions.create as unknown as (
+                    p: typeof createParams,
+                    opts?: { signal?: AbortSignal },
+                ) => Promise<AsyncIterable<OpenAI.Chat.ChatCompletionChunk>>
+            )(
+                createParams,
+                signal ? { signal } : undefined,
+            )) as AsyncIterable<OpenAI.Chat.ChatCompletionChunk>;
+        } catch (err) {
+            const message = err instanceof Error ? err.message : String(err);
+            this.logger.error(
+                `DashScope chatCompletionStream init failed [model=${this.chatModel}]: ${message}`,
+            );
+            throw new InternalServerErrorException(
+                `Chat stream service error: ${message}`,
+            );
+        }
+
+        try {
+            for await (const chunk of stream) {
+                if (signal?.aborted) return;
+                const delta = chunk.choices?.[0]?.delta?.content;
+                if (typeof delta === 'string' && delta.length > 0) {
+                    yield delta;
+                }
+            }
+        } catch (err) {
+            // Nếu abort do client đóng kết nối — đây là flow bình thường, không coi là lỗi.
+            if (signal?.aborted) return;
+            const message = err instanceof Error ? err.message : String(err);
+            this.logger.error(
+                `DashScope chatCompletionStream iteration failed [model=${this.chatModel}]: ${message}`,
+            );
+            throw new InternalServerErrorException(
+                `Chat stream service error: ${message}`,
+            );
+        }
+    }
+
     // ─── Helpers ────────────────────────────────────────────────────────────────
 
     private toChatRole(role: ChatMessageRole): 'system' | 'user' | 'assistant' {
