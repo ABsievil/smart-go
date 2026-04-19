@@ -40,6 +40,9 @@ export default registerAs(
             replyTtlSeconds: Number(
                 process.env.CHATBOT_CACHE_REPLY_TTL ?? 10 * 60,
             ),
+            historyTtlSeconds: Number(
+                process.env.CHATBOT_CACHE_HISTORY_TTL ?? 24 * 3600,
+            ),
         },
     }),
 );
