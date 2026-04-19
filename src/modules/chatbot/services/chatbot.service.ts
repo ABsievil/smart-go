@@ -47,32 +47,31 @@ export class ChatbotService {
      * sau đó gọi LLM Model để sinh câu trả lời.
      *
      * **Luồng xử lý:**
-     * 1. Embed tin nhắn thành vector bằng embedding model
+     * 1. Song song: embed message (DashScope) + resolve history (Mongo)
      * 2. Tìm kiếm tài liệu liên quan trong Zilliz (có lọc score)
      * 3. Gắn context vào system prompt
      * 4. Gọi LLM model để sinh câu trả lời
+     *
+     * Caller có thể truyền `history` dưới dạng `Promise` để cho phép
+     * embedding chạy song song với query Mongo — giảm ~150-400ms/lượt.
      */
     async chat(
         message: string,
-        history: ChatHistoryItemDto[] = [],
+        historyInput: ChatHistoryItemDto[] | Promise<ChatHistoryItemDto[]> = [],
     ): Promise<Omit<ChatResponseDto, 'conversationId'>> {
-        const embedding =
-            await this.dashScopeService.generateEmbedding(message);
+        const [embedding, history] = await Promise.all([
+            this.dashScopeService.generateEmbedding(message),
+            Promise.resolve(historyInput),
+        ]);
 
         const contextDocs = await this.zillizService.search(
             embedding,
             this.contextLimit,
         );
 
-        const ragHits = contextDocs.map((d) => ({
-            score: Number(d.score.toFixed(4)),
-            type: d.type,
-            metadata: d.metadata ?? {},
-        }));
         // this.logger.debug(
         //     `RAG ${contextDocs.length} hit(s)\n${JSON.stringify(ragHits, null, 2)}`,
         // );
-
         const enrichedSystemPrompt =
             this.buildSystemPromptWithContext(contextDocs);
         // this.logger.debug(`Enriched system prompt: ${enrichedSystemPrompt}`);
@@ -268,7 +267,7 @@ export class ChatbotService {
             return textLine;
         }
 
-        return `${textLine}\nStructured details (metadata):\n${JSON.stringify(meta, null, 2)}`;
+        return `${textLine}\nStructured details (metadata):\n${JSON.stringify(meta)}`;
     }
 
     /**

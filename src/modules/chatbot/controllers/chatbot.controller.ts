@@ -16,7 +16,6 @@ import {
 } from '@nestjs/swagger';
 import { ChatbotService } from '@modules/chatbot/services/chatbot.service';
 import { MessageService } from '@modules/messages/services/message.service';
-import { OrderDirection } from '@common/database/enums/order-direction.enum';
 import { messagesToChatHistoryItems } from '@modules/chatbot/utils/message-to-chat-history.util';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { ChatRequestDto } from '@modules/chatbot/dtos/request/chat.request.dto';
@@ -82,35 +81,47 @@ Gửi tin nhắn và nhận câu trả lời từ AI Assistant với hỗ trợ 
 
         const providedCid = dto.conversationId?.trim();
         const conversationId = providedCid || randomUUID();
-        let history = [];
 
-        if (providedCid) {
-            const { data } = await this.messageService.findAll(
-                { conversationId: providedCid, userId },
-                1,
-                CHAT_MAX_HISTORY_TURNS * 2,
-                'createdAt',
-                OrderDirection.DESC,
-            );
-            const chronological = [...data].reverse();
-            history = messagesToChatHistoryItems(chronological);
-        }
+        const historyPromise: Promise<
+            ReturnType<typeof messagesToChatHistoryItems>
+        > = providedCid
+            ? this.messageService
+                  .findLatestByConversation(
+                      providedCid,
+                      userId,
+                      CHAT_MAX_HISTORY_TURNS * 2,
+                  )
+                  .then((msgs) => messagesToChatHistoryItems(msgs))
+            : Promise.resolve([]);
 
-        const result = await this.chatbotService.chat(dto.message, history);
+        const result = await this.chatbotService.chat(
+            dto.message,
+            historyPromise,
+        );
 
-        await this.messageService.create({
-            conversationId,
-            userId,
-            role: UserRole.USER,
-            content: dto.message,
-        } as MessageCreateRequestDto);
-
-        await this.messageService.create({
-            conversationId,
-            userId,
-            role: UserRole.BOT,
-            content: result.reply,
-        } as MessageCreateRequestDto);
+        // Lưu cặp tin nhắn (user + bot) trong MỘT round-trip Mongo,
+        // non-blocking để không kéo dài latency trả response về client.
+        void this.messageService
+            .createMany([
+                {
+                    conversationId,
+                    userId,
+                    role: UserRole.USER,
+                    content: dto.message,
+                } as MessageCreateRequestDto,
+                {
+                    conversationId,
+                    userId,
+                    role: UserRole.BOT,
+                    content: result.reply,
+                } as MessageCreateRequestDto,
+            ])
+            .catch((err) => {
+                const msg = err instanceof Error ? err.message : String(err);
+                this.logger.error(
+                    `Failed to persist chat messages (cid=${conversationId}): ${msg}`,
+                );
+            });
 
         return { ...result, conversationId };
     }
