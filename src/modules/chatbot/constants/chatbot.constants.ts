@@ -16,7 +16,7 @@ export const ZILLIZ_INDEX_FIELD = 'embedding';
 export const ZILLIZ_DEFAULT_MIN_SCORE = 0.35;
 
 // ─── Chat ─────────────────────────────────────────────────────────────────────
-export const CHAT_MAX_HISTORY_TURNS = 10;
+export const CHAT_MAX_HISTORY_TURNS = 5;
 
 // ─── Timeout ──────────────────────────────────────────────────────────────────
 export const EMBED_FILE_TIMEOUT_MS = 30 * 60 * 1000; // 30 phút — batch embed nhiều items
@@ -24,6 +24,8 @@ export const EMBED_FILE_TIMEOUT_MS = 30 * 60 * 1000; // 30 phút — batch embed
 const CHATBOT_SYSTEM_PROMPT_CORE = [
     'Bạn là Smart Go Assistant — trợ lý giao thông công cộng cho TP. Hồ Chí Minh.',
     'Nhiệm vụ: giúp người dùng tra cứu tuyến xe buýt, trạm, lịch chạy, giá vé và thông tin liên quan một cách ngắn gọn, chính xác, lịch sự.',
+    'Độ dài câu trả lời: mặc định ngắn — khoảng 3–6 câu, hoặc vài gạch đầu dòng nếu cần liệt kê; ưu tiên thông tin trực tiếp trả lời câu hỏi, tránh mở bài, lặp ý, hay giải thích lan man.',
+    'Chỉ trả lời dài hơn khi người dùng yêu cầu rõ (ví dụ: "chi tiết", "giải thích kỹ", "liệt kê hết").',
 ].join(' ');
 
 // Khi không tìm được tài liệu RA

@@ -78,7 +78,7 @@ Gửi tin nhắn và nhận câu trả lời từ AI Assistant với hỗ trợ 
         @CurrentUser('_id') userId: string,
         @Body() dto: ChatRequestDto,
     ): Promise<ChatResponseDto> {
-        this.logger.debug(`Chat request: "${dto.message.slice(0, 80)}"`);
+        // this.logger.debug(`Chat request: "${dto.message.slice(0, 80)}"`);
 
         const providedCid = dto.conversationId?.trim();
         const conversationId = providedCid || randomUUID();
@@ -166,7 +166,7 @@ Dành riêng cho Admin. Upload file JSON chứa mảng các mục kiến thức 
 
 **Loại nội dung hỗ trợ:** route, station, faq, general
 
-**Hiệu năng (bulk):** Mỗi lô gọi embedding DashScope (text-embedding-v4) một lần cho nhiều câu và insert Zilliz một lần cho cả lô. Điều chỉnh \`CHATBOT_EMBED_BATCH_SIZE\` (mặc định 64, tối đa 256) nếu cần cân bằng tốc độ / giới hạn API.
+**Hiệu năng (bulk):** Mỗi lô gọi embedding DashScope một lần cho nhiều câu và insert Zilliz một lần cho cả lô. Điều chỉnh \`CHATBOT_EMBED_BATCH_SIZE\` (mặc định 64, tối đa 256) nếu cần cân bằng tốc độ / giới hạn API.
     `,
     })
     @ApiResponse({

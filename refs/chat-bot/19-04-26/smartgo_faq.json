@@ -1,0 +1,3564 @@
+[
+  {
+    "text": "Xe 150 đi từ đâu đến đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe 150 đi từ đâu đến đâu?",
+      "answer": "Tuyến 150 chạy từ Bến xe Chợ Lớn đến Ngã 3 Tân Vạn.",
+      "routeCode": "150"
+    }
+  },
+  {
+    "text": "Có xe nào đi từ Quận 7 sang Quận 1 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe nào đi từ Quận 7 sang Quận 1 không?",
+      "answer": "Bạn có thể đi tuyến 34, 102 hoặc xe điện D4 để di chuyển giữa Quận 7 và Quận 1.",
+      "routeCode": "34, 102, D4"
+    }
+  },
+  {
+    "text": "Lộ trình xe 08 có đi qua Đại học Bách Khoa không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe 08 có đi qua Đại học Bách Khoa không?",
+      "answer": "Có, xe 08 dừng ngay trạm trước cổng trường trên đường Lý Thường Kiệt.",
+      "routeCode": "08"
+    }
+  },
+  {
+    "text": "Tuyến xe nào chạy dọc đường Võ Văn Kiệt?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Tuyến xe nào chạy dọc đường Võ Văn Kiệt?",
+      "answer": "Tuyến số 39 và 101 chạy một đoạn dài trên trục đường Võ Văn Kiệt.",
+      "routeCode": "39, 101"
+    }
+  },
+  {
+    "text": "Chuyến xe sớm nhất của tuyến 08 bắt đầu lúc mấy giờ?",
+    "type": "faq",
+    "metadata": {
+      "group": "2_thoi_gian_tan_suat",
+      "intent": "time_info",
+      "question": "Chuyến xe sớm nhất của tuyến 08 bắt đầu lúc mấy giờ?",
+      "answer": "Xe xuất bến lúc 5:00 sáng tại cả hai đầu bến.",
+      "routeCode": "08"
+    }
+  },
+  {
+    "text": "Buổi tối mấy giờ xe 150 hết chuyến?",
+    "type": "faq",
+    "metadata": {
+      "group": "2_thoi_gian_tan_suat",
+      "intent": "time_info",
+      "question": "Buổi tối mấy giờ xe 150 hết chuyến?",
+      "answer": "Chuyến cuối cùng thường là 21:00, bạn nên ra trạm trước 15 phút.",
+      "routeCode": "150"
+    }
+  },
+  {
+    "text": "Giá vé lượt cho người lớn là bao nhiêu?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "fare_info",
+      "question": "Giá vé lượt cho người lớn là bao nhiêu?",
+      "answer": "Hiện hành là 6.000đ hoặc 7.000đ tùy theo cự ly tuyến.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tôi quên mang thẻ sinh viên, có được giảm giá không?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "fare_policy",
+      "question": "Tôi quên mang thẻ sinh viên, có được giảm giá không?",
+      "answer": "Rất tiếc, tiếp viên bắt buộc phải kiểm tra thẻ sinh viên để bán vé 3.000đ.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Làm sao để biết xe đang ở đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "5_theo_doi_thoi_gian_thuc",
+      "intent": "tracking_info",
+      "question": "Làm sao để biết xe đang ở đâu?",
+      "answer": "Bạn chọn số tuyến trên ứng dụng tra cứu, bản đồ sẽ hiển thị vị trí thực tế của xe dựa trên GPS.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Đi xe buýt nào để ra bến Water Bus?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Đi xe buýt nào để ra bến Water Bus?",
+      "answer": "Bạn xuống trạm Hàm Nghi hoặc công trường Mê Linh là đến ngay bến tàu thủy.",
+      "routeCode": "19, 03, 56"
+    }
+  },
+  {
+    "text": "Tài xế chạy ẩu thì báo cáo ai?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "report_issue",
+      "question": "Tài xế chạy ẩu thì báo cáo ai?",
+      "answer": "Bạn gọi hotline 1022 và cung cấp biển số xe để trung tâm xử lý.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe bus có cho mang xe đạp lên không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_policy",
+      "question": "Xe bus có cho mang xe đạp lên không?",
+      "answer": "Thông thường chỉ cho phép mang xe đạp gấp gọn và không chiếm diện tích lối đi. Các loại xe đạp lớn thường bị từ chối.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Mua vé tập xe buýt ở đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "fare_purchase",
+      "question": "Mua vé tập xe buýt ở đâu?",
+      "answer": "Bạn có thể mua tại các điểm bán vé tập trung như Bến xe Miền Đông, Miền Tây, hoặc trạm Hàm Nghi.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt có chạy vào ngày lễ 30/4 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "2_thoi_gian_tan_suat",
+      "intent": "time_holiday",
+      "question": "Xe buýt có chạy vào ngày lễ 30/4 không?",
+      "answer": "Các tuyến xe buýt vẫn hoạt động vào ngày lễ, tuy nhiên một số tuyến đi qua khu vực tổ chức sự kiện có thể thay đổi lộ trình tạm thời.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tuyến buýt nào đi ngang qua Dinh Độc Lập?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Tuyến buýt nào đi ngang qua Dinh Độc Lập?",
+      "answer": "Các tuyến 04, 18, 31, 36, 42, 52, 93, 109 có trạm dừng gần Dinh Độc Lập.",
+      "routeCode": "04, 18, 31, 36"
+    }
+  },
+  {
+    "text": "Trẻ em bao nhiêu tuổi được miễn phí vé xe buýt?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "fare_policy",
+      "question": "Trẻ em bao nhiêu tuổi được miễn phí vé xe buýt?",
+      "answer": "Trẻ em có chiều cao dưới 1,3m sẽ được miễn phí vé xe buýt.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 19 có đi qua Đại học Quốc gia không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Xe buýt số 19 có đi qua Đại học Quốc gia không?",
+      "answer": "Có, xe 19 là tuyến chính nối trung tâm thành phố với Khu đô thị ĐH Quốc gia TP.HCM.",
+      "routeCode": "19"
+    }
+  },
+  {
+    "text": "Làm thế nào để phản ánh thái độ của tiếp viên?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "report_staff",
+      "question": "Làm thế nào để phản ánh thái độ của tiếp viên?",
+      "answer": "Bạn có thể gửi phản ánh qua ứng dụng hoặc gọi tổng đài 1022, cung cấp số hiệu xe và thời điểm gặp sự cố.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt 2 tầng Hop-on Hop-off giá bao nhiêu?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_fare",
+      "question": "Xe buýt 2 tầng Hop-on Hop-off giá bao nhiêu?",
+      "answer": "Giá vé dao động từ 150.000đ đến 500.000đ tùy loại vé (theo giờ hoặc trọn ngày).",
+      "routeCode": "sightseeing"
+    }
+  },
+  {
+    "text": "Mất bao lâu để xe 150 đi hết một lượt?",
+    "type": "faq",
+    "metadata": {
+      "group": "2_thoi_gian_tan_suat",
+      "intent": "time_duration",
+      "question": "Mất bao lâu để xe 150 đi hết một lượt?",
+      "answer": "Thời gian hành trình trung bình khoảng 70-90 phút tùy điều kiện giao thông.",
+      "routeCode": "150"
+    }
+  },
+  {
+    "text": "Tôi có thể dùng mã QR để thanh toán tiền vé không?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "payment_method",
+      "question": "Tôi có thể dùng mã QR để thanh toán tiền vé không?",
+      "answer": "Hiện nay nhiều tuyến xe buýt mới đã tích hợp thanh toán qua QR trên ứng dụng hoặc ví điện tử như MoMo, ZaloPay.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 1 có máy lạnh không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_check",
+      "question": "Xe buýt số 1 có máy lạnh không?",
+      "answer": "Có, tuyến số 1 sử dụng xe đời mới có máy lạnh hiện đại.",
+      "routeCode": "01"
+    }
+  },
+  {
+    "text": "Quên đồ trên xe buýt thì phải làm sao?",
+    "type": "faq",
+    "metadata": {
+      "group": "11_tinh_huong_phat_sinh",
+      "intent": "lost_found",
+      "question": "Quên đồ trên xe buýt thì phải làm sao?",
+      "answer": "Bạn hãy liên hệ ngay với đơn vị vận hành tuyến đó hoặc ra trực tiếp bến xe đầu/cuối của tuyến để tìm lại.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tuyến xe buýt nào đi sân bay Tân Sơn Nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Tuyến xe buýt nào đi sân bay Tân Sơn Nhất?",
+      "answer": "Bạn có thể đi xe 152, 109 hoặc 72-1 để vào sân bay.",
+      "routeCode": "109, 152, 72-1"
+    }
+  },
+  {
+    "text": "Xe buýt có chạy đêm không?",
+    "type": "faq",
+    "metadata": {
+      "group": "2_thoi_gian_tan_suat",
+      "intent": "time_info",
+      "question": "Xe buýt có chạy đêm không?",
+      "answer": "Hầu hết xe buýt kết thúc lúc 21:00, một số tuyến sân bay như 109 có thể chạy đến 22:30.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Trạm dừng gần Chợ Bến Thành nhất là ở đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng gần Chợ Bến Thành nhất là ở đâu?",
+      "answer": "Trạm dừng tại Hàm Nghi hoặc trước cổng chợ trên đường Lê Lai/Phan Chu Trinh.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt điện D4 có sạc điện thoại không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_check",
+      "question": "Xe buýt điện D4 có sạc điện thoại không?",
+      "answer": "Có, xe điện D4 được trang bị cổng sạc USB tại mỗi ghế ngồi cho hành khách.",
+      "routeCode": "D4"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Quận 12 về Bến xe Miền Tây không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Quận 12 về Bến xe Miền Tây không?",
+      "answer": "Bạn có thể đi xe 32 rồi chuyển qua xe 10 tại các trạm trung gian hoặc đi xe 151.",
+      "routeCode": "151"
+    }
+  },
+  {
+    "text": "Làm sao để đăng ký thẻ Unipass?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "payment_registration",
+      "question": "Làm sao để đăng ký thẻ Unipass?",
+      "answer": "Bạn có thể đăng ký trực tuyến trên ứng dụng hoặc đến các điểm hỗ trợ tại bến xe lớn để làm thẻ vật lý.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 56 có ghé Bến xe Miền Đông không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Xe buýt số 56 có ghé Bến xe Miền Đông không?",
+      "answer": "Có, xe 56 chạy từ Bến xe Chợ Lớn qua Bến xe Miền Đông (cũ) và đi Đại học Nông Lâm.",
+      "routeCode": "56"
+    }
+  },
+  {
+    "text": "Tại sao xe buýt lại bỏ trạm?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "complaint",
+      "question": "Tại sao xe buýt lại bỏ trạm?",
+      "answer": "Xe có thể bỏ trạm nếu xe đã quá tải hoặc do lỗi chủ quan của tài xế. Bạn nên đứng đúng vị trí vạch sơn và vẫy tay ra hiệu cho tài xế.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tuyến xe buýt nào đi Suối Tiên?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Tuyến xe buýt nào đi Suối Tiên?",
+      "answer": "Rất nhiều tuyến như 19, 30, 33, 53, 150 đều đi qua KDL Suối Tiên.",
+      "routeCode": "19, 33, 150"
+    }
+  },
+  {
+    "text": "Xe buýt có chở hàng hóa lớn không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "policy_baggage",
+      "question": "Xe buýt có chở hàng hóa lớn không?",
+      "answer": "Quy định chỉ cho phép mang hành lý gọn nhẹ (dưới 10kg/0.5m3). Hàng hóa cồng kềnh có thể bị tính thêm phí hoặc từ chối.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 45 có đi qua Chợ Tân Định không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Xe buýt số 45 có đi qua Chợ Tân Định không?",
+      "answer": "Lộ trình xe 45 không đi trực tiếp qua Chợ Tân Định. Bạn nên đi xe 31 hoặc 36.",
+      "routeCode": "45"
+    }
+  },
+  {
+    "text": "Đi xe buýt từ TP.HCM xuống Cần Giờ bắt xe nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Đi xe buýt từ TP.HCM xuống Cần Giờ bắt xe nào?",
+      "answer": "Bạn đi xe 20 đến phà Bình Khánh, qua phà rồi bắt xe số 90 để đi tiếp xuống Cần Giờ.",
+      "routeCode": "20, 90"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Bệnh viện Từ Dũ nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Bệnh viện Từ Dũ nhất?",
+      "answer": "Bạn xuống trạm trên đường Cống Quỳnh hoặc đường Nguyễn Thị Minh Khai đều rất gần cổng bệnh viện.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt có được hút thuốc không?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "safety_policy",
+      "question": "Xe buýt có được hút thuốc không?",
+      "answer": "Nghiêm cấm hút thuốc trên xe buýt để đảm bảo an toàn phòng chống cháy nổ và sức khỏe hành khách.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tôi có thể mang sầu riêng lên xe buýt không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "policy_food",
+      "question": "Tôi có thể mang sầu riêng lên xe buýt không?",
+      "answer": "Không được mang thực phẩm có mùi nồng như sầu riêng, mắm tôm lên xe trừ khi được đóng gói cực kỳ kín trong thùng xốp.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Có WiFi miễn phí trên xe buýt không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_check",
+      "question": "Có WiFi miễn phí trên xe buýt không?",
+      "answer": "Một số tuyến xe buýt đời mới và xe điện có trang bị WiFi miễn phí cho hành khách.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Làm thế nào để biết xe nào sắp đến trạm của tôi?",
+    "type": "faq",
+    "metadata": {
+      "group": "5_theo_doi_thoi_gian_thuc",
+      "intent": "tracking_info",
+      "question": "Làm thế nào để biết xe nào sắp đến trạm của tôi?",
+      "answer": "Bạn vào tính năng 'Tìm trạm gần đây' trên ứng dụng, chọn trạm đang đứng để thấy danh sách xe sắp đến kèm thời gian dự kiến.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt 152 đi từ đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt 152 đi từ đâu?",
+      "answer": "Xe 152 đi từ Khu dân cư Trung Sơn đến Sân bay Tân Sơn Nhất.",
+      "routeCode": "152"
+    }
+  },
+  {
+    "text": "Giá vé tập xe buýt là bao nhiêu?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "fare_info",
+      "question": "Giá vé tập xe buýt là bao nhiêu?",
+      "answer": "Giá vé tập hiện tại là 135.000đ cho 1 xấp 30 vé (loại vé 6.000đ).",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tôi bị say xe, ngồi ở đâu trên xe buýt thì đỡ hơn?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "health_advice",
+      "question": "Tôi bị say xe, ngồi ở đâu trên xe buýt thì đỡ hơn?",
+      "answer": "Bạn nên chọn vị trí hàng ghế đầu hoặc giữa xe, tránh ngồi ở cuối xe vì đây là nơi xóc nhất.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt 60-1 đi từ đâu đến đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt 60-1 đi từ đâu đến đâu?",
+      "answer": "Tuyến 60-1 chạy từ Bến xe Miền Tây đến Bến xe Biên Hòa (Đồng Nai).",
+      "routeCode": "60-1"
+    }
+  },
+  {
+    "text": "Xe buýt có cho người khuyết tật lên không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_check",
+      "question": "Xe buýt có cho người khuyết tật lên không?",
+      "answer": "Có, các xe đời mới có thiết kế sàn thấp hoặc bàn nâng hỗ trợ người đi xe lăn.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Từ sân bay về Quận 1 bằng xe buýt nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Từ sân bay về Quận 1 bằng xe buýt nào?",
+      "answer": "Bạn nên bắt xe 109 (về thẳng Hàm Nghi) hoặc 152 (về Bến Thành).",
+      "routeCode": "109, 152"
+    }
+  },
+  {
+    "text": "Xe 150 có dừng ở Ngã tư Hàng Xanh không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Xe 150 có dừng ở Ngã tư Hàng Xanh không?",
+      "answer": "Có, xe 150 dừng ở trạm dưới chân cầu vượt Hàng Xanh hướng về Suối Tiên.",
+      "routeCode": "150"
+    }
+  },
+  {
+    "text": "Xe buýt số 14 đi qua những đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 14 đi qua những đâu?",
+      "answer": "Tuyến 14 chạy lộ trình: Bến xe Miền Đông - Đinh Bộ Lĩnh - Nguyễn Thị Minh Khai - 3 Tháng 2 - Bến xe Miền Tây.",
+      "routeCode": "14"
+    }
+  },
+  {
+    "text": "Làm thế nào để đổi vé tập xe buýt cũ?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "fare_policy",
+      "question": "Làm thế nào để đổi vé tập xe buýt cũ?",
+      "answer": "Bạn có thể đến văn phòng Trung tâm Quản lý Giao thông công cộng tại Quận 1 để làm thủ tục đổi trả hoặc bù tiền.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Bến xe Chợ Lớn nằm ở đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "12_thong_tin_dia_phuong",
+      "intent": "location_info",
+      "question": "Bến xe Chợ Lớn nằm ở đâu?",
+      "answer": "Bến xe nằm trên đường Lê Quang Sung, Quận 6, TP.HCM.",
+      "routeCode": "none"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi siêu thị Aeon Mall Tân Phú không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi siêu thị Aeon Mall Tân Phú không?",
+      "answer": "Bạn có thể đi tuyến 32, 69 hoặc xe buýt đưa đón miễn phí của Aeon Mall.",
+      "routeCode": "32, 69"
+    }
+  },
+  {
+    "text": "Đi xe buýt từ Bình Dương lên TP.HCM mất bao lâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "2_thoi_gian_tan_suat",
+      "intent": "time_duration",
+      "question": "Đi xe buýt từ Bình Dương lên TP.HCM mất bao lâu?",
+      "answer": "Thời gian khoảng 60-120 phút tùy điểm xuất phát và tình trạng kẹt xe.",
+      "routeCode": "611, 613, 616"
+    }
+  },
+  {
+    "text": "Bao nhiêu tuổi được tính là người cao tuổi khi đi xe buýt?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "fare_policy",
+      "question": "Bao nhiêu tuổi được tính là người cao tuổi khi đi xe buýt?",
+      "answer": "Người từ 70 tuổi trở lên được miễn phí vé xe buýt khi xuất trình CMND/CCCD.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 11 đi hướng nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 11 đi hướng nào?",
+      "answer": "Xe 11 đi từ Bến xe Đầm Sen đến Bến xe Chợ Lớn và ngược lại.",
+      "routeCode": "11"
+    }
+  },
+  {
+    "text": "Có xe buýt từ Quận 1 đi Thủ Đức không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt từ Quận 1 đi Thủ Đức không?",
+      "answer": "Có nhiều tuyến như 19, 06, 56, 30 đi xuyên suốt qua Quận 1 đến Thủ Đức.",
+      "routeCode": "19, 06, 56, 30"
+    }
+  },
+  {
+    "text": "Xe buýt có hỗ trợ tiếng Anh không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_check",
+      "question": "Xe buýt có hỗ trợ tiếng Anh không?",
+      "answer": "Một số tuyến trung tâm và ứng dụng SmartGo có hỗ trợ ngôn ngữ tiếng Anh cho người nước ngoài.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tuyến số 02 dừng ở đâu tại Quận 1?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Tuyến số 02 dừng ở đâu tại Quận 1?",
+      "answer": "Xe 02 dừng tại trạm trung chuyển Hàm Nghi trước khi về Bến Thành.",
+      "routeCode": "02"
+    }
+  },
+  {
+    "text": "Xe buýt có đi qua phố đi bộ Nguyễn Huệ không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Xe buýt có đi qua phố đi bộ Nguyễn Huệ không?",
+      "answer": "Xe buýt không chạy trực tiếp trên đường Nguyễn Huệ nhưng dừng ở các trạm xung quanh như Hàm Nghi, Lê Lợi, Đồng Khởi.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Có xe buýt nào chạy thẳng từ Sài Gòn đi Vũng Tàu không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào chạy thẳng từ Sài Gòn đi Vũng Tàu không?",
+      "answer": "Bạn có thể đi xe buýt chất lượng cao số 72-1 từ Sân bay Tân Sơn Nhất đi thẳng Vũng Tàu.",
+      "routeCode": "72-1"
+    }
+  },
+  {
+    "text": "Xe buýt số 47 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 47 đi đâu?",
+      "answer": "Xe 47 chạy lộ trình Bến xe Chợ Lớn - Hưng Long.",
+      "routeCode": "47"
+    }
+  },
+  {
+    "text": "Sử dụng app xe buýt có tốn phí không?",
+    "type": "faq",
+    "metadata": {
+      "group": "5_theo_doi_thoi_gian_thuc",
+      "intent": "app_info",
+      "question": "Sử dụng app xe buýt có tốn phí không?",
+      "answer": "Ứng dụng tra cứu xe buýt hoàn toàn miễn phí cho mọi người dùng.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt có loa thông báo trạm không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_check",
+      "question": "Xe buýt có loa thông báo trạm không?",
+      "answer": "Phần lớn xe buýt hiện nay đều có loa tự động thông báo tên trạm sắp dừng bằng tiếng Việt.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Đi xe buýt có được mang đồ ăn nóng không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "policy_food",
+      "question": "Đi xe buýt có được mang đồ ăn nóng không?",
+      "answer": "Hạn chế mang đồ ăn nóng, có nước (như bún, phở) lên xe để tránh làm đổ và gây mùi hôi.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tôi có thể mua vé xe buýt qua SMS không?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "payment_method",
+      "question": "Tôi có thể mua vé xe buýt qua SMS không?",
+      "answer": "Hiện tại chưa có dịch vụ mua vé qua SMS, bạn nên dùng tiền mặt hoặc ví điện tử.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 06 đi từ bến xe nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 06 đi từ bến xe nào?",
+      "answer": "Xe 06 đi từ Bến xe Chợ Lớn đến Đại học Nông Lâm.",
+      "routeCode": "06"
+    }
+  },
+  {
+    "text": "Có bao nhiêu trạm dừng xe buýt tại TP.HCM?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "general_info",
+      "question": "Có bao nhiêu trạm dừng xe buýt tại TP.HCM?",
+      "answer": "TP.HCM hiện có khoảng hơn 4.000 điểm dừng và nhà chờ xe buýt trên toàn thành phố.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Làm sao để biết xe buýt bị đổi lộ trình?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "notification",
+      "question": "Làm sao để biết xe buýt bị đổi lộ trình?",
+      "answer": "Bạn nên xem mục 'Thông báo' trên ứng dụng SmartGo hoặc website buyttphcm.com.vn để cập nhật các thay đổi lộ trình tạm thời.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 54 đi bệnh viện nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Xe buýt số 54 đi bệnh viện nào?",
+      "answer": "Xe 54 đi qua Bệnh viện Gia Định, Bệnh viện Ung Bướu, Bệnh viện Chợ Rẫy, Bệnh viện Hùng Vương.",
+      "routeCode": "54"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi Suối Tiên từ Bến xe Miền Tây không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi Suối Tiên từ Bến xe Miền Tây không?",
+      "answer": "Bạn có thể đi xe số 10 hoặc 60-1.",
+      "routeCode": "10, 60-1"
+    }
+  },
+  {
+    "text": "Tôi muốn xin vào làm tài xế xe buýt thì liên hệ ai?",
+    "type": "faq",
+    "metadata": {
+      "group": "12_thong_tin_dia_phuong",
+      "intent": "job_info",
+      "question": "Tôi muốn xin vào làm tài xế xe buýt thì liên hệ ai?",
+      "answer": "Bạn cần liên hệ trực tiếp với các Hợp tác xã hoặc doanh nghiệp vận tải xe buýt để nộp hồ sơ tuyển dụng.",
+      "routeCode": "none"
+    }
+  },
+  {
+    "text": "Xe buýt số 30 chạy lộ trình nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 30 chạy lộ trình nào?",
+      "answer": "Xe 30 chạy từ Chợ Tân Hương đến Đại học Quốc tế.",
+      "routeCode": "30"
+    }
+  },
+  {
+    "text": "Có được mang máy ảnh lên xe buýt không?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "policy_item",
+      "question": "Có được mang máy ảnh lên xe buýt không?",
+      "answer": "Có, nhưng bạn nên bảo quản cẩn thận để tránh va đập hoặc mất cắp.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tuyến xe buýt nào đi qua khu công nghiệp Tân Bình?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Tuyến xe buýt nào đi qua khu công nghiệp Tân Bình?",
+      "answer": "Các tuyến 28, 32, 48, 69, 104 thường đi qua khu vực này.",
+      "routeCode": "32, 104"
+    }
+  },
+  {
+    "text": "Đi xe buýt có an toàn hơn xe máy không?",
+    "type": "faq",
+    "metadata": {
+      "group": "13_so_sanh_phuong_tien",
+      "intent": "comparison",
+      "question": "Đi xe buýt có an toàn hơn xe máy không?",
+      "answer": "Xe buýt được xem là phương tiện giao thông an toàn hơn vì có khung xe bảo vệ và lái xe chuyên nghiệp.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 18 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 18 đi đâu?",
+      "answer": "Xe 18 đi từ Bến xe Miền Đông đến Chợ Hiệp Thành.",
+      "routeCode": "18"
+    }
+  },
+  {
+    "text": "Trạm dừng gần Bệnh viện Chợ Rẫy nhất nằm ở đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng gần Bệnh viện Chợ Rẫy nhất nằm ở đâu?",
+      "answer": "Trạm dừng ngay trước cổng bệnh viện trên đường Nguyễn Chí Thanh.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Quận 9 sang Quận 2 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Quận 9 sang Quận 2 không?",
+      "answer": "Bạn có thể đi xe 29, 99 hoặc xe điện D4.",
+      "routeCode": "99, D4"
+    }
+  },
+  {
+    "text": "Xe buýt số 24 đi qua những đường nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 24 đi qua những đường nào?",
+      "answer": "Xe 24 chạy từ Bến xe Miền Đông qua Phan Đăng Lưu, Hoàng Văn Thụ rồi về Hóc Môn.",
+      "routeCode": "24"
+    }
+  },
+  {
+    "text": "Sử dụng xe buýt có giúp giảm ô nhiễm môi trường không?",
+    "type": "faq",
+    "metadata": {
+      "group": "13_so_sanh_phuong_tien",
+      "intent": "environment_info",
+      "question": "Sử dụng xe buýt có giúp giảm ô nhiễm môi trường không?",
+      "answer": "Có, xe buýt chở được nhiều người cùng lúc giúp giảm lượng xe cá nhân, từ đó giảm khí thải CO2.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tại sao một số xe buýt lại cũ và nóng?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "feedback",
+      "question": "Tại sao một số xe buýt lại cũ và nóng?",
+      "answer": "Thành phố đang dần thay thế các xe cũ bằng xe mới chạy gas CNG hoặc xe điện để cải thiện chất lượng phục vụ.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tôi có thể mang nhạc cụ lên xe buýt không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "policy_item",
+      "question": "Tôi có thể mang nhạc cụ lên xe buýt không?",
+      "answer": "Các nhạc cụ nhỏ như đàn guitar có thể mang theo nếu bạn giữ cẩn thận và không cản trở lối đi.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 03 có qua Vincom Center không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 03 có qua Vincom Center không?",
+      "answer": "Có, xe 03 đi qua trạm Lê Thánh Tôn ngay cạnh Vincom Đồng Khởi.",
+      "routeCode": "03"
+    }
+  },
+  {
+    "text": "Xe buýt số 33 có chạy qua Đại học Nông Lâm không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Xe buýt số 33 có chạy qua Đại học Nông Lâm không?",
+      "answer": "Có, xe 33 dừng tại cổng trường ĐH Nông Lâm trên xa lộ Hà Nội.",
+      "routeCode": "33"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi Thảo Cầm Viên không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi Thảo Cầm Viên không?",
+      "answer": "Các tuyến 05, 06, 14, 19, 30, 42, 52 đều có trạm dừng gần Thảo Cầm Viên.",
+      "routeCode": "19, 14, 06"
+    }
+  },
+  {
+    "text": "Xe buýt số 65 đi từ đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 65 đi từ đâu?",
+      "answer": "Xe 65 đi từ Bến Thành đến Bến xe An Sương.",
+      "routeCode": "65"
+    }
+  },
+  {
+    "text": "Giá vé xe buýt đi tỉnh (như Biên Hòa) là bao nhiêu?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "fare_info",
+      "question": "Giá vé xe buýt đi tỉnh (như Biên Hòa) là bao nhiêu?",
+      "answer": "Giá vé dao động từ 15.000đ đến 30.000đ tùy theo cự ly bạn di chuyển.",
+      "routeCode": "60-1, 60-2"
+    }
+  },
+  {
+    "text": "Xe buýt số 7 chạy lộ trình nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 7 chạy lộ trình nào?",
+      "answer": "Xe 7 đi từ Bến xe Chợ Lớn đến Gò Vấp.",
+      "routeCode": "07"
+    }
+  },
+  {
+    "text": "Tại sao ứng dụng báo xe sắp tới nhưng sau đó lại biến mất?",
+    "type": "faq",
+    "metadata": {
+      "group": "5_theo_doi_thoi_gian_thuc",
+      "intent": "app_issue",
+      "question": "Tại sao ứng dụng báo xe sắp tới nhưng sau đó lại biến mất?",
+      "answer": "Có thể xe bị mất tín hiệu GPS tạm thời hoặc xe đã đi qua trạm nhưng hệ thống chưa cập nhật kịp.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi Bệnh viện Nhi Đồng 1 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi Bệnh viện Nhi Đồng 1 không?",
+      "answer": "Bạn có thể đi xe số 02, 07, 10, 91 để đến Bệnh viện Nhi Đồng 1 trên đường Sư Vạn Hạnh.",
+      "routeCode": "02, 10"
+    }
+  },
+  {
+    "text": "Xe buýt số 148 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 148 đi đâu?",
+      "answer": "Xe 148 chạy lộ trình Bến xe Miền Tây - Gò Vấp.",
+      "routeCode": "148"
+    }
+  },
+  {
+    "text": "Làm thế nào để tra cứu bản đồ các tuyến xe buýt?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "map_lookup",
+      "question": "Làm thế nào để tra cứu bản đồ các tuyến xe buýt?",
+      "answer": "Bạn vào tính năng 'Bản đồ' trên ứng dụng SmartGo để xem lộ trình chi tiết của từng tuyến.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt có camera an ninh không?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "facility_check",
+      "question": "Xe buýt có camera an ninh không?",
+      "answer": "Hầu hết các xe buýt hiện nay đều được trang bị camera giám sát hành trình và camera trong xe để đảm bảo an ninh.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tuyến xe buýt nào đi qua Đại học Y Dược?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Tuyến xe buýt nào đi qua Đại học Y Dược?",
+      "answer": "Các tuyến 06, 08, 56, 150 đều dừng gần ĐH Y Dược trên đường Hồng Bàng.",
+      "routeCode": "06, 08, 56, 150"
+    }
+  },
+  {
+    "text": "Xe buýt số 139 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 139 đi đâu?",
+      "answer": "Xe 139 chạy từ Bến xe Miền Tây đến Phú Xuân (Nhà Bè).",
+      "routeCode": "139"
+    }
+  },
+  {
+    "text": "Có thể sạc laptop trên xe buýt điện không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_check",
+      "question": "Có thể sạc laptop trên xe buýt điện không?",
+      "answer": "Cổng sạc trên xe buýt điện D4 thường là cổng USB công suất thấp, phù hợp sạc điện thoại hơn là laptop.",
+      "routeCode": "D4"
+    }
+  },
+  {
+    "text": "Xe buýt có cho phép mang rượu bia lên không?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "policy_item",
+      "question": "Xe buýt có cho phép mang rượu bia lên không?",
+      "answer": "Bạn có thể mang rượu bia đã đóng gói kín, nhưng tuyệt đối không được sử dụng rượu bia trên xe.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tuyến xe buýt nào đi qua Quận 2?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Tuyến xe buýt nào đi qua Quận 2?",
+      "answer": "Các tuyến 06, 30, 43, 88, 104, D4 thường xuyên đi qua khu vực Quận 2 cũ.",
+      "routeCode": "06, 30, D4"
+    }
+  },
+  {
+    "text": "Xe buýt số 102 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 102 đi đâu?",
+      "answer": "Xe 102 đi từ Bến xe Miền Tây đến Nguyễn Văn Linh và về Bến xe Buýt Sài Gòn.",
+      "routeCode": "102"
+    }
+  },
+  {
+    "text": "Làm sao để biết xe buýt nào đang có máy lạnh?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_check",
+      "question": "Làm sao để biết xe buýt nào đang có máy lạnh?",
+      "answer": "Hầu như 95% xe buýt nội thành hiện nay đều có máy lạnh. Bạn có thể nhận biết qua các xe có cửa kính đóng kín.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi Củ Chi không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi Củ Chi không?",
+      "answer": "Bạn bắt xe 13 hoặc 94 từ trung tâm để đi thẳng về Bến xe Củ Chi.",
+      "routeCode": "13, 94"
+    }
+  },
+  {
+    "text": "Tần suất xe buýt vào giờ thấp điểm như thế nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "2_thoi_gian_tan_suat",
+      "intent": "time_info",
+      "question": "Tần suất xe buýt vào giờ thấp điểm như thế nào?",
+      "answer": "Giờ thấp điểm xe thường giãn cách từ 15-25 phút mỗi chuyến tùy tuyến.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 9 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 9 đi đâu?",
+      "answer": "Xe 9 chạy lộ trình Bến xe Chợ Lớn - Bình Chánh - Hưng Long.",
+      "routeCode": "09"
+    }
+  },
+  {
+    "text": "Tại sao không được ăn uống trên xe buýt?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "policy_food",
+      "question": "Tại sao không được ăn uống trên xe buýt?",
+      "answer": "Để giữ vệ sinh chung, tránh ám mùi vào máy lạnh và hạn chế rác thải trên xe.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 61-1 có đi qua Big C Dĩ An không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Xe buýt số 61-1 có đi qua Big C Dĩ An không?",
+      "answer": "Có, tuyến 61-1 có lộ trình đi ngang qua khu vực Big C Dĩ An (nay là GO! Dĩ An).",
+      "routeCode": "61-1"
+    }
+  },
+  {
+    "text": "Làm thế nào để biết xe buýt nào vắng khách?",
+    "type": "faq",
+    "metadata": {
+      "group": "5_theo_doi_thoi_gian_thuc",
+      "intent": "tracking_info",
+      "question": "Làm thế nào để biết xe buýt nào vắng khách?",
+      "answer": "Một số ứng dụng đang thử nghiệm tính năng dự báo độ lấp đầy của xe, nhưng hiện tại bạn chủ yếu dựa vào quan sát thực tế.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 59 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 59 đi đâu?",
+      "answer": "Xe 59 đi từ Bến xe Quận 8 đến Bến xe Ngã tư Ga.",
+      "routeCode": "59"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi Nhà Bè không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi Nhà Bè không?",
+      "answer": "Các tuyến 20, 110, 139 là những tuyến chính đi về khu vực Nhà Bè.",
+      "routeCode": "20, 110"
+    }
+  },
+  {
+    "text": "Tôi có thể mua vé xe buýt bằng thẻ tín dụng không?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "payment_method",
+      "question": "Tôi có thể mua vé xe buýt bằng thẻ tín dụng không?",
+      "answer": "Các xe có máy POS chấp nhận thẻ Napas hoặc thẻ tín dụng có tính năng chạm (Contactless).",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 81 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 81 đi đâu?",
+      "answer": "Xe 81 chạy lộ trình Bến xe Chợ Lớn - Lê Minh Xuân.",
+      "routeCode": "81"
+    }
+  },
+  {
+    "text": "Xe buýt có cho phép mang vật liệu dễ cháy không?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "safety_policy",
+      "question": "Xe buýt có cho phép mang vật liệu dễ cháy không?",
+      "answer": "Tuyệt đối cấm mang bình gas, xăng dầu, pháo hoa hoặc các vật liệu dễ cháy nổ lên xe buýt.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tuyến xe buýt nào đi qua Đầm Sen?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Tuyến xe buýt nào đi qua Đầm Sen?",
+      "answer": "Các tuyến 11, 15, 23, 38, 64, 69, 145, 148 đều có trạm dừng gần Công viên văn hóa Đầm Sen.",
+      "routeCode": "11, 38, 64"
+    }
+  },
+  {
+    "text": "Xe buýt số 91 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 91 đi đâu?",
+      "answer": "Xe 91 chạy lộ trình Bến xe Miền Tây - Chợ Nông sản Thủ Đức.",
+      "routeCode": "91"
+    }
+  },
+  {
+    "text": "Có xe buýt nào từ Gò Vấp đi Quận 7 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào từ Gò Vấp đi Quận 7 không?",
+      "answer": "Bạn có thể đi xe 18 hoặc 24 rồi chuyển qua xe 31 hoặc 34 để về Quận 7.",
+      "routeCode": "18, 34"
+    }
+  },
+  {
+    "text": "Tại sao xe buýt thường hay chạy chậm?",
+    "type": "faq",
+    "metadata": {
+      "group": "2_thoi_gian_tan_suat",
+      "intent": "feedback",
+      "question": "Tại sao xe buýt thường hay chạy chậm?",
+      "answer": "Xe buýt phải tuân thủ đúng biểu đồ giờ và đảm bảo an toàn, ngoài ra kẹt xe cũng là nguyên nhân khiến xe di chuyển chậm.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 103 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 103 đi đâu?",
+      "answer": "Xe 103 chạy lộ trình Bến xe Chợ Lớn - Bến xe Ngã tư Ga.",
+      "routeCode": "103"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua Bệnh viện Hùng Vương không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi qua Bệnh viện Hùng Vương không?",
+      "answer": "Các tuyến 05, 06, 08, 56, 150 đều dừng gần Bệnh viện Hùng Vương trên đường Hồng Bàng.",
+      "routeCode": "08, 56"
+    }
+  },
+  {
+    "text": "Xe buýt số 145 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 145 đi đâu?",
+      "answer": "Xe 145 đi từ Bến xe Chợ Lớn qua Đầm Sen và về Chợ Hiệp Thành.",
+      "routeCode": "145"
+    }
+  },
+  {
+    "text": "Làm thế nào để biết xe buýt nào có hỗ trợ xe lăn?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_check",
+      "question": "Làm thế nào để biết xe buýt nào có hỗ trợ xe lăn?",
+      "answer": "Thông tin này thường được hiển thị trong chi tiết tuyến trên ứng dụng hoặc nhận diện qua biểu tượng xe lăn dán trên thân xe.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 151 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 151 đi đâu?",
+      "answer": "Xe 151 chạy lộ trình Bến xe Miền Tây - Bến xe An Sương.",
+      "routeCode": "151"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Quận 10 sang Quận 1 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Quận 10 sang Quận 1 không?",
+      "answer": "Tuyến 02, 07, 14, 150 là những lựa chọn phổ biến nhất.",
+      "routeCode": "150, 02"
+    }
+  },
+  {
+    "text": "Xe buýt số 16 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 16 đi đâu?",
+      "answer": "Xe 16 đi từ Bến xe Chợ Lớn đến Bến xe Tân Phú.",
+      "routeCode": "16"
+    }
+  },
+  {
+    "text": "Sử dụng xe buýt có tiết kiệm chi phí hơn xe máy không?",
+    "type": "faq",
+    "metadata": {
+      "group": "13_so_sanh_phuong_tien",
+      "intent": "comparison",
+      "question": "Sử dụng xe buýt có tiết kiệm chi phí hơn xe máy không?",
+      "answer": "Rất tiết kiệm, đặc biệt nếu bạn mua vé tập hoặc là sinh viên, chi phí hàng tháng chỉ bằng một phần nhỏ so với tiền xăng xe máy.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 20 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 20 đi đâu?",
+      "answer": "Xe 20 đi từ Bến Thành đến Nhà Bè (Phà Bình Khánh).",
+      "routeCode": "20"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua bảo tàng Chứng tích Chiến tranh không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua bảo tàng Chứng tích Chiến tranh không?",
+      "answer": "Các tuyến 04, 14, 28 có trạm dừng gần bảo tàng trên đường Võ Văn Tần hoặc Lê Quý Đôn.",
+      "routeCode": "04, 14, 28"
+    }
+  },
+  {
+    "text": "Xe buýt số 27 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 27 đi đâu?",
+      "answer": "Xe 27 chạy lộ trình Bến xe Buýt Sài Gòn - Âu Cơ - Bến xe An Sương.",
+      "routeCode": "27"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Diamond Plaza nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Diamond Plaza nhất?",
+      "answer": "Trạm dừng trên đường Lê Duẩn hoặc Công xã Paris ngay sát nhà thờ Đức Bà.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 31 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 31 đi đâu?",
+      "answer": "Xe 31 đi từ Khu dân cư 6B (Bình Chánh) đến Đại học Văn Lang.",
+      "routeCode": "31"
+    }
+  },
+  {
+    "text": "Tại sao không thấy xe buýt hiển thị trên bản đồ app?",
+    "type": "faq",
+    "metadata": {
+      "group": "5_theo_doi_thoi_gian_thuc",
+      "intent": "app_issue",
+      "question": "Tại sao không thấy xe buýt hiển thị trên bản đồ app?",
+      "answer": "Có thể do xe đó chưa bắt đầu hành trình hoặc thiết bị GPS trên xe đang gặp sự cố kỹ thuật.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 34 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 34 đi đâu?",
+      "answer": "Xe 34 đi từ Bến xe Buýt Sài Gòn qua Quận 7 và về Đại học Công nghệ Sài Gòn.",
+      "routeCode": "34"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Hóc Môn về Quận 1 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Hóc Môn về Quận 1 không?",
+      "answer": "Bạn có thể đi xe 24 hoặc 94 để về khu vực trung tâm.",
+      "routeCode": "24, 94"
+    }
+  },
+  {
+    "text": "Xe buýt số 36 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 36 đi đâu?",
+      "answer": "Xe 36 đi từ Bến xe Buýt Sài Gòn đến Thới An (Quận 12).",
+      "routeCode": "36"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 38 có qua Bệnh viện Gia Định không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 38 có qua Bệnh viện Gia Định không?",
+      "answer": "Có, xe 38 dừng gần Bệnh viện Gia Định trên đường Phan Đăng Lưu.",
+      "routeCode": "38"
+    }
+  },
+  {
+    "text": "Xe buýt số 39 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 39 đi đâu?",
+      "answer": "Xe 39 đi từ Bến xe Miền Tây đến Bến Thành (Võ Văn Kiệt).",
+      "routeCode": "39"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua bitexco không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua bitexco không?",
+      "answer": "Các tuyến dừng tại trạm Hàm Nghi hoặc Hải Triều đều rất gần Bitexco Financial Tower.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 41 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 41 đi đâu?",
+      "answer": "Xe 41 đi từ Bến xe Miền Tây đến Bến xe Ngã tư Ga.",
+      "routeCode": "41"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần phố Bùi Viện nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần phố Bùi Viện nhất?",
+      "answer": "Bạn xuống trạm tại Bến xe Buýt Sài Gòn (Công viên 23/9) là gần nhất.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 42 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 42 đi đâu?",
+      "answer": "Xe 42 chạy lộ trình Bến xe Chợ Lớn - Chợ Thủ Đức.",
+      "routeCode": "42"
+    }
+  },
+  {
+    "text": "Tại sao xe buýt không cho hành khách lên cửa sau?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "policy_entry",
+      "question": "Tại sao xe buýt không cho hành khách lên cửa sau?",
+      "answer": "Lên cửa trước để tiếp viên dễ dàng kiểm tra vé và đảm bảo trật tự, cửa sau chỉ dành cho khách xuống.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 43 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 43 đi đâu?",
+      "answer": "Xe 43 chạy lộ trình Bến xe Miền Đông - Phà Cát Lái.",
+      "routeCode": "43"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Quận 8 sang Quận 5 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Quận 8 sang Quận 5 không?",
+      "answer": "Tuyến 08, 17, 59 là những tuyến nối trực tiếp Quận 8 và Quận 5.",
+      "routeCode": "08, 59"
+    }
+  },
+  {
+    "text": "Xe buýt số 44 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 44 đi đâu?",
+      "answer": "Xe 44 đi từ Cảng Quận 4 đến Bình Quới (Bình Thạnh).",
+      "routeCode": "44"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 46 có qua khu cư xá Bắc Hải không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 46 có qua khu cư xá Bắc Hải không?",
+      "answer": "Có, xe 46 chạy xuyên qua khu vực Bắc Hải, Quận 10.",
+      "routeCode": "46"
+    }
+  },
+  {
+    "text": "Xe buýt số 48 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 48 đi đâu?",
+      "answer": "Xe 48 chạy lộ trình Siêu thị Metro Hiệp Phú - Bến xe Tân Phú.",
+      "routeCode": "48"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua Nhà hát Thành phố không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua Nhà hát Thành phố không?",
+      "answer": "Các tuyến 02, 03, 19, 45, 53 thường dừng gần Nhà hát Thành phố trên đường Lê Lợi hoặc Đồng Khởi.",
+      "routeCode": "19, 02"
+    }
+  },
+  {
+    "text": "Xe buýt số 50 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 50 đi đâu?",
+      "answer": "Xe 50 đi từ Đại học Bách Khoa đến Đại học Quốc gia.",
+      "routeCode": "50"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Bệnh viện Tai Mũi Họng nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Bệnh viện Tai Mũi Họng nhất?",
+      "answer": "Trạm dừng ngay trước cổng bệnh viện trên đường Trần Quốc Thảo.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 51 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 51 đi đâu?",
+      "answer": "Xe 51 đi từ Bến xe Miền Đông đến Bình Hưng Hòa.",
+      "routeCode": "51"
+    }
+  },
+  {
+    "text": "Tại sao xe buýt điện D4 lại có giá vé cao hơn xe thường?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "fare_info",
+      "question": "Tại sao xe buýt điện D4 lại có giá vé cao hơn xe thường?",
+      "answer": "Xe điện D4 là loại xe chất lượng cao với dịch vụ tốt hơn, tuy nhiên mức chênh lệch không quá lớn so với xe buýt thường cùng cự ly.",
+      "routeCode": "D4"
+    }
+  },
+  {
+    "text": "Xe buýt số 52 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 52 đi đâu?",
+      "answer": "Xe 52 đi từ Bến Thành đến Đại học Quốc tế.",
+      "routeCode": "52"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Bình Thạnh sang Quận 10 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Bình Thạnh sang Quận 10 không?",
+      "answer": "Tuyến 14, 30, 150 là những lựa chọn phù hợp nhất.",
+      "routeCode": "14, 150"
+    }
+  },
+  {
+    "text": "Xe buýt số 53 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 53 đi đâu?",
+      "answer": "Xe 53 đi từ Lê Hồng Phong đến Đại học Quốc gia.",
+      "routeCode": "53"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 55 có qua Công viên phần mềm Quang Trung không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 55 có qua Công viên phần mềm Quang Trung không?",
+      "answer": "Có, tuyến 55 chạy từ Công viên phần mềm Quang Trung đến Khu Công nghệ cao Quận 9.",
+      "routeCode": "55"
+    }
+  },
+  {
+    "text": "Xe buýt số 57 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 57 đi đâu?",
+      "answer": "Xe 57 chạy lộ trình Chợ Hiệp Thành - Đại học Nông Lâm.",
+      "routeCode": "57"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua Nhà thờ Đức Bà không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua Nhà thờ Đức Bà không?",
+      "answer": "Các tuyến 04, 18, 19, 31, 36, 52, 93, 109 đều có trạm dừng ngay tại Nhà thờ Đức Bà.",
+      "routeCode": "19, 36"
+    }
+  },
+  {
+    "text": "Xe buýt số 58 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 58 đi đâu?",
+      "answer": "Xe 58 đi từ Bến xe Ngã tư Ga đến Khu công nghiệp Đông Nam.",
+      "routeCode": "58"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Bệnh viện 115 nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Bệnh viện 115 nhất?",
+      "answer": "Trạm dừng ngay trước cổng bệnh viện trên đường Sư Vạn Hạnh.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 60-2 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 60-2 đi đâu?",
+      "answer": "Xe 60-2 đi từ Đại học Nông Lâm đến Bến xe Phú Túc (Đồng Nai).",
+      "routeCode": "60-2"
+    }
+  },
+  {
+    "text": "Tại sao không được mang thú cưng lên xe buýt nếu không có lồng?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "policy_pet",
+      "question": "Tại sao không được mang thú cưng lên xe buýt nếu không có lồng?",
+      "answer": "Để đảm bảo an toàn cho các hành khách khác, tránh thú cưng chạy nhảy hoặc gây mất vệ sinh trên xe.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 61 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 61 đi đâu?",
+      "answer": "Xe 61 chạy lộ trình Bến xe Chợ Lớn - Khu công nghiệp Lê Minh Xuân.",
+      "routeCode": "61"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Tân Bình sang Quận 1 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Tân Bình sang Quận 1 không?",
+      "answer": "Tuyến 04, 28, 152, 109 là những tuyến chính nối Tân Bình và Quận 1.",
+      "routeCode": "04, 152"
+    }
+  },
+  {
+    "text": "Xe buýt số 62 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 62 đi đâu?",
+      "answer": "Xe 62 đi từ Bến xe Quận 8 đến Thới An.",
+      "routeCode": "62"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 64 có qua Công viên Gia Định không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 64 có qua Công viên Gia Định không?",
+      "answer": "Có, xe 64 dừng gần Công viên Gia Định trên đường Phổ Quang.",
+      "routeCode": "64"
+    }
+  },
+  {
+    "text": "Xe buýt số 66 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 66 đi đâu?",
+      "answer": "Xe 66 chạy lộ trình Bến xe Chợ Lớn - Bến xe An Sương.",
+      "routeCode": "66"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua Bưu điện Trung tâm Thành phố không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua Bưu điện Trung tâm Thành phố không?",
+      "answer": "Tương tự như Nhà thờ Đức Bà, các tuyến 18, 19, 36, 109 đều dừng ngay sát Bưu điện Trung tâm.",
+      "routeCode": "19, 36"
+    }
+  },
+  {
+    "text": "Xe buýt số 68 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 68 đi đâu?",
+      "answer": "Xe 68 chạy lộ trình Bến xe Chợ Lớn - Khu công nghiệp Tân Thới Hiệp.",
+      "routeCode": "68"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Bệnh viện Phụ sản Quốc tế nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Bệnh viện Phụ sản Quốc tế nhất?",
+      "answer": "Trạm dừng trên đường Tôn Thất Tùng hoặc Bùi Thị Xuân là gần nhất.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 70 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 70 đi đâu?",
+      "answer": "Xe 70 chạy lộ trình Bến xe Tân Phú - Vĩnh Lộc.",
+      "routeCode": "70"
+    }
+  },
+  {
+    "text": "Tại sao không nên nói chuyện quá to trên xe buýt?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "etiquette_info",
+      "question": "Tại sao không nên nói chuyện quá to trên xe buýt?",
+      "answer": "Để tôn trọng không gian chung và tránh làm phiền các hành khách khác cũng như tài xế.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 71 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 71 đi đâu?",
+      "answer": "Xe 71 chạy lộ trình Bến xe An Sương - Phật Tích Tòng Lâm.",
+      "routeCode": "71"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Thủ Đức sang Quận 7 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Thủ Đức sang Quận 7 không?",
+      "answer": "Bạn có thể đi xe 56 rồi chuyển sang xe 34 hoặc đi xe điện D4 từ khu Vinhomes Grand Park.",
+      "routeCode": "D4"
+    }
+  },
+  {
+    "text": "Xe buýt số 73 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 73 đi đâu?",
+      "answer": "Xe 73 chạy lộ trình Chợ Bình Chánh - KCN Lê Minh Xuân.",
+      "routeCode": "73"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 74 có đi qua Bệnh viện Xuyên Á không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 74 có đi qua Bệnh viện Xuyên Á không?",
+      "answer": "Có, xe 74 chạy lộ trình Bến xe An Sương - Bến xe Củ Chi và có đi ngang qua Bệnh viện Xuyên Á.",
+      "routeCode": "74"
+    }
+  },
+  {
+    "text": "Xe buýt số 76 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 76 đi đâu?",
+      "answer": "Xe 76 đi từ Long Phước đến Đền Hùng (Quận 9).",
+      "routeCode": "76"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua Chợ Lớn không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua Chợ Lớn không?",
+      "answer": "Hầu như tất cả các tuyến có đầu bến tại Bến xe Chợ Lớn đều đi qua khu vực này như 01, 05, 06, 07, 08, 56...",
+      "routeCode": "01, 05, 08"
+    }
+  },
+  {
+    "text": "Xe buýt số 77 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 77 đi đâu?",
+      "answer": "Xe 77 chạy lộ trình Hiệp Phước - Phà Bình Khánh.",
+      "routeCode": "77"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Tòa án Nhân dân Thành phố nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Tòa án Nhân dân Thành phố nhất?",
+      "answer": "Trạm dừng trên đường Nam Kỳ Khởi Nghĩa là gần nhất.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 78 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 78 đi đâu?",
+      "answer": "Xe 78 đi từ Thới An đến Hóc Môn.",
+      "routeCode": "78"
+    }
+  },
+  {
+    "text": "Tại sao xe buýt lại phải dừng chờ ở bến trung chuyển?",
+    "type": "faq",
+    "metadata": {
+      "group": "2_thoi_gian_tan_suat",
+      "intent": "time_info",
+      "question": "Tại sao xe buýt lại phải dừng chờ ở bến trung chuyển?",
+      "answer": "Để khớp nối đúng thời gian biểu đồ giờ, đảm bảo giãn cách giữa các chuyến xe không quá thưa hoặc quá dày.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 79 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 79 đi đâu?",
+      "answer": "Xe 79 chạy lộ trình Bến xe Củ Chi - Đền Bến Dược.",
+      "routeCode": "79"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Quận 1 sang Quận 4 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Quận 1 sang Quận 4 không?",
+      "answer": "Tuyến 20, 31, 34, 44, 72, 102 đều nối Quận 1 và Quận 4.",
+      "routeCode": "34, 20"
+    }
+  },
+  {
+    "text": "Xe buýt số 84 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 84 đi đâu?",
+      "answer": "Xe 84 chạy lộ trình Bến xe Buýt Sài Gòn - Tân Túc.",
+      "routeCode": "84"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 86 có qua cầu Bình Triệu không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 86 có qua cầu Bình Triệu không?",
+      "answer": "Có, tuyến 86 chạy từ Bến xe Miền Đông qua cầu Bình Triệu hướng về Thủ Đức.",
+      "routeCode": "86"
+    }
+  },
+  {
+    "text": "Xe buýt số 87 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 87 đi đâu?",
+      "answer": "Xe 87 chạy lộ trình Bến xe Củ Chi - An Nhơn Tây.",
+      "routeCode": "87"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua khu du lịch Văn Thánh không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua khu du lịch Văn Thánh không?",
+      "answer": "Các tuyến dừng tại trạm Tân Cảng hoặc chân cầu Sài Gòn như 06, 30, 53, 56, 150 đều rất gần KDL Văn Thánh.",
+      "routeCode": "06, 150"
+    }
+  },
+  {
+    "text": "Xe buýt số 88 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 88 đi đâu?",
+      "answer": "Xe 88 chạy lộ trình Bến Thành - Đồng Văn Cống - Quận 2.",
+      "routeCode": "88"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Công viên Tao Đàn nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Công viên Tao Đàn nhất?",
+      "answer": "Trạm dừng trên đường Nguyễn Thị Minh Khai hoặc Cách Mạng Tháng Tám là gần nhất.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 89 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 89 đi đâu?",
+      "answer": "Xe 89 chạy lộ trình Đại học Nông Lâm - Trường Thạnh (Quận 9).",
+      "routeCode": "89"
+    }
+  },
+  {
+    "text": "Tại sao không nên đeo tai nghe âm lượng quá lớn khi ngồi trên xe buýt?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "safety_info",
+      "question": "Tại sao không nên đeo tai nghe âm lượng quá lớn khi ngồi trên xe buýt?",
+      "answer": "Để bạn vẫn có thể nghe thấy loa thông báo trạm và các tình huống khẩn cấp xảy ra trên xe.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 93 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 93 đi đâu?",
+      "answer": "Xe 93 đi từ Bến Thành đến Đại học Nông Lâm.",
+      "routeCode": "93"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Bình Tân về trung tâm không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Bình Tân về trung tâm không?",
+      "answer": "Tuyến 02, 10, 39, 91 là các lựa chọn chính từ Bình Tân về Quận 1 và Quận 5.",
+      "routeCode": "02, 39"
+    }
+  },
+  {
+    "text": "Xe buýt số 94 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 94 đi đâu?",
+      "answer": "Xe 94 chạy lộ trình Bến xe Chợ Lớn - Bến xe Củ Chi.",
+      "routeCode": "94"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 95 có qua trường Cao đẳng Kỹ thuật Cao Thắng không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 95 có qua trường Cao đẳng Kỹ thuật Cao Thắng không?",
+      "answer": "Không, xe 95 chạy lộ trình từ Miền Đông đến KCN Tân Bình. Để đi Cao Thắng bạn nên chọn xe 02, 03, 19.",
+      "routeCode": "95"
+    }
+  },
+  {
+    "text": "Xe buýt số 96 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 96 đi đâu?",
+      "answer": "Xe 96 chạy lộ trình Bến Thành - Chợ Bình Điền.",
+      "routeCode": "96"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua khu phố đi bộ Bùi Viện không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua khu phố đi bộ Bùi Viện không?",
+      "answer": "Bạn có thể đi bất kỳ xe nào về Bến xe Buýt Sài Gòn rồi đi bộ khoảng 300m là đến Bùi Viện.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 99 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 99 đi đâu?",
+      "answer": "Xe 99 đi từ Chợ Thạnh Mỹ Lợi đến Đại học Quốc gia.",
+      "routeCode": "99"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Bệnh viện Tai Mũi Họng nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Bệnh viện Tai Mũi Họng nhất?",
+      "answer": "Trạm dừng trên đường Trần Quốc Thảo ngay trước cổng bệnh viện.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 100 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 100 đi đâu?",
+      "answer": "Xe 100 chạy lộ trình Bến xe Củ Chi - Bến xe Tân Thạnh (Long An).",
+      "routeCode": "100"
+    }
+  },
+  {
+    "text": "Tại sao một số xe buýt chỉ có một cửa?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_check",
+      "question": "Tại sao một số xe buýt chỉ có một cửa?",
+      "answer": "Thường là các loại xe buýt nhỏ (B40) phục vụ trong các tuyến hẻm hoặc đường nhỏ hẹp.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 101 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 101 đi đâu?",
+      "answer": "Xe 101 chạy lộ trình Bến xe Quận 8 - Chợ Bình Điền.",
+      "routeCode": "101"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Quận 6 sang Quận 7 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Quận 6 sang Quận 7 không?",
+      "answer": "Bạn có thể đi xe 102 để nối trực tiếp Quận 6 và Quận 7.",
+      "routeCode": "102"
+    }
+  },
+  {
+    "text": "Xe buýt số 104 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 104 đi đâu?",
+      "answer": "Xe 104 chạy lộ trình Bến xe An Sương - Đại học Nông Lâm.",
+      "routeCode": "104"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 107 có qua khu du lịch Bình Quới không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 107 có qua khu du lịch Bình Quới không?",
+      "answer": "Không, xe 107 chạy lộ trình Bến xe Chợ Lớn - Đỗ Xuân Hợp. Để đi Bình Quới bạn nên dùng xe 44.",
+      "routeCode": "107"
+    }
+  },
+  {
+    "text": "Xe buýt số 109 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 109 đi đâu?",
+      "answer": "Xe 109 chạy lộ trình Sân bay Tân Sơn Nhất - Bến xe Buýt Sài Gòn.",
+      "routeCode": "109"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua khu công nghệ cao Quận 9 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua khu công nghệ cao Quận 9 không?",
+      "answer": "Các tuyến 55, 56, 76 đều có lộ trình đi vào hoặc đi ngang qua Khu Công nghệ cao.",
+      "routeCode": "55, 56"
+    }
+  },
+  {
+    "text": "Xe buýt số 110 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 110 đi đâu?",
+      "answer": "Xe 110 chạy lộ trình Hiệp Phước - Phà Bình Khánh.",
+      "routeCode": "110"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Bệnh viện Da Liễu nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Bệnh viện Da Liễu nhất?",
+      "answer": "Trạm dừng trên đường Nguyễn Thông ngay trước cổng bệnh viện.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 120 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 120 đi đâu?",
+      "answer": "Xe 120 chạy lộ trình Tuyến vòng khu vực trung tâm Quận 1.",
+      "routeCode": "120"
+    }
+  },
+  {
+    "text": "Tại sao không nên đứng ở khu vực cửa xe khi đang di chuyển?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "safety_info",
+      "question": "Tại sao không nên đứng ở khu vực cửa xe khi đang di chuyển?",
+      "answer": "Để đảm bảo an toàn cho chính bạn nếu cửa mở đột ngột và không cản trở khách lên xuống.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 123 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 123 đi đâu?",
+      "answer": "Xe 123 đi từ Phú Mỹ Hưng đến Quận 1 (đây thường là tuyến xe buýt nhanh doanh nghiệp).",
+      "routeCode": "123"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Gò Vấp sang Quận 2 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Gò Vấp sang Quận 2 không?",
+      "answer": "Bạn có thể đi xe 95 hoặc 36 về khu vực Bình Thạnh rồi chuyển sang xe 06 hoặc 43.",
+      "routeCode": "36, 06"
+    }
+  },
+  {
+    "text": "Xe buýt số 126 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 126 đi đâu?",
+      "answer": "Xe 126 chạy lộ trình Bến xe Củ Chi - Bình Mỹ.",
+      "routeCode": "126"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 127 có qua ga Sài Gòn không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 127 có qua ga Sài Gòn không?",
+      "answer": "Không, xe 127 chạy ở khu vực Quận 9. Để đi Ga Sài Gòn bạn nên dùng xe 07, 149.",
+      "routeCode": "127"
+    }
+  },
+  {
+    "text": "Xe buýt số 128 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 128 đi đâu?",
+      "answer": "Xe 128 chạy lộ trình Tân Đoàn Việt - Hiệp Phước.",
+      "routeCode": "128"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua khu công nghiệp Vĩnh Lộc không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua khu công nghiệp Vĩnh Lộc không?",
+      "answer": "Tuyến 28, 48, 70, 104 đều có lộ trình đi ngang hoặc vào khu vực Vĩnh Lộc.",
+      "routeCode": "28, 104"
+    }
+  },
+  {
+    "text": "Xe buýt số 13 chạy tuyến nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 13 chạy tuyến nào?",
+      "answer": "Xe 13 chạy lộ trình Công viên 23/9 - Bến xe Củ Chi.",
+      "routeCode": "13"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Bệnh viện Bình Dân nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Bệnh viện Bình Dân nhất?",
+      "answer": "Trạm dừng trên đường Điện Biên Phủ ngay gần cổng bệnh viện.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 140 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 140 đi đâu?",
+      "answer": "Xe 140 đi từ Bến xe Buýt Sài Gòn đến Khu dân cư Phú Lợi.",
+      "routeCode": "140"
+    }
+  },
+  {
+    "text": "Tại sao nên xếp hàng khi lên xe buýt?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "etiquette_info",
+      "question": "Tại sao nên xếp hàng khi lên xe buýt?",
+      "answer": "Để đảm bảo trật tự, an toàn và giúp xe xuất bến nhanh chóng hơn.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 141 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 141 đi đâu?",
+      "answer": "Xe 141 chạy lộ trình Khu du lịch BCR - Long Trường - Khu Công nghệ cao.",
+      "routeCode": "141"
+    }
+  },
+  {
+    "text": "Có xe buýt nào từ Quận 12 đi Quận 1 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào từ Quận 12 đi Quận 1 không?",
+      "answer": "Tuyến 18, 36, 65 là những lựa chọn thuận tiện từ Quận 12 về trung tâm.",
+      "routeCode": "18, 36, 65"
+    }
+  },
+  {
+    "text": "Xe buýt số 146 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 146 đi đâu?",
+      "answer": "Xe 146 chạy lộ trình Bến xe Miền Đông - Hiệp Thành.",
+      "routeCode": "146"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 149 có qua Công viên Lê Thị Riêng không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 149 có qua Công viên Lê Thị Riêng không?",
+      "answer": "Có, xe 149 chạy qua đoạn đường Cách Mạng Tháng Tám ngay sát Công viên Lê Thị Riêng.",
+      "routeCode": "149"
+    }
+  },
+  {
+    "text": "Xe buýt số 150 có bao nhiêu trạm dừng?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "route_info",
+      "question": "Xe buýt số 150 có bao nhiêu trạm dừng?",
+      "answer": "Tuyến 150 có khoảng 50-60 trạm dừng trên toàn bộ lộ trình dài gần 30km.",
+      "routeCode": "150"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua khu công nghiệp Tân Tạo không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua khu công nghiệp Tân Tạo không?",
+      "answer": "Các tuyến 25, 61, 81, 151 đều đi qua hoặc gần khu vực KCN Tân Tạo.",
+      "routeCode": "81, 151"
+    }
+  },
+  {
+    "text": "Xe buýt số 152 có chở được vali lớn không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "policy_baggage",
+      "question": "Xe buýt số 152 có chở được vali lớn không?",
+      "answer": "Có, vì là tuyến sân bay nên xe có không gian để vali, tuy nhiên nếu vali quá lớn có thể bị tính thêm 1 suất vé.",
+      "routeCode": "152"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Bệnh viện Truyền máu Huyết học nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Bệnh viện Truyền máu Huyết học nhất?",
+      "answer": "Trạm dừng ngay trước cổng bệnh viện trên đường Phạm Viết Chánh.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 56 có máy lạnh tốt không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "facility_check",
+      "question": "Xe buýt số 56 có máy lạnh tốt không?",
+      "answer": "Hầu hết xe 56 là xe đời mới nên hệ thống máy lạnh hoạt động rất tốt.",
+      "routeCode": "56"
+    }
+  },
+  {
+    "text": "Tại sao không nên mang vật nuôi lên xe buýt nếu không có lồng?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "policy_pet",
+      "question": "Tại sao không nên mang vật nuôi lên xe buýt nếu không có lồng?",
+      "answer": "Để tránh gây sợ hãi cho các hành khách khác và đảm bảo vệ sinh trên xe.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 01 đi qua những đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 01 đi qua những đâu?",
+      "answer": "Xe 01 đi từ Bến xe Buýt Sài Gòn đến Bến xe Chợ Lớn qua đường Trần Hưng Đạo.",
+      "routeCode": "01"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi từ Quận 7 sang Quận 8 không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_find",
+      "question": "Có xe buýt nào đi từ Quận 7 sang Quận 8 không?",
+      "answer": "Bạn có thể đi xe 17 hoặc 102.",
+      "routeCode": "102, 17"
+    }
+  },
+  {
+    "text": "Xe buýt số 02 có dừng ở chợ Thái Bình không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Xe buýt số 02 có dừng ở chợ Thái Bình không?",
+      "answer": "Có, xe 02 đi qua khu vực chợ Thái Bình trên đường Cống Quỳnh.",
+      "routeCode": "02"
+    }
+  },
+  {
+    "text": "Lộ trình xe buýt 03 có qua Ga Sài Gòn không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Lộ trình xe buýt 03 có qua Ga Sài Gòn không?",
+      "answer": "Không, xe 03 chạy hướng từ Bến Thành về Gò Vấp. Để đi Ga Sài Gòn bạn nên đi xe 07.",
+      "routeCode": "03"
+    }
+  },
+  {
+    "text": "Xe buýt số 04 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 04 đi đâu?",
+      "answer": "Xe 04 đi từ Bến xe Buýt Sài Gòn đến Cộng Hòa và về Bến xe An Sương.",
+      "routeCode": "04"
+    }
+  },
+  {
+    "text": "Có xe buýt nào đi qua khu du lịch Tân Cảng không?",
+    "type": "faq",
+    "metadata": {
+      "group": "8_du_lich_tham_quan",
+      "intent": "tourism_find",
+      "question": "Có xe buýt nào đi qua khu du lịch Tân Cảng không?",
+      "answer": "Các tuyến 06, 30, 53, 56, 150 đều dừng tại trạm Tân Cảng ngay cổng khu du lịch.",
+      "routeCode": "150, 06"
+    }
+  },
+  {
+    "text": "Xe buýt số 05 đi đâu?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_info",
+      "question": "Xe buýt số 05 đi đâu?",
+      "answer": "Xe 05 đi từ Bến xe Chợ Lớn đến Bến xe Biên Hòa.",
+      "routeCode": "05"
+    }
+  },
+  {
+    "text": "Trạm dừng xe buýt gần Bệnh viện Nhiệt Đới nhất?",
+    "type": "faq",
+    "metadata": {
+      "group": "3_vi_tri_tram_khoang_cach",
+      "intent": "location_find",
+      "question": "Trạm dừng xe buýt gần Bệnh viện Nhiệt Đới nhất?",
+      "answer": "Trạm dừng ngay trước cổng bệnh viện trên đường Võ Văn Kiệt.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 06 chạy từ mấy giờ sáng?",
+    "type": "faq",
+    "metadata": {
+      "group": "2_thoi_gian_tan_suat",
+      "intent": "time_info",
+      "question": "Xe buýt số 06 chạy từ mấy giờ sáng?",
+      "answer": "Xe 06 bắt đầu chạy từ 5:00 sáng hàng ngày.",
+      "routeCode": "06"
+    }
+  },
+  {
+    "text": "Tại sao nên nhường ghế cho người già và phụ nữ mang thai?",
+    "type": "faq",
+    "metadata": {
+      "group": "10_an_toan_tin_cay",
+      "intent": "etiquette_info",
+      "question": "Tại sao nên nhường ghế cho người già và phụ nữ mang thai?",
+      "answer": "Đây là nét văn hóa ứng xử văn minh và giúp đảm bảo an toàn cho những người có khả năng giữ thăng bằng kém hơn.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tôi có thể mua vé tháng xe buýt không?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "fare_info",
+      "question": "Tôi có thể mua vé tháng xe buýt không?",
+      "answer": "Hiện tại TP.HCM chủ yếu sử dụng vé tập hoặc thẻ Unipass tích lũy, chưa áp dụng mô hình vé tháng không giới hạn lượt đi như Hà Nội.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt có cho mang xe đẩy em bé lên không?",
+    "type": "faq",
+    "metadata": {
+      "group": "9_tien_ich_co_so_vat_chat",
+      "intent": "policy_item",
+      "question": "Xe buýt có cho mang xe đẩy em bé lên không?",
+      "answer": "Có, nhưng bạn nên gấp gọn xe đẩy nếu có thể để tiết kiệm không gian và tránh va quẹt.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Tôi bị mất thẻ sinh viên thì làm sao để mua vé 3.000đ?",
+    "type": "faq",
+    "metadata": {
+      "group": "4_gia_ve_thanh_toan",
+      "intent": "fare_policy",
+      "question": "Tôi bị mất thẻ sinh viên thì làm sao để mua vé 3.000đ?",
+      "answer": "Bạn có thể dùng giấy xác nhận sinh viên có dán ảnh và đóng dấu giáp lai của nhà trường để thay thế tạm thời.",
+      "routeCode": "all"
+    }
+  },
+  {
+    "text": "Xe buýt số 150 có dừng ở Suối Tiên không?",
+    "type": "faq",
+    "metadata": {
+      "group": "1_tuyen_duong_lo_trinh",
+      "intent": "route_check",
+      "question": "Xe buýt số 150 có dừng ở Suối Tiên không?",
+      "answer": "Có, xe 150 dừng tại trạm dừng ngay trước cổng Khu du lịch Suối Tiên.",
+      "routeCode": "150"
+    }
+  },
+  {
+    "text": "Tôi có thể dùng SmartGo để tìm quán ăn ngon gần trạm xe buýt không?",
+    "type": "faq",
+    "metadata": {
+      "group": "lifestyle_integration",
+      "intent": "nearby_amenities",
+      "question": "Tìm tiện ích quanh trạm?",
+      "answer": "Có nhé! Khi bạn chọn một trạm xe, app sẽ hiển thị mục 'Xung quanh đây' bao gồm quán ăn, ATM, cửa hàng tiện lợi và nhà thuốc."
+    }
+  },
+  {
+    "text": "Làm sao để tắt âm thanh 'tít tít' mỗi khi xe sắp đến?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_customization",
+      "intent": "mute_alerts",
+      "question": "Tắt âm thanh thông báo?",
+      "answer": "Bạn vào Cài đặt -> Thông báo -> Cảnh báo xe đến và chọn chế độ 'Chỉ rung' hoặc 'Im lặng'."
+    }
+  },
+  {
+    "text": "App có cho phép đặt vé trước cho xe buýt liên tỉnh không?",
+    "type": "faq",
+    "metadata": {
+      "group": "service_expansion",
+      "intent": "intercity_booking",
+      "question": "Đặt vé liên tỉnh?",
+      "answer": "Hiện SmartGo mới hỗ trợ vé buýt nội đô. Tính năng liên kết xe khách liên tỉnh đang được phát triển và sẽ sớm ra mắt."
+    }
+  },
+  {
+    "text": "Tại sao tôi không thấy xe 150 trên bản đồ dù đang đứng ở trạm?",
+    "type": "faq",
+    "metadata": {
+      "group": "technical_issue",
+      "intent": "missing_vehicle_gps",
+      "question": "Không thấy xe trên bản đồ?",
+      "answer": "Có thể thiết bị GPS trên xe đó đang gặp sự cố hoặc mất tín hiệu tạm thời. Bạn hãy đợi vài phút hoặc kiểm tra xe tiếp theo nhé."
+    }
+  },
+  {
+    "text": "Điểm thưởng SmartPoints dùng để làm gì?",
+    "type": "faq",
+    "metadata": {
+      "group": "loyalty_program",
+      "intent": "point_usage",
+      "question": "Tác dụng của SmartPoints?",
+      "answer": "Bạn có thể dùng SmartPoints để đổi mã giảm giá Grab, voucher Highland Coffee hoặc trừ trực tiếp vào giá vé tháng."
+    }
+  },
+  {
+    "text": "Làm sao để biết xe buýt nào cho phép mang xe đạp lên?",
+    "type": "faq",
+    "metadata": {
+      "group": "vehicle_info",
+      "intent": "bicycle_friendly",
+      "question": "Mang xe đạp lên xe buýt?",
+      "answer": "Trong phần chi tiết tuyến xe, hãy tìm biểu tượng 'Xe đạp'. Thường các tuyến xe buýt điện mới sẽ có không gian cho xe đạp."
+    }
+  },
+  {
+    "text": "Dữ liệu vị trí của tôi có bị bán cho bên thứ ba không?",
+    "type": "faq",
+    "metadata": {
+      "group": "security_privacy",
+      "intent": "data_privacy",
+      "question": "Bảo mật dữ liệu vị trí?",
+      "answer": "SmartGo cam kết không bán dữ liệu cá nhân. Vị trí của bạn chỉ được dùng để gợi ý lộ trình và tối ưu hóa dịch vụ xe buýt."
+    }
+  },
+  {
+    "text": "Tôi muốn đăng ký làm cộng tác viên cập nhật lộ trình thì làm thế nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "community",
+      "intent": "contributor_signup",
+      "question": "Trở thành cộng tác viên?",
+      "answer": "Cảm ơn bạn! Hãy vào mục 'Cá nhân' -> 'Đóng góp dữ liệu' -> 'Đăng ký điều phối viên' để cùng xây dựng bản đồ chính xác hơn."
+    }
+  },
+  {
+    "text": "App có cảnh báo nếu xe buýt thay đổi lộ trình do biểu tình hay sửa đường không?",
+    "type": "faq",
+    "metadata": {
+      "group": "traffic_info",
+      "intent": "route_detour_alert",
+      "question": "Cảnh báo đổi lộ trình đột xuất?",
+      "answer": "Có, nếu có sự cố ngăn đường, SmartGo sẽ gửi thông báo đẩy (push notification) ngay lập tức đến các người dùng đang theo dõi tuyến đó."
+    }
+  },
+  {
+    "text": "Tôi lỡ tay xóa App, tiền trong ví SmartGo có mất không?",
+    "type": "faq",
+    "metadata": {
+      "group": "account_management",
+      "intent": "balance_recovery",
+      "question": "Xóa app có mất tiền trong ví?",
+      "answer": "Không nhé! Tiền gắn liền với tài khoản (số điện thoại) của bạn. Chỉ cần đăng nhập lại là thấy số dư cũ."
+    }
+  },
+  {
+    "text": "Làm sao để biết trạm nào có hỗ trợ lối đi cho người đi xe lăn?",
+    "type": "faq",
+    "metadata": {
+      "group": "accessibility",
+      "intent": "wheelchair_access",
+      "question": "Lối đi xe lăn?",
+      "answer": "Các trạm và tuyến xe hỗ trợ người khuyết tật sẽ có biểu tượng xe lăn màu xanh dương trong phần thông tin chi tiết."
+    }
+  },
+  {
+    "text": "App có hỗ trợ thanh toán qua Apple Pay hay Google Pay không?",
+    "type": "faq",
+    "metadata": {
+      "group": "payment",
+      "intent": "nfc_payment",
+      "question": "Thanh toán Apple/Google Pay?",
+      "answer": "Hiện tại chúng tôi đã hỗ trợ Apple Pay. Google Pay dự kiến sẽ được cập nhật trong quý tới."
+    }
+  },
+  {
+    "text": "Tôi muốn gửi tặng vé tháng xe buýt cho con trai qua app được không?",
+    "type": "faq",
+    "metadata": {
+      "group": "payment",
+      "intent": "gift_ticket",
+      "question": "Tặng vé cho người thân?",
+      "answer": "Được! Bạn chọn 'Mua vé' -> 'Gửi tặng' và nhập số điện thoại người nhận (cũng sử dụng SmartGo)."
+    }
+  },
+  {
+    "text": "Tại sao hình ảnh thực tế của trạm xe buýt trông cũ hơn so với ngoài đời?",
+    "type": "faq",
+    "metadata": {
+      "group": "community",
+      "intent": "outdated_photo",
+      "question": "Hình ảnh trạm bị cũ?",
+      "answer": "Hình ảnh được cập nhật định kỳ. Bạn có thể giúp cộng đồng bằng cách nhấn 'Chụp ảnh mới' và tải lên hình ảnh hiện tại của trạm."
+    }
+  },
+  {
+    "text": "SmartGo có tính năng tìm bạn đồng hành đi cùng xe buýt không?",
+    "type": "faq",
+    "metadata": {
+      "group": "community",
+      "intent": "travel_buddy",
+      "question": "Tìm bạn đồng hành?",
+      "answer": "Hiện app chưa có tính năng chat. Bạn có thể dùng tính năng 'Check-in' để xem có bao nhiêu người dùng SmartGo khác đang trên cùng chuyến xe với mình."
+    }
+  },
+  {
+    "text": "Làm sao để báo cáo một trạm xe buýt đã bị dỡ bỏ?",
+    "type": "faq",
+    "metadata": {
+      "group": "customer_feedback",
+      "intent": "report_removed_station",
+      "question": "Báo cáo trạm bị hủy?",
+      "answer": "Bạn nhấn giữ vào vị trí trạm đó trên bản đồ -> Chọn 'Báo cáo sai sót' -> 'Trạm không còn tồn tại'."
+    }
+  },
+  {
+    "text": "Tôi thấy người hút thuốc trên xe buýt, tôi có thể tố cáo qua app không?",
+    "type": "faq",
+    "metadata": {
+      "group": "safety_privacy",
+      "intent": "report_incident",
+      "question": "Tố cáo vi phạm trên xe?",
+      "answer": "Có, mục 'Phản ánh nhanh' cho phép bạn báo cáo các hành vi vi phạm nội quy xe buýt để trung tâm điều hành xử lý."
+    }
+  },
+  {
+    "text": "App có nhắc tôi mang theo ô nếu dự báo thời tiết có mưa ở điểm đến không?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "weather_warning",
+      "question": "Cảnh báo thời tiết?",
+      "answer": "Tính năng 'Thông minh' của SmartGo sẽ nhắc bạn mang ô nếu điểm đến của lộ trình có xác suất mưa trên 70%."
+    }
+  },
+  {
+    "text": "Làm thế nào để xuất hóa đơn VAT cho vé tháng đã mua?",
+    "type": "faq",
+    "metadata": {
+      "group": "payment",
+      "intent": "vat_invoice",
+      "question": "Yêu cầu hóa đơn VAT?",
+      "answer": "Bạn vào mục Lịch sử giao dịch -> Chọn vé đã mua -> Nhấn 'Yêu cầu hóa đơn điện tử' và điền thông tin công ty."
+    }
+  },
+  {
+    "text": "Tôi muốn xem lại tổng quãng đường tôi đã đi bằng xe buýt trong năm nay?",
+    "type": "faq",
+    "metadata": {
+      "group": "loyalty_program",
+      "intent": "annual_stats",
+      "question": "Thống kê di chuyển năm?",
+      "answer": "Vào cuối mỗi năm, SmartGo sẽ có tính năng 'Nhìn lại một năm' hiển thị tổng quãng đường, số lượng CO2 bạn đã giảm thiểu."
+    }
+  },
+  {
+    "text": "SmartGo có bản dùng thử các tính năng Premium không?",
+    "type": "faq",
+    "metadata": {
+      "group": "membership",
+      "intent": "premium_trial",
+      "question": "Dùng thử Premium?",
+      "answer": "Mỗi tài khoản mới sẽ được tặng 7 ngày trải nghiệm Premium (không quảng cáo, xem dự báo chỗ ngồi)."
+    }
+  },
+  {
+    "text": "Làm sao để đăng nhập bằng dấu vân tay (FaceID)?",
+    "type": "faq",
+    "metadata": {
+      "group": "security_privacy",
+      "intent": "biometric_login",
+      "question": "Đăng nhập bằng sinh trắc học?",
+      "answer": "Vào Cài đặt -> Bảo mật -> Bật 'Đăng nhập bằng sinh trắc học' (vân tay hoặc khuôn mặt)."
+    }
+  },
+  {
+    "text": "Tôi có thể lọc tìm các tuyến xe buýt có Wifi miễn phí không?",
+    "type": "faq",
+    "metadata": {
+      "group": "vehicle_info",
+      "intent": "wifi_filter",
+      "question": "Lọc xe có Wifi?",
+      "answer": "Được nhé! Trong phần lọc tuyến xe, hãy chọn tiện ích 'Wifi miễn phí' để hệ thống gợi ý các xe phù hợp."
+    }
+  },
+  {
+    "text": "Làm sao để biết phí gửi xe máy tại trạm trung chuyển?",
+    "type": "faq",
+    "metadata": {
+      "group": "lifestyle_integration",
+      "intent": "parking_fee",
+      "question": "Phí gửi xe tại trạm?",
+      "answer": "Thông tin về bãi giữ xe và giá tiền sẽ hiển thị trong mục 'Thông tin trạm' tại các điểm trung chuyển lớn."
+    }
+  },
+  {
+    "text": "Tôi bị mất điện thoại, làm sao để khóa ví SmartGo?",
+    "type": "faq",
+    "metadata": {
+      "group": "security_privacy",
+      "intent": "lock_account",
+      "question": "Khóa tài khoản khẩn cấp?",
+      "answer": "Hãy gọi ngay hotline 1900-xxxx hoặc dùng thiết bị khác đăng nhập và chọn 'Đăng xuất khỏi tất cả thiết bị'."
+    }
+  },
+  {
+    "text": "Tại sao app tự động đổi lộ trình của tôi khi tôi đang đi bộ?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "dynamic_rerouting",
+      "question": "Tự động đổi lộ trình?",
+      "answer": "Nếu bạn đi chệch hướng quá xa, SmartGo sẽ tự động tính toán lại đường đi mới từ vị trí hiện tại của bạn."
+    }
+  },
+  {
+    "text": "Làm sao để tăng cỡ chữ trong ứng dụng cho người lớn tuổi?",
+    "type": "faq",
+    "metadata": {
+      "group": "accessibility",
+      "intent": "font_size",
+      "question": "Thay đổi cỡ chữ?",
+      "answer": "SmartGo tuân theo cài đặt cỡ chữ của hệ thống điện thoại. Bạn hãy chỉnh cỡ chữ lớn trong cài đặt máy, app sẽ tự thích ứng."
+    }
+  },
+  {
+    "text": "Tôi muốn tắt tính năng tự động phát video giới thiệu tuyến xe?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_customization",
+      "intent": "disable_autoplay",
+      "question": "Tắt tự động phát video?",
+      "answer": "Vào Cài đặt -> Giao diện & Dữ liệu -> Tắt 'Tự động phát video bằng mạng di động'."
+    }
+  },
+  {
+    "text": "Có thể dùng SmartGo ở các thành phố khác ngoài TP.HCM và Hà Nội không?",
+    "type": "faq",
+    "metadata": {
+      "group": "service_expansion",
+      "intent": "city_availability",
+      "question": "Phạm vi sử dụng?",
+      "answer": "Hiện SmartGo đã có dữ liệu tại Đà Nẵng, Cần Thơ và Hải Phòng. Chúng tôi đang tiếp tục mở rộng ra toàn quốc."
+    }
+  },
+  {
+    "text": "Làm thế nào để tham gia khảo sát cải thiện dịch vụ của SmartGo?",
+    "type": "faq",
+    "metadata": {
+      "group": "customer_feedback",
+      "intent": "user_survey",
+      "question": "Tham gia khảo sát?",
+      "answer": "Thỉnh thoảng sẽ có banner khảo sát ở trang chủ. Hoàn thành khảo sát bạn sẽ nhận được 50 SmartPoints."
+    }
+  },
+  {
+    "text": "Tôi có thể xem lộ trình của xe buýt trên trình duyệt web máy tính không?",
+    "type": "faq",
+    "metadata": {
+      "group": "service_expansion",
+      "intent": "web_version",
+      "question": "Bản web cho máy tính?",
+      "answer": "Có, bạn truy cập website maps.smartgo.vn để tra cứu lộ trình tương tự như trên điện thoại."
+    }
+  },
+  {
+    "text": "Tại sao tôi không thể sử dụng mã giảm giá?",
+    "type": "faq",
+    "metadata": {
+      "group": "payment",
+      "intent": "promo_code_error",
+      "question": "Lỗi mã giảm giá?",
+      "answer": "Hãy kiểm tra thời hạn mã và điều kiện áp dụng (ví dụ: chỉ cho vé tháng hoặc chỉ cho người dùng mới)."
+    }
+  },
+  {
+    "text": "Làm sao để biết xe buýt này có sàn thấp (cho người già dễ bước lên)?",
+    "type": "faq",
+    "metadata": {
+      "group": "accessibility",
+      "intent": "low_floor_bus",
+      "question": "Xe buýt sàn thấp?",
+      "answer": "Biểu tượng bậc thang gạch chéo trong phần thông tin xe biểu thị đây là xe sàn thấp, thuận tiện cho người già."
+    }
+  },
+  {
+    "text": "App có tính năng nhắc nhở tôi đi bộ mỗi ngày không?",
+    "type": "faq",
+    "metadata": {
+      "group": "lifestyle_integration",
+      "intent": "health_tracking",
+      "question": "Nhắc nhở đi bộ?",
+      "answer": "Có, trong mục 'Sức khỏe', bạn có thể đặt mục tiêu số bước chân đi bộ ra trạm mỗi ngày để nhận huy hiệu."
+    }
+  },
+  {
+    "text": "Tôi muốn biết lịch trình xe buýt tết âm lịch?",
+    "type": "faq",
+    "metadata": {
+      "group": "traffic_info",
+      "intent": "holiday_schedule",
+      "question": "Lịch xe chạy ngày Tết?",
+      "answer": "Lịch chạy Tết sẽ được cập nhật trước 2 tuần trong mục 'Thông báo chung'. Một số tuyến sẽ nghỉ hoặc giảm tần suất."
+    }
+  },
+  {
+    "text": "Làm sao để xóa tài khoản mạng xã hội đã liên kết với SmartGo?",
+    "type": "faq",
+    "metadata": {
+      "group": "account_management",
+      "intent": "unlink_social",
+      "question": "Hủy liên kết mạng xã hội?",
+      "answer": "Vào Cài đặt -> Tài khoản -> Các liên kết -> Nhấn 'Hủy' bên cạnh biểu tượng Facebook hoặc Google."
+    }
+  },
+  {
+    "text": "Tôi muốn đổi nhạc chuông báo thức điểm dừng của app?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_customization",
+      "intent": "change_alarm_sound",
+      "question": "Đổi nhạc chuông báo thức?",
+      "answer": "Hiện app chỉ hỗ trợ nhạc chuông mặc định của hệ thống. Chúng tôi sẽ thêm tính năng chọn nhạc riêng trong bản cập nhật tới."
+    }
+  },
+  {
+    "text": "Làm thế nào để biết một tuyến xe buýt đang tạm ngừng hoạt động?",
+    "type": "faq",
+    "metadata": {
+      "group": "traffic_info",
+      "intent": "suspended_route",
+      "question": "Tuyến xe tạm ngừng?",
+      "answer": "Các tuyến xe tạm ngừng sẽ hiển thị màu xám và có nhãn 'Tạm ngưng' trong danh sách tìm kiếm."
+    }
+  },
+  {
+    "text": "Tại sao app yêu cầu quyền truy cập vào Bluetooth?",
+    "type": "faq",
+    "metadata": {
+      "group": "technical_issue",
+      "intent": "bluetooth_permission",
+      "question": "Quyền Bluetooth dùng làm gì?",
+      "answer": "Bluetooth được dùng để kết nối với các thiết bị Beacon tại trạm nhằm xác định vị trí chính xác hơn khi GPS yếu."
+    }
+  },
+  {
+    "text": "Tôi có thể xem lại các thông báo đã bỏ lỡ không?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "notification_history",
+      "question": "Xem lại thông báo?",
+      "answer": "Có, bạn nhấn vào biểu tượng 'Quả chuông' ở góc trên trang chủ để xem lại toàn bộ lịch sử thông báo."
+    }
+  },
+  {
+    "text": "Tôi bị say xe, app có gợi ý tuyến đường ít cua quẹo nhất không?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "motion_sickness_mode",
+      "question": "Lộ trình cho người say xe?",
+      "answer": "Bạn có thể chọn ưu tiên 'Lộ trình thẳng nhất' trong phần bộ lọc để giảm bớt các đoạn rẽ liên tục."
+    }
+  },
+  {
+    "text": "Làm sao để biết thời gian xe buýt cuối cùng trong ngày?",
+    "type": "faq",
+    "metadata": {
+      "group": "vehicle_info",
+      "intent": "last_bus_time",
+      "question": "Chuyến xe cuối cùng?",
+      "answer": "Trong bảng giờ chạy của mỗi tuyến, giờ xuất bến cuối cùng được in đậm và có màu đỏ để bạn lưu ý."
+    }
+  },
+  {
+    "text": "App có hỗ trợ chuyển tiền giữa các ví người dùng SmartGo không?",
+    "type": "faq",
+    "metadata": {
+      "group": "payment",
+      "intent": "p2p_transfer",
+      "question": "Chuyển tiền giữa người dùng?",
+      "answer": "Hiện tại chưa có tính năng chuyển tiền mặt, bạn chỉ có thể chuyển 'Điểm thưởng' hoặc tặng vé xe."
+    }
+  },
+  {
+    "text": "Tôi muốn báo cáo ứng dụng bị lỗi chính tả hoặc dịch sai?",
+    "type": "faq",
+    "metadata": {
+      "group": "customer_feedback",
+      "intent": "report_typo",
+      "question": "Báo lỗi nội dung?",
+      "answer": "Hãy chụp ảnh màn hình và gửi vào mục 'Góp ý nội dung'. Chúng tôi rất trân trọng sự giúp đỡ của bạn."
+    }
+  },
+  {
+    "text": "Làm sao để tắt hiển thị các quảng cáo xung quanh trạm xe?",
+    "type": "faq",
+    "metadata": {
+      "group": "membership",
+      "intent": "remove_ads",
+      "question": "Tắt quảng cáo?",
+      "answer": "Bạn có thể nâng cấp lên tài khoản Premium để có trải nghiệm hoàn toàn không quảng cáo."
+    }
+  },
+  {
+    "text": "App có hiển thị số điện thoại của tài xế không?",
+    "type": "faq",
+    "metadata": {
+      "group": "security_privacy",
+      "intent": "driver_contact",
+      "question": "SĐT tài xế?",
+      "answer": "Vì lý do bảo mật, app không hiển thị SĐT tài xế. Bạn hãy liên hệ qua tổng đài nhà xe nếu có việc khẩn cấp."
+    }
+  },
+  {
+    "text": "Tôi có thể lưu bản đồ lộ trình thành tệp PDF để in ra không?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "export_route_pdf",
+      "question": "Xuất PDF lộ trình?",
+      "answer": "Có, trong phần chi tiết lộ trình, nhấn biểu tượng 'Chia sẻ' -> 'Lưu thành PDF' để in ra nếu cần."
+    }
+  },
+  {
+    "text": "Làm thế nào để biết xe buýt có đang chở quá số người quy định không?",
+    "type": "faq",
+    "metadata": {
+      "group": "traffic_info",
+      "intent": "overcrowding_report",
+      "question": "Báo cáo xe quá tải?",
+      "answer": "Nếu thấy xe quá đông, bạn hãy dùng chức năng 'Đánh giá chuyến đi' và chọn nhãn 'Quá tải' để hệ thống ghi nhận."
+    }
+  },
+  {
+    "text": "Tôi muốn thay đổi đơn vị khoảng cách từ km sang mile?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_customization",
+      "intent": "change_units",
+      "question": "Đổi đơn vị đo lường?",
+      "answer": "Vào Cài đặt -> Đơn vị hiển thị -> Chọn Kilometers (km) hoặc Miles (mi)."
+    }
+  },
+  {
+    "text": "Làm sao để biết trạm xe buýt có camera an ninh không?",
+    "type": "faq",
+    "metadata": {
+      "group": "safety_privacy",
+      "intent": "station_security",
+      "question": "An ninh tại trạm?",
+      "answer": "Thông tin về việc trạm có camera giám sát thường được ghi chú trong phần 'Tiện ích trạm' để bạn yên tâm hơn khi đứng chờ đêm khuya."
+    }
+  },
+  {
+    "text": "Làm sao để đổi ngôn ngữ sang tiếng Anh?",
+    "type": "faq",
+    "metadata": {
+      "group": "user_settings",
+      "intent": "change_language",
+      "question": "Làm sao để đổi ngôn ngữ sang tiếng Anh?",
+      "answer": "Bạn vào mục 'Cài đặt' (biểu tượng bánh răng), chọn 'Ngôn ngữ' và chuyển sang 'Tiếng Anh' (English)."
+    }
+  },
+  {
+    "text": "App bị đứng hình khi đang load bản đồ thì làm thế nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "technical_support",
+      "intent": "app_freeze",
+      "question": "Ứng dụng bị treo khi tải bản đồ?",
+      "answer": "Bạn hãy thử xóa bộ nhớ đệm (cache) của app hoặc khởi động lại ứng dụng. Đảm bảo kết nối internet ổn định."
+    }
+  },
+  {
+    "text": "Tôi muốn nạp tiền vào ví SmartGo qua Momo được không?",
+    "type": "faq",
+    "metadata": {
+      "group": "payment",
+      "intent": "topup_method",
+      "question": "Nạp tiền qua ví điện tử?",
+      "answer": "Hiện tại SmartGo hỗ trợ nạp tiền qua Momo, ZaloPay và thẻ ngân hàng nội địa (Napas)."
+    }
+  },
+  {
+    "text": "Làm sao để lưu trạm xe buýt tôi hay đi vào danh sách yêu thích?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "save_favorite",
+      "question": "Cách lưu trạm yêu thích?",
+      "answer": "Tại màn hình thông tin trạm, bạn nhấn vào biểu tượng 'Ngôi sao' ở góc phải để lưu vào danh sách yêu thích."
+    }
+  },
+  {
+    "text": "Tôi để quên đồ trên xe buýt, app có hỗ trợ tìm lại không?",
+    "type": "faq",
+    "metadata": {
+      "group": "customer_service",
+      "intent": "lost_and_found",
+      "question": "Mất đồ trên xe buýt?",
+      "answer": "Bạn hãy vào mục 'Hỗ trợ' -> 'Báo mất đồ'. Gửi thông tin số xe, thời gian và mô tả món đồ để tổng đài hỗ trợ liên hệ nhà xe."
+    }
+  },
+  {
+    "text": "Tại sao thông báo xe sắp đến không kêu tiếng chuông?",
+    "type": "faq",
+    "metadata": {
+      "group": "technical_support",
+      "intent": "notification_issue",
+      "question": "Thông báo không có âm thanh?",
+      "answer": "Kiểm tra xem bạn đã cấp quyền thông báo và âm thanh cho SmartGo trong phần cài đặt của điện thoại chưa nhé."
+    }
+  },
+  {
+    "text": "Đăng ký tài khoản thành viên có quyền lợi gì?",
+    "type": "faq",
+    "metadata": {
+      "group": "membership",
+      "intent": "benefit_info",
+      "question": "Quyền lợi thành viên?",
+      "answer": "Thành viên sẽ được tích điểm đổi voucher, lưu lịch sử chuyến đi không giới hạn và nhận thông báo về các thay đổi lộ trình sớm nhất."
+    }
+  },
+  {
+    "text": "App có chế độ tối (Dark Mode) không?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "dark_mode",
+      "question": "Sử dụng chế độ tối?",
+      "answer": "Có, bạn vào Cài đặt -> Giao diện -> Chọn 'Chế độ tối' để bảo vệ mắt khi dùng app ban đêm."
+    }
+  },
+  {
+    "text": "Làm sao để góp ý về thái độ của tài xế?",
+    "type": "faq",
+    "metadata": {
+      "group": "customer_feedback",
+      "intent": "driver_complaint",
+      "question": "Khiếu nại tài xế?",
+      "answer": "Bạn có thể đánh giá chuyến đi ngay sau khi kết thúc hoặc vào mục 'Góp ý' để gửi phản hồi kèm biển số xe."
+    }
+  },
+  {
+    "text": "Tại sao bản đồ hiển thị vị trí của tôi không chính xác?",
+    "type": "faq",
+    "metadata": {
+      "group": "technical_support",
+      "intent": "gps_accuracy",
+      "question": "Sai lệch vị trí GPS?",
+      "answer": "Bạn cần bật 'Độ chính xác cao' trong cài đặt Vị trí của điện thoại và đảm bảo không đứng trong nhà cao tầng quá kín."
+    }
+  },
+  {
+    "text": "Tôi muốn chia sẻ lộ trình chuyến đi cho người thân xem?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "share_trip",
+      "question": "Chia sẻ chuyến đi?",
+      "answer": "Khi đang trong chuyến đi, nhấn nút 'Chia sẻ' để gửi link theo dõi trực tiếp cho bạn bè qua Zalo hoặc Messenger."
+    }
+  },
+  {
+    "text": "Làm thế nào để xóa lịch sử tìm kiếm?",
+    "type": "faq",
+    "metadata": {
+      "group": "user_settings",
+      "intent": "clear_history",
+      "question": "Xóa lịch sử tìm kiếm?",
+      "answer": "Trong thanh tìm kiếm, bạn chọn 'Xem tất cả lịch sử' rồi nhấn 'Xóa tất cả'."
+    }
+  },
+  {
+    "text": "Thẻ xe buýt thông minh có liên kết được với app không?",
+    "type": "faq",
+    "metadata": {
+      "group": "payment",
+      "intent": "card_linking",
+      "question": "Liên kết thẻ thông minh?",
+      "answer": "Được nhé! Bạn vào mục 'Ví của tôi' -> 'Liên kết thẻ' và quét mã QR trên thẻ vật lý."
+    }
+  },
+  {
+    "text": "App có nhắc tôi khi sắp đến trạm cần xuống không?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "arrival_alert",
+      "question": "Nhắc nhở xuống trạm?",
+      "answer": "Có, hãy bật tính năng 'Báo thức điểm dừng' khi bắt đầu lên xe, app sẽ rung và chuông khi bạn cách trạm 200m."
+    }
+  },
+  {
+    "text": "Làm sao để biết xe buýt có máy lạnh hay không?",
+    "type": "faq",
+    "metadata": {
+      "group": "vehicle_info",
+      "intent": "amenities",
+      "question": "Tiện nghi trên xe?",
+      "answer": "Trong phần thông tin tuyến xe, biểu tượng hoa tuyết hiển thị các xe có trang bị máy lạnh."
+    }
+  },
+  {
+    "text": "Tôi có thể xem lịch trình xe buýt cho ngày mai không?",
+    "type": "faq",
+    "metadata": {
+      "group": "planning",
+      "intent": "future_schedule",
+      "question": "Xem lịch trình tương lai?",
+      "answer": "Có, bạn chọn biểu tượng lịch ở phần tìm kiếm lộ trình và chọn ngày/giờ mong muốn để xem dự báo."
+    }
+  },
+  {
+    "text": "Tại sao tôi không nhận được mã OTP khi đăng ký?",
+    "type": "faq",
+    "metadata": {
+      "group": "technical_support",
+      "intent": "otp_issue",
+      "question": "Không nhận được OTP?",
+      "answer": "Hãy kiểm tra xem số điện thoại nhập đúng chưa, hoặc chờ 60s để nhấn 'Gửi lại'. Đôi khi do nghẽn mạng viễn thông."
+    }
+  },
+  {
+    "text": "App có hỗ trợ tìm đường cho người đi xe đạp không?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "bicycle_mode",
+      "question": "Chế độ xe đạp?",
+      "answer": "SmartGo hiện tập trung vào xe buýt và đi bộ. Lộ trình kết hợp xe đạp sẽ được cập nhật trong tương lai."
+    }
+  },
+  {
+    "text": "Tôi muốn đổi ảnh đại diện tài khoản thì làm thế nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "user_settings",
+      "intent": "change_avatar",
+      "question": "Đổi ảnh đại diện?",
+      "answer": "Vào 'Cá nhân' -> Nhấn vào hình tròn ảnh đại diện hiện tại -> Chọn ảnh từ thư viện máy."
+    }
+  },
+  {
+    "text": "Làm sao để biết giá vé của một tuyến xe?",
+    "type": "faq",
+    "metadata": {
+      "group": "vehicle_info",
+      "intent": "fare_info",
+      "question": "Thông tin giá vé?",
+      "answer": "Thông tin giá vé (vé lượt, vé tập) luôn hiển thị chi tiết trong phần 'Thông tin tuyến'."
+    }
+  },
+  {
+    "text": "Giao diện mới khó dùng quá, làm sao để quay lại bản cũ?",
+    "type": "faq",
+    "metadata": {
+      "group": "customer_feedback",
+      "intent": "version_rollback",
+      "question": "Quay lại bản cũ?",
+      "answer": "Rất tiếc chúng tôi không hỗ trợ hạ cấp phiên bản. Bạn có thể xem video hướng dẫn ở mục 'Trợ giúp' để làm quen giao diện mới."
+    }
+  },
+  {
+    "text": "Tại sao app yêu cầu quyền truy cập Danh bạ?",
+    "type": "faq",
+    "metadata": {
+      "group": "security",
+      "intent": "permission_reason",
+      "question": "Quyền truy cập danh bạ?",
+      "answer": "Quyền này giúp bạn dễ dàng tìm kiếm và chia sẻ vị trí hoặc tặng vé xe cho bạn bè trong danh bạ nhanh hơn."
+    }
+  },
+  {
+    "text": "Tôi có thể mua vé tháng trực tuyến trên SmartGo không?",
+    "type": "faq",
+    "metadata": {
+      "group": "payment",
+      "intent": "monthly_ticket",
+      "question": "Mua vé tháng online?",
+      "answer": "Có, bạn vào mục 'Vé của tôi' -> 'Đăng ký vé tháng'. Sau khi thanh toán, vé sẽ được lưu dưới dạng mã QR."
+    }
+  },
+  {
+    "text": "Làm sao để tắt thông báo khuyến mãi?",
+    "type": "faq",
+    "metadata": {
+      "group": "user_settings",
+      "intent": "disable_promo_notif",
+      "question": "Tắt thông báo khuyến mãi?",
+      "answer": "Vào Cài đặt -> Thông báo -> Gạt tắt mục 'Tin tức & Khuyến mãi'."
+    }
+  },
+  {
+    "text": "App có tốn nhiều pin khi chạy ngầm không?",
+    "type": "faq",
+    "metadata": {
+      "group": "technical_support",
+      "intent": "battery_usage",
+      "question": "Mức tiêu thụ pin?",
+      "answer": "SmartGo đã được tối ưu hóa. Tuy nhiên, nếu bạn bật định vị liên tục khi chạy ngầm, pin sẽ tiêu tốn khoảng 3-5% mỗi giờ."
+    }
+  },
+  {
+    "text": "Làm sao để đánh giá 5 sao cho ứng dụng?",
+    "type": "faq",
+    "metadata": {
+      "group": "customer_feedback",
+      "intent": "rate_app",
+      "question": "Đánh giá ứng dụng?",
+      "answer": "Bạn có thể vào App Store hoặc Google Play tìm SmartGo và để lại đánh giá cùng nhận xét của mình nhé. Cảm ơn bạn!"
+    }
+  },
+  {
+    "text": "Tôi muốn xóa tài khoản SmartGo vĩnh viễn?",
+    "type": "faq",
+    "metadata": {
+      "group": "user_settings",
+      "intent": "delete_account",
+      "question": "Xóa tài khoản?",
+      "answer": "Vào Cài đặt -> Tài khoản và bảo mật -> Xóa tài khoản. Lưu ý hành động này không thể hoàn tác và bạn sẽ mất điểm tích lũy."
+    }
+  },
+  {
+    "text": "Tìm kiếm trạm bằng giọng nói như thế nào?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "voice_search",
+      "question": "Tìm kiếm giọng nói?",
+      "answer": "Nhấn vào biểu tượng 'Micro' ở cuối thanh tìm kiếm và nói tên địa danh hoặc số tuyến xe bạn muốn tìm."
+    }
+  },
+  {
+    "text": "Làm sao để xem bản đồ ngoại tuyến (offline)?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "offline_map",
+      "question": "Bản đồ ngoại tuyến?",
+      "answer": "Vào Cài đặt -> Tải bản đồ ngoại tuyến. Bạn có thể tra cứu lộ trình cơ bản mà không cần mạng."
+    }
+  },
+  {
+    "text": "Có cách nào để biết xe buýt có đang bị kẹt xe không?",
+    "type": "faq",
+    "metadata": {
+      "group": "traffic_info",
+      "intent": "traffic_status",
+      "question": "Tình trạng kẹt xe?",
+      "answer": "Các tuyến đường trên bản đồ có màu đỏ biểu thị tình trạng kẹt xe nặng, giúp bạn chủ động thời gian."
+    }
+  },
+  {
+    "text": "Tại sao tôi không thể quét mã QR khi lên xe?",
+    "type": "faq",
+    "metadata": {
+      "group": "technical_support",
+      "intent": "qr_scan_issue",
+      "question": "Lỗi quét mã QR?",
+      "answer": "Đảm bảo camera sạch, đủ ánh sáng và bạn đã cấp quyền sử dụng Camera cho ứng dụng."
+    }
+  },
+  {
+    "text": "Làm sao để nhận biết xe buýt điện?",
+    "type": "faq",
+    "metadata": {
+      "group": "vehicle_info",
+      "intent": "electric_bus",
+      "question": "Nhận biết xe điện?",
+      "answer": "Các tuyến xe điện (như VinBus) sẽ có biểu tượng tia sét xanh lá cây trên bản đồ để bạn nhận diện."
+    }
+  },
+  {
+    "text": "Tôi muốn xem lại các chuyến xe đã đi trong tháng này?",
+    "type": "faq",
+    "metadata": {
+      "group": "membership",
+      "intent": "trip_history",
+      "question": "Xem lịch sử chuyến đi?",
+      "answer": "Vào mục 'Cá nhân' -> 'Lịch sử di chuyển' để xem chi tiết các chuyến bạn đã thực hiện."
+    }
+  },
+  {
+    "text": "App có hiển thị số chỗ ngồi còn trống không?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "seat_availability",
+      "question": "Chỗ ngồi trống?",
+      "answer": "Một số tuyến xe mới có hỗ trợ cảm biến sẽ hiển thị biểu tượng người (Xanh: vắng, Vàng: vừa, Đỏ: đông)."
+    }
+  },
+  {
+    "text": "Làm sao để bật Widget SmartGo ngoài màn hình chính?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "widget_setup",
+      "question": "Cài đặt Widget?",
+      "answer": "Nhấn giữ màn hình chính điện thoại -> Chọn Widget -> Tìm SmartGo -> Kéo widget tra cứu nhanh ra màn hình."
+    }
+  },
+  {
+    "text": "Tôi bị trừ tiền 2 lần cho 1 lần quét mã, phải làm sao?",
+    "type": "faq",
+    "metadata": {
+      "group": "payment",
+      "intent": "double_charge",
+      "question": "Bị trừ tiền 2 lần?",
+      "answer": "Vui lòng gửi ảnh chụp màn hình lịch sử giao dịch vào mục 'Hỗ trợ khách hàng', chúng tôi sẽ hoàn tiền trong 24h."
+    }
+  },
+  {
+    "text": "Làm sao để xem danh sách các tuyến xe buýt đêm?",
+    "type": "faq",
+    "metadata": {
+      "group": "vehicle_info",
+      "intent": "night_bus",
+      "question": "Tuyến xe buýt đêm?",
+      "answer": "Trong bộ lọc tìm kiếm, bạn chọn 'Tuyến chạy đêm' để thấy các xe hoạt động sau 21:00."
+    }
+  },
+  {
+    "text": "Tôi muốn đổi mật khẩu đăng nhập?",
+    "type": "faq",
+    "metadata": {
+      "group": "user_settings",
+      "intent": "change_password",
+      "question": "Đổi mật khẩu?",
+      "answer": "Vào Cài đặt -> Tài khoản & Bảo mật -> Đổi mật khẩu. Bạn cần nhập mật khẩu cũ để xác nhận."
+    }
+  },
+  {
+    "text": "SmartGo có bản dành cho đồng hồ thông minh (Smartwatch) không?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "smartwatch_support",
+      "question": "Hỗ trợ Smartwatch?",
+      "answer": "Hiện tại SmartGo đã có phiên bản rút gọn cho Apple Watch và WearOS để xem giờ xe đến nhanh."
+    }
+  },
+  {
+    "text": "Làm sao để biết trạm xe buýt có mái che không?",
+    "type": "faq",
+    "metadata": {
+      "group": "ux_features",
+      "intent": "station_amenities",
+      "question": "Tiện ích tại trạm?",
+      "answer": "Nhấn vào tên trạm trên bản đồ, phần mô tả sẽ hiển thị hình ảnh thực tế và các tiện ích (mái che, ghế ngồi, bảng điện tử)."
+    }
+  }
+]
