@@ -10,11 +10,11 @@ export default registerAs(
                 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1',
             chatModel: process.env.DASHSCOPE_CHAT_MODEL ?? 'qwen3.5-35b-a3b',
             embeddingModel:
-                process.env.DASHSCOPE_EMBEDDING_MODEL ?? 'text-embedding-v4',
+                process.env.DASHSCOPE_EMBEDDING_MODEL ?? 'text-embedding-v3',
             embeddingDimension: Number(
                 process.env.DASHSCOPE_EMBEDDING_DIMENSION ?? 1536,
             ),
-            maxNewTokens: Number(process.env.DASHSCOPE_MAX_NEW_TOKENS ?? 1024),
+            maxNewTokens: Number(process.env.DASHSCOPE_MAX_NEW_TOKENS ?? 640),
             temperature: Number(process.env.DASHSCOPE_TEMPERATURE ?? 0.7),
             enableThinking:
                 (process.env.DASHSCOPE_ENABLE_THINKING ?? 'false') === 'true',

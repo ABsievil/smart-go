@@ -62,7 +62,7 @@ export class DashScopeService implements OnModuleInit {
 
     /**
      * @description Sinh embedding vector cho một đoạn văn bản.
-     * Sử dụng DashScope OpenAI-compatible endpoint với model text-embedding-v4.
+     * Sử dụng DashScope OpenAI-compatible endpoint với embedding model.
      */
     async generateEmbedding(text: string): Promise<number[]> {
         if (!text?.trim()) {

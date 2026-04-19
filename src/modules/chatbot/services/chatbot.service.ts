@@ -47,7 +47,7 @@ export class ChatbotService {
      * sau đó gọi LLM Model để sinh câu trả lời.
      *
      * **Luồng xử lý:**
-     * 1. Embed tin nhắn thành vector bằng text-embedding-v4
+     * 1. Embed tin nhắn thành vector bằng embedding model
      * 2. Tìm kiếm tài liệu liên quan trong Zilliz (có lọc score)
      * 3. Gắn context vào system prompt
      * 4. Gọi LLM model để sinh câu trả lời
@@ -69,13 +69,13 @@ export class ChatbotService {
             type: d.type,
             metadata: d.metadata ?? {},
         }));
-        this.logger.debug(
-            `RAG ${contextDocs.length} hit(s)\n${JSON.stringify(ragHits, null, 2)}`,
-        );
+        // this.logger.debug(
+        //     `RAG ${contextDocs.length} hit(s)\n${JSON.stringify(ragHits, null, 2)}`,
+        // );
 
         const enrichedSystemPrompt =
             this.buildSystemPromptWithContext(contextDocs);
-        this.logger.debug(`Enriched system prompt: ${enrichedSystemPrompt}`);
+        // this.logger.debug(`Enriched system prompt: ${enrichedSystemPrompt}`);
 
         const messages = this.buildMessageHistory(history, message);
 
