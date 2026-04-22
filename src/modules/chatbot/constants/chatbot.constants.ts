@@ -18,6 +18,9 @@ export const ZILLIZ_DEFAULT_MIN_SCORE = 0.35;
 // ─── Chat ─────────────────────────────────────────────────────────────────────
 export const CHAT_MAX_HISTORY_TURNS = 5;
 
+/** Số tin nhắn (user + assistant) tối đa đưa vào context LLM / cache / query Mongo */
+export const CHAT_HISTORY_MESSAGE_LIMIT = CHAT_MAX_HISTORY_TURNS * 2;
+
 // ─── Timeout ──────────────────────────────────────────────────────────────────
 export const EMBED_FILE_TIMEOUT_MS = 30 * 60 * 1000; // 30 phút — batch embed nhiều items
 
@@ -57,6 +60,7 @@ export const EMBEDDING_API_BATCH_LIMIT = 10;
 // khi format key hoặc payload thay đổi mà không cần flush Redis thủ công.
 export const CACHE_KEY_EMBEDDING_PREFIX = 'chatbot:emb:v1:';
 export const CACHE_KEY_REPLY_PREFIX = 'chatbot:reply:v1:';
+export const CACHE_KEY_HISTORY_PREFIX = 'chatbot:hist:v1:';
 
 // ─── Streaming ────────────────────────────────────────────────────────────────
 // Tên các SSE event emit cho client khi streaming chat reply.

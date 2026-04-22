@@ -19,7 +19,7 @@ import { ChatResponseDto } from '@modules/chatbot/dtos/response/chat.response.dt
 import { EmbedGetResponseDto } from '@modules/chatbot/dtos/response/embed-get.response.dto';
 import { EmbedListResponseDto } from '@modules/chatbot/dtos/response/embed-list.response.dto';
 import {
-    CHAT_MAX_HISTORY_TURNS,
+    CHAT_HISTORY_MESSAGE_LIMIT,
     CHATBOT_SYSTEM_PROMPT,
     CHATBOT_SYSTEM_PROMPT_WITH_CONTEXT,
 } from '@modules/chatbot/constants/chatbot.constants';
@@ -93,15 +93,15 @@ export class ChatbotService {
             this.contextLimit,
         );
 
-        // this.logger.debug(
-        //     `RAG ${contextDocs.length} hit(s)\n${JSON.stringify(ragHits, null, 2)}`,
-        // );
+        this.logger.debug(
+            `RAG ${contextDocs.length} hit(s)\n${JSON.stringify(contextDocs, null, 2)}`,
+        );
         const enrichedSystemPrompt =
             this.buildSystemPromptWithContext(contextDocs);
-        // this.logger.debug(`Enriched system prompt: ${enrichedSystemPrompt}`);
+        this.logger.debug(`Enriched system prompt: ${enrichedSystemPrompt}`);
 
         const messages = this.buildMessageHistory(history, message);
-
+        this.logger.debug(`Messages: ${JSON.stringify(messages, null, 2)}`);
         const reply = await this.dashScopeService.chatCompletion(
             messages,
             enrichedSystemPrompt,
@@ -377,7 +377,7 @@ export class ChatbotService {
         history: ChatHistoryItemDto[],
         currentMessage: string,
     ): IChatMessage[] {
-        const trimmedHistory = history.slice(-CHAT_MAX_HISTORY_TURNS * 2);
+        const trimmedHistory = history.slice(-CHAT_HISTORY_MESSAGE_LIMIT);
 
         return [
             ...trimmedHistory.map((item) => ({

@@ -20,8 +20,8 @@ import {
 } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
 import { ChatbotService } from '@modules/chatbot/services/chatbot.service';
+import { ChatbotCacheService } from '@modules/chatbot/services/chatbot-cache.service';
 import { MessageService } from '@modules/messages/services/message.service';
-import { messagesToChatHistoryItems } from '@modules/chatbot/utils/message-to-chat-history.util';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { ChatRequestDto } from '@modules/chatbot/dtos/request/chat.request.dto';
 import { EmbedRequestDto } from '@modules/chatbot/dtos/request/embed.request.dto';
@@ -56,6 +56,7 @@ export class ChatbotController {
 
     constructor(
         private readonly chatbotService: ChatbotService,
+        private readonly chatbotCache: ChatbotCacheService,
         private readonly messageService: MessageService,
     ) {}
 
@@ -70,7 +71,7 @@ export class ChatbotController {
         description: `
 Gửi tin nhắn và nhận câu trả lời từ AI Assistant với hỗ trợ RAG (Retrieval-Augmented Generation).
 **Hỗ trợ:**
-- Lịch sử cuộc trò chuyện theo \`conversationId\` (tối đa ${CHAT_MAX_HISTORY_TURNS} lượt, lấy từ DB)
+- Lịch sử cuộc trò chuyện theo \`conversationId\` (tối đa ${CHAT_MAX_HISTORY_TURNS} lượt; ưu tiên Redis snapshot, miss thì Mongo)
 - RAG từ knowledge base (tuyến, trạm, FAQ)
 - Lưu tin người dùng và câu trả lời bot vào DB; response trả về \`conversationId\` (hội thoại mới được tạo UUID nếu chưa gửi)
         `,
@@ -90,22 +91,15 @@ Gửi tin nhắn và nhận câu trả lời từ AI Assistant với hỗ trợ 
         const providedCid = dto.conversationId?.trim();
         const conversationId = providedCid || randomUUID();
 
-        const historyPromise: Promise<
-            ReturnType<typeof messagesToChatHistoryItems>
-        > = providedCid
-            ? this.messageService
-                  .findLatestByConversation(
-                      providedCid,
-                      userId,
-                      CHAT_MAX_HISTORY_TURNS * 2,
-                  )
-                  .then((msgs) => messagesToChatHistoryItems(msgs))
-            : Promise.resolve([]);
+        const historyPromise =
+            this.chatbotCache.loadConversationHistory(userId, providedCid);
 
         const result = await this.chatbotService.chat(
             dto.message,
             historyPromise,
         );
+
+        const priorHistory = await historyPromise;
 
         // Lưu cặp tin nhắn (user + bot) trong MỘT round-trip Mongo,
         // non-blocking để không kéo dài latency trả response về client.
@@ -124,6 +118,15 @@ Gửi tin nhắn và nhận câu trả lời từ AI Assistant với hỗ trợ 
                     content: result.reply,
                 } as MessageCreateRequestDto,
             ])
+            .then(() =>
+                this.chatbotCache.appendTurnToHistoryCache(
+                    userId,
+                    conversationId,
+                    priorHistory,
+                    dto.message,
+                    result.reply,
+                ),
+            )
             .catch((err) => {
                 const msg = err instanceof Error ? err.message : String(err);
                 this.logger.error(
@@ -211,17 +214,8 @@ DashScope ngay lập tức (không tốn thêm token).
         const providedCid = rawConversationId?.trim();
         const conversationId = providedCid || randomUUID();
 
-        const historyPromise: Promise<
-            ReturnType<typeof messagesToChatHistoryItems>
-        > = providedCid
-            ? this.messageService
-                  .findLatestByConversation(
-                      providedCid,
-                      userId,
-                      CHAT_MAX_HISTORY_TURNS * 2,
-                  )
-                  .then((msgs) => messagesToChatHistoryItems(msgs))
-            : Promise.resolve([]);
+        const historyPromise =
+            this.chatbotCache.loadConversationHistory(userId, providedCid);
 
         return new Observable<MessageEvent>((subscriber) => {
             // Abort signal được teardown handler kích hoạt khi client
@@ -290,6 +284,7 @@ DashScope ngay lập tức (không tốn thêm token).
                     // Chỉ persist khi thực sự có reply và không bị client
                     // abort giữa chừng — tránh lưu reply half-baked.
                     if (fullReply && !abort.signal.aborted) {
+                        const priorHistory = await historyPromise;
                         void this.messageService
                             .createMany([
                                 {
@@ -305,6 +300,15 @@ DashScope ngay lập tức (không tốn thêm token).
                                     content: fullReply,
                                 } as MessageCreateRequestDto,
                             ])
+                            .then(() =>
+                                this.chatbotCache.appendTurnToHistoryCache(
+                                    userId,
+                                    conversationId,
+                                    priorHistory,
+                                    message,
+                                    fullReply,
+                                ),
+                            )
                             .catch((dbErr) => {
                                 const dbMsg =
                                     dbErr instanceof Error
