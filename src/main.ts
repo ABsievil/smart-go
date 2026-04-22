@@ -9,6 +9,8 @@ import { LanguageExceptionFilter } from '@common/language/filters/language-excep
 import { Response } from 'express';
 
 async function bootstrap() {
+    process.env.TZ = process.env.APP_TIMEZONE ?? 'Asia/Ho_Chi_Minh';
+
     const app = await NestFactory.create(AppModule, { bufferLogs: true });
     app.useLogger(app.get(AppLogger));
 
@@ -62,7 +64,9 @@ async function bootstrap() {
         res.redirect(`/${swaggerPath}`);
     });
 
-    logger.log(`Listening on ${host}:${port} (tz=${timezone}, lang=${language})`);
+    logger.log(
+        `Listening on ${host}:${port} (tz=${timezone}, lang=${language})`,
+    );
 
     await app.listen(port, host);
 }
