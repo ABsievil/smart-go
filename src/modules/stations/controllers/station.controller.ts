@@ -25,6 +25,8 @@ import { StationCreateRequestDto } from '@modules/stations/dtos/request/station-
 import { StationUpdateRequestDto } from '@modules/stations/dtos/request/station-update.request.dto';
 import { StationGetResponseDto } from '@modules/stations/dtos/response/station-get.response.dto';
 import { StationListResponseDto } from '@modules/stations/dtos/response/station-list.response.dto';
+import { OrderDirection } from '@common/database/enums/order-direction.enum';
+import { STATION_SEARCH_FIELDS } from '@modules/stations/constants/station.constant';
 
 @ApiTags('Stations')
 @Controller('stations')
@@ -40,6 +42,19 @@ export class StationController {
     @ApiOperation({ summary: 'Get all stations' })
     @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
     @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+    @ApiQuery({
+        name: 'search',
+        required: false,
+        type: String,
+        description: 'Search in stationCode, stationName',
+    })
+    @ApiQuery({ name: 'orderBy', required: false, type: String })
+    @ApiQuery({
+        name: 'orderDirection',
+        required: false,
+        enum: OrderDirection,
+        description: 'Sort direction: asc or desc',
+    })
     @ApiResponse({
         status: 200,
         description: 'List of stations',
@@ -49,12 +64,26 @@ export class StationController {
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
         @Query() query: Record<string, any>,
+        @Query('search') search?: string,
+        @Query('orderBy') orderBy?: string,
+        @Query('orderDirection') orderDirection?: string,
     ): Promise<StationListResponseDto> {
-        const { page: _, limit: __, ...filter } = query;
+        const {
+            page: _,
+            limit: __,
+            search: _s,
+            orderBy: _o,
+            orderDirection: _od,
+            ...filter
+        } = query;
         const { data, total } = await this.stationService.findAll(
             filter,
             page,
             limit,
+            orderBy,
+            orderDirection as OrderDirection,
+            search,
+            STATION_SEARCH_FIELDS,
         );
 
         return {

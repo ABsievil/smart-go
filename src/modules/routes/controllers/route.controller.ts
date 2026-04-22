@@ -27,6 +27,12 @@ import { RouteUpdateRequestDto } from '@modules/routes/dtos/request/route-update
 import { RouteGetResponseDto } from '@modules/routes/dtos/response/route-get.response.dto';
 import { RouteListResponseDto } from '@modules/routes/dtos/response/route-list.response.dto';
 import { RouteSummaryResponseDto } from '@modules/routes/dtos/response/route-summary.response.dto';
+import {
+    ROUTE_NAME_INBOUND_PREFIX,
+    ROUTE_NAME_OUTBOUND_PREFIX,
+    ROUTE_SEARCH_FIELDS,
+} from '@modules/routes/constants/route.constant';
+import { OrderDirection } from '@common/database/enums/order-direction.enum';
 
 @ApiTags('Routes')
 @Controller('routes')
@@ -45,6 +51,34 @@ export class RouteController {
     @ApiOperation({ summary: 'Get all routes' })
     @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
     @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+    @ApiQuery({ name: 'orderBy', required: false, type: String })
+    @ApiQuery({
+        name: 'orderDirection',
+        required: false,
+        enum: OrderDirection,
+        description: 'Sort direction: asc or desc',
+    })
+    @ApiQuery({ name: 'routeCode', required: false, type: String })
+    @ApiQuery({
+        name: 'search',
+        required: false,
+        type: String,
+        description: 'Search in routeCode, routeName, routeVarShortName',
+    })
+    @ApiQuery({
+        name: 'isOutbound',
+        required: false,
+        type: Boolean,
+        description:
+            'Filter by direction: true = outbound (lượt đi), false = inbound (lượt về)',
+    })
+    @ApiQuery({
+        name: 'stripRouteNamePrefix',
+        required: false,
+        type: Boolean,
+        description:
+            'When true, strips "Lượt đi:" and "Lượt về:" prefixes from routeName',
+    })
     @ApiResponse({
         status: 200,
         description: 'List of routes',
@@ -54,14 +88,39 @@ export class RouteController {
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
         @Query() query: Record<string, any>,
+        @Query('orderBy') orderBy?: string,
+        @Query('orderDirection') orderDirection?: string,
         @Query('routeCode') routeCode?: string,
+        @Query('search') search?: string,
+        @Query('isOutbound') isOutboundRaw?: string,
+        @Query('stripRouteNamePrefix') stripRoutePrefixRaw?: string,
     ): Promise<any> {
-        const { page: _, limit: __, ...filter } = query;
-        const find = routeCode ? { ...filter, routeCode } : filter;
+        const {
+            page: _,
+            limit: __,
+            orderBy: _o,
+            orderDirection: _od,
+            search: _s,
+            isOutbound: _io,
+            stripRouteNamePrefix: _srp,
+            ...filter
+        } = query;
+
+        const isOutbound =
+            isOutboundRaw !== undefined ? isOutboundRaw === 'true' : undefined;
+        const stripRouteNamePrefix = stripRoutePrefixRaw === 'true';
+
+        if (routeCode) filter.routeCode = routeCode;
+        if (isOutbound !== undefined) filter.isOutbound = isOutbound;
+
         const { data, total } = await this.routeService.findAll(
-            find,
+            filter,
             page,
             limit,
+            orderBy,
+            orderDirection as OrderDirection,
+            search,
+            ROUTE_SEARCH_FIELDS,
         );
 
         const allStationIds = Array.from(
@@ -71,11 +130,27 @@ export class RouteController {
             _id: { $in: allStationIds },
         });
 
+        let routes = this.routeService.mapList(data);
+        if (stripRouteNamePrefix) {
+            routes = routes.map((route) => ({
+                ...route,
+                routeName: route.routeName
+                    ?.replace(
+                        new RegExp(
+                            `^(${ROUTE_NAME_OUTBOUND_PREFIX}|${ROUTE_NAME_INBOUND_PREFIX})\\s*`,
+                            'i',
+                        ),
+                        '',
+                    )
+                    .trim(),
+            }));
+        }
+
         return {
             total,
             page,
             limit,
-            routes: this.routeService.mapList(data),
+            routes,
             stations: this.stationService.mapList(stations),
         };
     }
