@@ -7,6 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { LanguageResponseInterceptor } from '@common/language/interceptors/language-response.interceptor';
 import { LanguageExceptionFilter } from '@common/language/filters/language-exception.filter';
 import { Response } from 'express';
+import { ResponseEncryptionInterceptor } from '@common/encryption/interceptors/response-encryption.interceptor';
 
 async function bootstrap() {
     process.env.TZ = process.env.APP_TIMEZONE ?? 'Asia/Ho_Chi_Minh';
@@ -39,8 +40,11 @@ async function bootstrap() {
         defaultVersion: apiVersion,
     });
 
-    // Register global language response interceptor
-    app.useGlobalInterceptors(app.get(LanguageResponseInterceptor));
+    // Register global interceptors
+    app.useGlobalInterceptors(
+        app.get(ResponseEncryptionInterceptor),
+        app.get(LanguageResponseInterceptor),
+    );
 
     // Register global language exception filter
     app.useGlobalFilters(app.get(LanguageExceptionFilter));
