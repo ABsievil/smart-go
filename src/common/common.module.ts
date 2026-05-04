@@ -8,6 +8,7 @@ import vnpayConfig from '@common/configs/vnpay.config';
 import cloudinaryConfig from '@common/configs/cloudinary.config';
 import redisConfig from '@common/configs/redis.config';
 import chatbotConfig from '@common/configs/chatbot.config';
+import encryptionConfig from '@common/configs/encryption.config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DB_CONNECTION_NAME } from '@common/database/constants/database.constant';
 import { set } from 'mongoose';
@@ -16,6 +17,7 @@ import { LanguageModule } from '@common/language/language.module';
 import { UploadModule } from '@common/upload/upload.module';
 import { RedisModule } from '@common/redis/redis.module';
 import { DatabaseModule } from '@common/database/database.module';
+import { EncryptionModule } from '@common/encryption/encryption.module';
 
 @Global()
 @Module({
@@ -36,8 +38,10 @@ import { DatabaseModule } from '@common/database/database.module';
                 cloudinaryConfig,
                 redisConfig,
                 chatbotConfig,
+                encryptionConfig,
             ],
         }),
+        EncryptionModule,
         LoggerModule,
         MongooseModule.forRootAsync({
             imports: [ConfigModule],

@@ -7,7 +7,11 @@ import {
     IsArray,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { TransportType, RouteStatus } from '@modules/routes/enums/route.enum';
+import {
+    TransportType,
+    RouteStatus,
+    RouteType,
+} from '@modules/routes/enums/route.enum';
 
 export class RouteCreateRequestDto {
     @ApiPropertyOptional({ description: 'Route key' })
@@ -62,6 +66,15 @@ export class RouteCreateRequestDto {
     @ApiProperty({ description: 'Transport type', enum: TransportType })
     @IsEnum(TransportType)
     transportType: TransportType;
+
+    @ApiPropertyOptional({
+        description: 'Route mode (bus / metro / waterbus)',
+        enum: RouteType,
+        default: RouteType.BUS,
+    })
+    @IsOptional()
+    @IsEnum(RouteType)
+    routeType?: RouteType;
 
     @ApiPropertyOptional({ description: 'Total distance in km', example: 8.59 })
     @IsOptional()

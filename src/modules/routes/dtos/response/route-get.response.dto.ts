@@ -1,7 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Expose } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer';
 import { BaseResponseDto } from '@common/dtos/base-response.dto';
-import { TransportType, RouteStatus } from '@modules/routes/enums/route.enum';
+import {
+    TransportType,
+    RouteStatus,
+    RouteType,
+} from '@modules/routes/enums/route.enum';
 
 export class RouteGetResponseDto extends BaseResponseDto {
     @ApiPropertyOptional({ description: 'Route key' })
@@ -43,6 +47,15 @@ export class RouteGetResponseDto extends BaseResponseDto {
     @ApiProperty({ description: 'Transport type', enum: TransportType })
     @Expose()
     transportType: TransportType;
+
+    @ApiProperty({
+        description: 'Route mode (bus / metro / waterbus)',
+        enum: RouteType,
+        default: RouteType.BUS,
+    })
+    @Expose()
+    @Transform(({ obj }) => obj.routeType ?? RouteType.BUS)
+    routeType: RouteType;
 
     @ApiPropertyOptional({ description: 'Total distance in km' })
     @Expose()

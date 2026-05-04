@@ -1,0 +1,22 @@
+---
+description: Clean code conventions and endpoint-scoped encryption/decryption
+alwaysApply: true
+---
+
+# Smart Go Clean Code Rules
+
+- Keep code clean and modular: separate `constants`, `enums`, `interfaces`, `decorators`, `services`, and `interceptors` into dedicated files/folders.
+- Follow existing project structure and naming conventions before introducing new files.
+- Prefer endpoint-scoped behavior over global behavior when requirement is per API.
+
+# Config and Environment Rules
+
+- Keep only necessary config keys; remove unused flags and dead config.
+- Put encryption secrets/algorithm in env config; avoid hardcoding secrets in business logic.
+- Update `.env.example` whenever env keys are added/removed.
+
+# Code Quality Rules
+
+- Prefer small, single-responsibility classes/functions.
+- Remove dead code/imports/files after refactor.
+- Keep formatting consistent with repository style and run build/lint checks after significant changes.
