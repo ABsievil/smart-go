@@ -1,7 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { DBEntityBase } from '@common/database/repositories/entities/database.entity';
 import { IDatabaseDocument } from '@common/database/repositories/database.repository';
-import { TransportType, RouteStatus } from '@modules/routes/enums/route.enum';
+import {
+    TransportType,
+    RouteStatus,
+    RouteType,
+} from '@modules/routes/enums/route.enum';
 
 @Schema({ collection: 'routes_V3', timestamps: true })
 export class RouteEntity extends DBEntityBase {
@@ -40,6 +44,14 @@ export class RouteEntity extends DBEntityBase {
         enum: TransportType,
     })
     transportType: TransportType;
+
+    @Prop({
+        required: true,
+        type: String,
+        enum: RouteType,
+        default: RouteType.BUS,
+    })
+    routeType: RouteType;
 
     @Prop({ required: false, type: Number })
     totalDistance: number;
