@@ -99,8 +99,6 @@ Gửi tin nhắn và nhận câu trả lời từ AI Assistant với hỗ trợ 
             historyPromise,
         );
 
-        const priorHistory = await historyPromise;
-
         // Lưu cặp tin nhắn (user + bot) trong MỘT round-trip Mongo,
         // non-blocking để không kéo dài latency trả response về client.
         void this.messageService
@@ -119,13 +117,25 @@ Gửi tin nhắn và nhận câu trả lời từ AI Assistant với hỗ trợ 
                 } as MessageCreateRequestDto,
             ])
             .then(() =>
-                this.chatbotCache.appendTurnToHistoryCache(
-                    userId,
-                    conversationId,
-                    priorHistory,
-                    dto.message,
-                    result.reply,
-                ),
+                historyPromise
+                    .then((priorHistory) =>
+                        this.chatbotCache.appendTurnToHistoryCache(
+                            userId,
+                            conversationId,
+                            priorHistory,
+                            dto.message,
+                            result.reply,
+                        ),
+                    )
+                    .catch((cacheErr) => {
+                        const msg =
+                            cacheErr instanceof Error
+                                ? cacheErr.message
+                                : String(cacheErr);
+                        this.logger.warn(
+                            `Failed to update chat history cache (cid=${conversationId}): ${msg}`,
+                        );
+                    }),
             )
             .catch((err) => {
                 const msg = err instanceof Error ? err.message : String(err);
