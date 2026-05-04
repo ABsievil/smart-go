@@ -5,6 +5,7 @@ import { PriorityQueue } from './priority-queue';
 import { RedisService } from '@common/redis/redis.service';
 import { Graph, GraphNode } from '@modules/routing/interfaces/graph.interface';
 import { RoutePath } from '@modules/routing/interfaces/routing.interface';
+import { RouteType } from '@modules/routes/enums/route.enum';
 import {
     ENUM_WALKING_LEG_TYPE,
     RoutingCriteria,
@@ -18,8 +19,6 @@ import { RoutingMetricsDto } from '@modules/routing/dtos/response/routing-metric
 import { RoutingResponseData } from '@modules/routing/interfaces/routing-response.interface';
 import {
     GRAPH_CACHE_TTL,
-    AVERAGE_BUS_SPEED,
-    FARE_PER_BOARDING,
     TRANSFER_WAIT_TIME,
     MINUTES_PER_HOUR,
     CONGESTION_MULTIPLIER,
@@ -39,7 +38,14 @@ import {
     ROUTING_RESULT_CACHE_TTL_SECONDS,
     WALKING_TRANSFER_ROUTE_CODE,
     MAX_TOTAL_WALKING_DISTANCE_KM,
+    HEURISTIC_LOWER_BOUND_TRANSIT_SPEED_KMH,
 } from '@modules/routing/constants/routing.constants';
+import {
+    fareCostToScoreUnits,
+    getTransitAverageSpeedKmh,
+    getTransitFareBoardingVnd,
+    transitUsesRoadCongestion,
+} from '@modules/routing/utils/transit-mode.util';
 import { CongestionFactors } from '@modules/routing/interfaces/congestion-factor.interface';
 import { MultiObjectiveWeights } from '@modules/routing/interfaces/multi-objective-weight.interface';
 import {
@@ -160,6 +166,25 @@ export class RoutingService {
     }
 
     /**
+     * Áp hệ số tắc nghẽn đường bộ chỉ cho chặng bus; metro/waterbus giữ base time.
+     */
+    private applyRoadCongestionToTransitSegments(
+        segments: RoutePath['segments'],
+        congestionFactor: number,
+    ): { segments: RoutePath['segments']; totalTransitMinutes: number } {
+        let totalTransitMinutes = 0;
+        const next = segments.map((seg) => {
+            const mult = transitUsesRoadCongestion(seg.routeType)
+                ? congestionFactor
+                : 1.0;
+            const time = seg.time * mult;
+            totalTransitMinutes += time;
+            return { ...seg, time };
+        });
+        return { segments: next, totalTransitMinutes };
+    }
+
+    /**
      * Đếm số lần chuyển tuyến dựa trên danh sách segments
      */
     private countTransfersFromSegments(
@@ -184,12 +209,11 @@ export class RoutingService {
     /**
      * Tái tạo đường đi từ cameFrom map.
      *
-     * Tách biệt bus segments và walking transfer legs:
-     * - segments: chỉ chứa các đoạn xe buýt
-     * - transferWalkingLegs: các đoạn đi bộ chuyển tuyến giữa 2 trạm
+     * Tách biệt các chặng tuyến (bus/metro/waterbus) và walking transfer legs:
+     * - segments: chặng vận tải công cộng theo đồ thị
+     * - transferWalkingLegs: các đoạn đi bộ chuyển trạm / chuyển mode
      *
-     * totalTime/totalDistance trong RoutePath trả về chỉ là phần xe buýt
-     * (chưa có congestion). Caller sẽ cộng thêm walking và áp dụng congestion.
+     * totalTime/totalDistance: phần tuyến (chưa áp congestion đường bộ — chỉ bus).
      */
     private reconstructPath(
         graph: Graph,
@@ -248,6 +272,8 @@ export class RoutingService {
                             to: current,
                             routeCode: edge.routeCode,
                             routeName: edge.route.routeName ?? '',
+                            routeType:
+                                edge.routeType ?? RouteType.BUS,
                             distance: edge.distance,
                             time: this.graphBuilder.calculateWeight(
                                 edge,
@@ -264,12 +290,13 @@ export class RoutingService {
             current = prev2.node;
         }
 
-        // Tính chi phí theo model xe buýt Việt Nam:
-        // Giá vé CỐ ĐỊNH mỗi lần lên xe, chỉ tính khi routeCode thay đổi.
+        // Mỗi lần lên tuyến (đổi routeCode): một lần vé theo mode (bus / metro / waterbus).
         let currentRouteCode: string | undefined = undefined;
         for (const segment of busSegments) {
             const isNewBoarding = segment.routeCode !== currentRouteCode;
-            segment.cost = isNewBoarding ? FARE_PER_BOARDING : 0;
+            segment.cost = isNewBoarding
+                ? getTransitFareBoardingVnd(segment.routeType)
+                : 0;
             currentRouteCode = segment.routeCode;
         }
 
@@ -289,7 +316,7 @@ export class RoutingService {
             return null;
         }
 
-        // Tổng hợp chỉ từ bus segments (walking sẽ được cộng thêm bởi caller)
+        // Tổng hợp chỉ từ chặng tuyến (walking sẽ được cộng thêm bởi caller)
         let totalDistance = 0;
         let totalTime = 0;
         let totalCost = 0;
@@ -311,7 +338,7 @@ export class RoutingService {
             };
         });
 
-        // Routes chỉ từ bus segments
+        // Routes chỉ từ các chặng tuyến
         const routeMap = new Map<string, { routeCode: string; routeName: string }>();
         for (const seg of busSegments) {
             if (!routeMap.has(seg.routeCode)) {
@@ -471,7 +498,7 @@ export class RoutingService {
      * Helper tìm path với multi-objective weights cụ thể.
      *
      * Xử lý 2 loại cạnh trong đồ thị:
-     * - Bus edge: tính theo bus speed, congestion, fare khi lên xe
+     * - Transit edge (bus/metro/waterbus): tốc độ & vé theo mode; chỉ bus chị congestion đường bộ
      * - Walking edge (isWalkingEdge): tính theo walking speed, không có fare,
      *   không có congestion — cho phép chuyển tuyến qua đi bộ ngắn
      *
@@ -488,7 +515,7 @@ export class RoutingService {
         const startNode = graph.nodes.get(fromStationCode)!;
         const goalNode = graph.nodes.get(toStationCode)!;
 
-        // Heuristic đa tiêu chí — admissible vì dùng bus speed (nhanh hơn walking)
+        // Heuristic đa tiêu chí — admissible: tốc độ tối đa PT (lạc quan) ≤ thời gian thực tế trung bình
         const multiObjectiveHeuristic = (
             from: GraphNode,
             to: GraphNode,
@@ -509,8 +536,9 @@ export class RoutingService {
                 to.station.longitude,
             );
 
-            // Dùng bus speed để ước tính → lower bound → admissible
-            const time = (distance / AVERAGE_BUS_SPEED) * MINUTES_PER_HOUR;
+            const time =
+                (distance / HEURISTIC_LOWER_BOUND_TRANSIT_SPEED_KMH) *
+                MINUTES_PER_HOUR;
             return (
                 weights.timeWeight * time + weights.distanceWeight * distance
             );
@@ -588,19 +616,19 @@ export class RoutingService {
                             0,
                         ) ?? 0;
 
+                    const { segments: transitSegs, totalTransitMinutes } =
+                        this.applyRoadCongestionToTransitSegments(
+                            path.segments,
+                            congestionFactor,
+                        );
+
                     const adjustedPath: RoutePath & { nodesExplored?: number } =
                         {
                             ...path,
-                            // Bus time với congestion + walking time không chịu congestion
-                            totalTime:
-                                path.totalTime * congestionFactor +
-                                walkTransferTime,
+                            totalTime: totalTransitMinutes + walkTransferTime,
                             totalDistance:
                                 path.totalDistance + walkTransferDistance,
-                            segments: path.segments.map((seg) => ({
-                                ...seg,
-                                time: seg.time * congestionFactor,
-                            })),
+                            segments: transitSegs,
                             nodesExplored,
                         };
 
@@ -638,23 +666,33 @@ export class RoutingService {
                             MINUTES_PER_HOUR;
                         edgeCost = 0;
                     } else {
-                        // Xe buýt: phát hiện chuyển tuyến (bus-to-bus hoặc sau walking)
-                        const isBusToBusTransfer =
+                        const isLineTransfer =
                             !previousIsWalking &&
                             previousRouteCode !== undefined &&
                             previousRouteCode !== edge.routeCode;
                         const isFirstBoarding = previousRouteCode === undefined;
                         const isNewBoarding =
                             isFirstBoarding ||
-                            isBusToBusTransfer ||
+                            isLineTransfer ||
                             previousIsWalking;
 
+                        const speedKmh = getTransitAverageSpeedKmh(
+                            edge.routeType,
+                        );
+                        const roadCongestion = transitUsesRoadCongestion(
+                            edge.routeType,
+                        )
+                            ? congestionFactor
+                            : 1.0;
+
                         edgeTime =
-                            (edgeDistance / AVERAGE_BUS_SPEED) *
+                            (edgeDistance / speedKmh) *
                                 MINUTES_PER_HOUR *
-                                congestionFactor +
-                            (isBusToBusTransfer ? TRANSFER_WAIT_TIME : 0);
-                        edgeCost = isNewBoarding ? FARE_PER_BOARDING : 0;
+                                roadCongestion +
+                            (isLineTransfer ? TRANSFER_WAIT_TIME : 0);
+                        edgeCost = isNewBoarding
+                            ? getTransitFareBoardingVnd(edge.routeType)
+                            : 0;
                     }
 
                     const edgeWeight =
@@ -1507,9 +1545,7 @@ export class RoutingService {
     }
 
     /**
-     * Tính optimization score
-     * totalCost tính bằng VND (số lần lên xe × FARE_PER_BOARDING).
-     * Normalize về "số lần lên xe" để cùng đơn vị với A* edge cost.
+     * Tính optimization score — cost chuẩn hóa về đơn vị vé bus để khớp trọng số tuning cũ.
      */
     private calculateOptimizationScore(
         weights: MultiObjectiveWeights,
@@ -1517,10 +1553,9 @@ export class RoutingService {
         totalCost: number,
         totalDistance: number,
     ): number {
-        const boardingCount = totalCost / FARE_PER_BOARDING;
         return (
             weights.timeWeight * totalTime +
-            weights.costWeight * boardingCount +
+            weights.costWeight * fareCostToScoreUnits(totalCost) +
             weights.distanceWeight * totalDistance
         );
     }

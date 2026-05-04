@@ -35,6 +35,8 @@
         "sync-route-detail-v3": "ts-node -r tsconfig-paths/register refs/sync-data-v3/scripts/sync-route-detail-v3.ts",
         "merge-station-lat-lng": "ts-node -r tsconfig-paths/register refs/sync-data-v2/scripts/merge-station-lat-lng.ts",
         "sync-stations-v2": "ts-node -r tsconfig-paths/register refs/sync-data-v2/scripts/sync-stations-v2.ts",
+        "sync-stations-v4": "ts-node -r tsconfig-paths/register refs/sync-data-v4/scripts/sync-stations-v4.ts",
+        "sync-metro-waterbus-routes-v4": "ts-node -r tsconfig-paths/register refs/sync-data-v4/scripts/sync-metro-waterbus-routes-v4.ts",
         "snap-stations-valhalla": "ts-node -r tsconfig-paths/register refs/sync-data/scripts/snap-stations-valhalla.ts"
     },
     "dependencies": {

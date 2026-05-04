@@ -27,11 +27,31 @@ export const ROUTING_RESULT_CACHE_TTL_SECONDS = 5 * 60; // 5 phút
 export const REDIS_KEY_GRAPH_ROUTES = 'routing:graph:routes';
 export const REDIS_KEY_GRAPH_STATIONS = 'routing:graph:stations';
 
-// ─── Tốc độ ───────────────────────────────────────────────────────────────────
-export const AVERAGE_BUS_SPEED = 20; // km/h
+// ─── Tốc độ (trung bình có dừng trạm) ─────────────────────────────────────────
+export const AVERAGE_BUS_SPEED = 20; // km/h — đường bộ
+/** Metro đô thị (ví dụ tuyến 1 HCMC): tốc độ vận hành có dừng ga */
+export const AVERAGE_METRO_SPEED_KMH = 38;
+/** Waterbus trên kênh/sông — chậm hơn ô tô và metro */
+export const AVERAGE_WATERBUS_SPEED_KMH = 17;
 
-// ─── Chi phí xe buýt Việt Nam ─────────────────────────────────────────────────
-export const FARE_PER_BOARDING = 6000; // VND/lần lên xe (giá vé phổ thông)
+/**
+ * H(n) dùng tốc độ nhanh nhất trong các phương thức → ước lượng thời gian lạc quan
+ * (lower bound) → heuristic vẫn admissible cho A*.
+ */
+export const HEURISTIC_LOWER_BOUND_TRANSIT_SPEED_KMH = Math.max(
+    AVERAGE_BUS_SPEED,
+    AVERAGE_METRO_SPEED_KMH,
+    AVERAGE_WATERBUS_SPEED_KMH,
+);
+
+// ─── Chi phí lên xe (ước lượng cho routing — có thể tinh chỉnh theo bảng giá) ─
+export const FARE_PER_BOARDING = 6000; // VND — bus Phổ thông có trợ giá
+/** Metro vé theo quãng đường — dùng đại diện trung bình cho cost trong graph */
+export const FARE_METRO_BOARDING_TYPICAL_VND = 20000;
+export const FARE_WATERBUS_BOARDING_VND = 15000;
+
+/** Quy đổi tổng chi phí VND trong optimization score về “đơn vị” cùng thang vé bus */
+export const REFERENCE_FARE_FOR_OPTIMIZATION_SCORE_VND = FARE_PER_BOARDING;
 
 // Thời gian chờ trung bình tại trạm khi chuyển tuyến
 export const TRANSFER_WAIT_TIME = 5; // phút

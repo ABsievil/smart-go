@@ -1,3 +1,5 @@
+import { RouteType } from '@modules/routes/enums/route.enum';
+
 export interface StationInfo {
     stationCode: string;
     stationName: string;
@@ -17,6 +19,7 @@ export interface RouteSegment {
     to: string;
     routeCode: string;
     routeName: string;
+    routeType: RouteType;
     distance: number;
     time: number;
     cost: number;
@@ -40,9 +43,9 @@ export interface TransferWalkingLeg {
 export interface RoutePath {
     stations: StationInfo[];
     routes: RouteInfo[];
-    /** Tổng khoảng cách xe buýt (km) — chưa bao gồm walking transfer */
+    /** Tổng khoảng cách phương tiện công cộng (km) — chưa bao gồm walking transfer */
     totalDistance: number;
-    /** Tổng thời gian xe buýt (phút, chưa có congestion) — chưa bao gồm walking transfer */
+    /** Tổng thời gian PT công cộng (phút, chưa có congestion đường bộ nếu có) — chưa gồm walking transfer */
     totalTime: number;
     totalCost: number; // VND
     segments: RouteSegment[];

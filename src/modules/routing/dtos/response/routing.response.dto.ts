@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import { RoutingMetricsDto } from './routing-metrics.dto';
 import { ENUM_WALKING_LEG_TYPE } from '@modules/routing/enums/routing.enum';
+import { RouteType } from '@modules/routes/enums/route.enum';
 
 /**
  * Chặng đi bộ trong lộ trình:
@@ -90,6 +91,13 @@ export class RouteSegmentDto {
     @Expose()
     routeName: string;
 
+    @ApiPropertyOptional({
+        description: 'Loại tuyến (bus / metro / waterbus)',
+        enum: RouteType,
+    })
+    @Expose()
+    routeType?: RouteType;
+
     @ApiProperty({ description: 'Khoảng cách (km)', example: 5.2 })
     @Expose()
     distance: number;
@@ -153,7 +161,7 @@ export class ParetoOptimalPathDto {
     transfers: number;
 
     @ApiProperty({
-        description: 'Chi tiết segments xe buýt',
+        description: 'Chi tiết các chặng trên tuyến (bus / metro / waterbus)',
         type: [RouteSegmentDto],
     })
     @Expose()
@@ -190,7 +198,7 @@ export class ParetoOptimalPathDto {
 
     @ApiPropertyOptional({
         description:
-            'Khoảng cách di chuyển bằng xe buýt (km), không bao gồm đi bộ',
+            'Khoảng cách di chuyển bằng PT (km), không bao gồm đi bộ',
         example: 15.6,
     })
     @Expose()
@@ -198,7 +206,7 @@ export class ParetoOptimalPathDto {
 
     @ApiPropertyOptional({
         description:
-            'Thời gian di chuyển bằng xe buýt (phút), không bao gồm đi bộ',
+            'Thời gian di chuyển bằng PT (phút), không bao gồm đi bộ',
         example: 35,
     })
     @Expose()

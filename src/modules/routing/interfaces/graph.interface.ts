@@ -1,3 +1,5 @@
+import { RouteType } from '@modules/routes/enums/route.enum';
+
 /**
  * @description Chỉ giữ các field cần thiết cho thuật toán routing.
  * Không lưu full RouteEntity / StationEntity để giảm bộ nhớ.
@@ -23,6 +25,7 @@ export interface GraphEdge {
     to: string;
     routeCode: string;
     route: GraphRouteLite;
+    routeType?: RouteType;
     distance: number;
     weight: number;
     isWalkingEdge?: boolean;

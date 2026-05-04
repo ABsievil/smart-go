@@ -9,8 +9,6 @@ import {
 import {
     EARTH_RADIUS_KM,
     DEGREES_TO_RADIANS,
-    AVERAGE_BUS_SPEED,
-    FARE_PER_BOARDING,
     DEFAULT_DISTANCE,
     MINUTES_PER_HOUR,
     MAX_ROUTES_PER_PAGE,
@@ -28,6 +26,11 @@ import {
 } from '@modules/routing/interfaces/graph-data.interface';
 import { RoutingCriteria } from '@modules/routing/enums/routing.enum';
 import { RedisService } from '@common/redis/redis.service';
+import { RouteType } from '@modules/routes/enums/route.enum';
+import {
+    estimateTransitEdgeTimeMinutes,
+    getTransitFareBoardingVnd,
+} from '@modules/routing/utils/transit-mode.util';
 
 /**
  * Service xây dựng đồ thị từ routes và stations.
@@ -92,8 +95,11 @@ export class GraphBuilderService {
 
         if (cachedRoutes && cachedStations) {
             this.logger.debug('Graph raw data loaded from Redis cache');
+            const routesRaw = JSON.parse(cachedRoutes) as RouteLite[];
             return {
-                routes: JSON.parse(cachedRoutes) as RouteLite[],
+                routes: routesRaw.map((r) =>
+                    this.normalizeRouteLite(r),
+                ),
                 stations: JSON.parse(cachedStations) as StationLite[],
             };
         }
@@ -108,11 +114,14 @@ export class GraphBuilderService {
 
         const routes: RouteLite[] = fullRoutes
             .filter((r) => r.stationIds?.length >= 2)
-            .map((r) => ({
-                routeCode: r.routeCode,
-                routeName: r.routeName,
-                stationIds: r.stationIds,
-            }));
+            .map((r) =>
+                this.normalizeRouteLite({
+                    routeCode: r.routeCode,
+                    routeName: r.routeName,
+                    stationIds: r.stationIds!,
+                    routeType: r.routeType ?? RouteType.BUS,
+                }),
+            );
 
         const stations: StationLite[] = fullStations.map((s) => ({
             _id: s._id,
@@ -141,6 +150,13 @@ export class GraphBuilderService {
         );
 
         return { routes, stations };
+    }
+
+    private normalizeRouteLite(r: RouteLite): RouteLite {
+        return {
+            ...r,
+            routeType: r.routeType ?? RouteType.BUS,
+        };
     }
 
     /**
@@ -177,8 +193,7 @@ export class GraphBuilderService {
      * Cho phép A* chọn đi bộ ngắn sang trạm gần thay vì đi thêm nhiều
      * trạm xe buýt để đến điểm giao nhau giữa 2 tuyến.
      *
-     * Heuristic vẫn admissible vì walking speed < bus speed:
-     *   cost_walk ≥ h(n) luôn đúng (heuristic dùng bus speed để ước tính).
+     * Heuristic trong A* admissible: đi bộ chậm hơn các phương thức tuyến.
      */
     private addWalkingTransferEdges(graph: Graph): void {
         const stations = Array.from(graph.nodes.values());
@@ -204,19 +219,19 @@ export class GraphBuilderService {
                 const codeA = nodeA.stationCode;
                 const codeB = nodeB.stationCode;
 
-                // Bỏ qua nếu 2 trạm đã có bus trực tiếp theo cả 2 chiều
-                const hasBusAtoB =
+                // Bỏ qua nếu đã có cạnh tuyến (không đi bộ) theo cả hai chiều
+                const hasTransitAtoB =
                     nodeA.neighbors.has(codeB) &&
                     nodeA.neighbors
                         .get(codeB)!
                         .some((e) => !e.isWalkingEdge);
-                const hasBusBtoA =
+                const hasTransitBtoA =
                     nodeB.neighbors.has(codeA) &&
                     nodeB.neighbors
                         .get(codeA)!
                         .some((e) => !e.isWalkingEdge);
 
-                if (hasBusAtoB && hasBusBtoA) continue;
+                if (hasTransitAtoB && hasTransitBtoA) continue;
 
                 const walkingTime =
                     (distance / WALKING_SPEED_KMH) * MINUTES_PER_HOUR;
@@ -241,7 +256,7 @@ export class GraphBuilderService {
                     isWalkingEdge: true,
                 };
 
-                if (!hasBusAtoB) {
+                if (!hasTransitAtoB) {
                     const existing = nodeA.neighbors.get(codeB);
                     if (!existing) {
                         nodeA.neighbors.set(codeB, [edgeAtoB]);
@@ -250,7 +265,7 @@ export class GraphBuilderService {
                     }
                 }
 
-                if (!hasBusBtoA) {
+                if (!hasTransitBtoA) {
                     const existing = nodeB.neighbors.get(codeA);
                     if (!existing) {
                         nodeB.neighbors.set(codeA, [edgeBtoA]);
@@ -333,6 +348,7 @@ export class GraphBuilderService {
                 to: toCode,
                 routeCode: route.routeCode,
                 route: { routeName: route.routeName },
+                routeType: route.routeType,
                 distance,
                 weight: distance,
             };
@@ -362,10 +378,13 @@ export class GraphBuilderService {
                 return edge.distance;
 
             case RoutingCriteria.TIME:
-                return (edge.distance / AVERAGE_BUS_SPEED) * MINUTES_PER_HOUR;
+                return estimateTransitEdgeTimeMinutes(
+                    edge.distance,
+                    edge.routeType,
+                );
 
             case RoutingCriteria.COST:
-                return FARE_PER_BOARDING;
+                return getTransitFareBoardingVnd(edge.routeType);
 
             default:
                 return edge.distance;
