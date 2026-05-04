@@ -93,15 +93,15 @@ export class ChatbotService {
             this.contextLimit,
         );
 
-        this.logger.debug(
-            `RAG ${contextDocs.length} hit(s)\n${JSON.stringify(contextDocs, null, 2)}`,
-        );
+        // this.logger.debug(
+        //     `RAG ${contextDocs.length} hit(s)\n${JSON.stringify(contextDocs, null, 2)}`,
+        // );
         const enrichedSystemPrompt =
             this.buildSystemPromptWithContext(contextDocs);
-        this.logger.debug(`Enriched system prompt: ${enrichedSystemPrompt}`);
+        // this.logger.debug(`Enriched system prompt: ${enrichedSystemPrompt}`);
 
         const messages = this.buildMessageHistory(history, message);
-        this.logger.debug(`Messages: ${JSON.stringify(messages, null, 2)}`);
+        // this.logger.debug(`Messages: ${JSON.stringify(messages, null, 2)}`);
         const reply = await this.dashScopeService.chatCompletion(
             messages,
             enrichedSystemPrompt,
