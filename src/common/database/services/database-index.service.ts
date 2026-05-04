@@ -10,7 +10,7 @@ import {
 
 /**
  * Đồng bộ tất cả compound / multi-field indexes khai báo tại
- * `DATABASE_INDEXES` với MongoDB khi ứng dụng bootstrap xong.
+ * `database-index.registry` (`DATABASE_INDEXES`) với MongoDB khi ứng dụng bootstrap xong.
  *
  * Dùng `OnApplicationBootstrap` (chạy SAU khi tất cả module đã init)
  * để chắc chắn mọi `MongooseModule.forFeature(...)` đã đăng ký model
