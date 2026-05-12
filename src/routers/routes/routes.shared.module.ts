@@ -18,6 +18,8 @@ import { PaymentTransactionController } from '@modules/payment-transactions/cont
 import { PaymentTransactionModule } from '@modules/payment-transactions/payment-transaction.module';
 import { BusSimulationController } from '@modules/bus-simulations/controllers/bus-simulation.controller';
 import { BusSimulationModule } from '@modules/bus-simulations/bus-simulation.module';
+import { FavoriteRouteController } from '@modules/favorite-routes/controllers/favorite-route.controller';
+import { FavoriteRouteModule } from '@modules/favorite-routes/favorite-route.module';
 
 @Module({
     controllers: [
@@ -30,6 +32,7 @@ import { BusSimulationModule } from '@modules/bus-simulations/bus-simulation.mod
         MessageController,
         PaymentTransactionController,
         BusSimulationController,
+        FavoriteRouteController,
     ],
     imports: [
         AuthModule,
@@ -42,6 +45,7 @@ import { BusSimulationModule } from '@modules/bus-simulations/bus-simulation.mod
         ChatbotModule,
         MessageModule,
         BusSimulationModule,
+        FavoriteRouteModule,
     ],
 })
 export class RoutesSharedModule {}

@@ -1,0 +1,14 @@
+{
+    "success": {
+        "create": "Đã thêm tuyến vào yêu thích",
+        "findAll": "Lấy danh sách tuyến yêu thích thành công",
+        "findOne": "Lấy chi tiết tuyến yêu thích thành công",
+        "remove": "Đã bỏ tuyến khỏi yêu thích"
+    },
+    "error": {
+        "create": "Không thể thêm tuyến yêu thích",
+        "findAll": "Không thể lấy danh sách tuyến yêu thích",
+        "findOne": "Không tìm thấy tuyến yêu thích",
+        "remove": "Không thể bỏ tuyến yêu thích"
+    }
+}

@@ -9,7 +9,7 @@ import {
     ValidateNested,
     IsNumber,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 import { RoutingCriteria } from '@modules/routing/enums/routing.enum';
 
 /**
@@ -20,6 +20,7 @@ export class CoordinateDto {
         description: 'Vĩ độ (latitude)',
         example: 10.762622,
     })
+    @Expose()
     @IsNumber()
     latitude: number;
 
@@ -27,6 +28,7 @@ export class CoordinateDto {
         description: 'Kinh độ (longitude)',
         example: 106.660172,
     })
+    @Expose()
     @IsNumber()
     longitude: number;
 }
@@ -39,6 +41,7 @@ export class StationCodeDto {
         description: 'Mã trạm xuất phát',
         example: 'BX_MienTay',
     })
+    @Expose()
     @IsOptional()
     @IsString()
     from?: string;
@@ -47,6 +50,7 @@ export class StationCodeDto {
         description: 'Mã trạm đích',
         example: 'BX_MienDong',
     })
+    @Expose()
     @IsOptional()
     @IsString()
     to?: string;
@@ -60,6 +64,7 @@ export class CoordinatesDto {
         description: 'Tọa độ điểm xuất phát',
         type: CoordinateDto,
     })
+    @Expose()
     @IsOptional()
     @ValidateNested()
     @Type(() => CoordinateDto)
@@ -69,6 +74,7 @@ export class CoordinatesDto {
         description: 'Tọa độ điểm đích',
         type: CoordinateDto,
     })
+    @Expose()
     @IsOptional()
     @ValidateNested()
     @Type(() => CoordinateDto)
