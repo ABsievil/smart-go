@@ -7,6 +7,7 @@ import {
     IsString,
     MaxLength,
     MinLength,
+    IsArray,
 } from 'class-validator';
 import { UserRole } from '@modules/users/enums/user-role.enum';
 
@@ -41,4 +42,22 @@ export class UserCreateRequestDto {
     @IsOptional()
     @IsString()
     avatar?: string;
+
+    @ApiPropertyOptional({
+        type: [String],
+        description: 'Danh sách ID tuyến (Route) yêu thích',
+    })
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    favoriteRouteIds?: string[];
+
+    @ApiPropertyOptional({
+        type: [String],
+        description: 'Danh sách ID trạm (Station) yêu thích',
+    })
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    favoriteStationIds?: string[];
 }
