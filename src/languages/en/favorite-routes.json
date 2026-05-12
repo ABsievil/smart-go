@@ -1,0 +1,14 @@
+{
+    "success": {
+        "create": "Favorite route added successfully",
+        "findAll": "Favorite routes retrieved successfully",
+        "findOne": "Favorite route retrieved successfully",
+        "remove": "Favorite route removed successfully"
+    },
+    "error": {
+        "create": "Failed to add favorite route",
+        "findAll": "Failed to retrieve favorite routes",
+        "findOne": "Favorite route not found",
+        "remove": "Failed to remove favorite route"
+    }
+}

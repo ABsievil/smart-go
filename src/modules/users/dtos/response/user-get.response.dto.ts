@@ -19,4 +19,18 @@ export class UserGetResponseDto extends BaseResponseDto {
     @ApiPropertyOptional({ description: 'Avatar URL' })
     @Expose()
     avatar?: string;
+
+    @ApiPropertyOptional({
+        description: 'Danh sách ID tuyến (Route) yêu thích',
+        type: [String],
+    })
+    @Expose()
+    favoriteRouteIds?: string[];
+
+    @ApiPropertyOptional({
+        description: 'Danh sách ID trạm (Station) yêu thích',
+        type: [String],
+    })
+    @Expose()
+    favoriteStationIds?: string[];
 }

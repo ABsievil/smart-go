@@ -25,6 +25,12 @@ export class UserEntity extends DBEntityBase {
 
     @Prop({ required: false, trim: true })
     avatar?: string;
+
+    @Prop({ required: false, type: [String], default: [] })
+    favoriteRouteIds?: string[];
+
+    @Prop({ required: false, type: [String], default: [] })
+    favoriteStationIds?: string[];
 }
 
 export type UserDoc = IDatabaseDocument<UserEntity>;
