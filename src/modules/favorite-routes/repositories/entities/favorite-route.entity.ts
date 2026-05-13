@@ -11,6 +11,9 @@ export class FavoriteRouteEntity extends DBEntityBase {
     @Prop({ required: true, index: true })
     userId: string;
 
+    @Prop({ required: true, type: String, trim: true })
+    routeName: string;
+
     @Prop({
         required: false,
         type: {
