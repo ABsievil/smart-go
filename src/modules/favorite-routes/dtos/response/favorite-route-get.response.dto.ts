@@ -11,6 +11,10 @@ export class FavoriteRouteGetResponseDto extends BaseResponseDto {
     @Expose()
     userId: string;
 
+    @ApiProperty({ description: 'Tên hiển thị lộ trình yêu thích' })
+    @Expose()
+    routeName: string;
+
     @ApiPropertyOptional({
         type: StationCodeDto,
         description: 'Mã trạm xuất phát / đích (nếu có)',

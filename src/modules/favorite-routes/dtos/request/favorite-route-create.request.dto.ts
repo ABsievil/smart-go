@@ -1,6 +1,12 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, ValidateNested } from 'class-validator';
+import {
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+    MaxLength,
+    ValidateNested,
+} from 'class-validator';
 import {
     StationCodeDto,
     CoordinatesDto,
@@ -11,6 +17,16 @@ import {
  * (stationCode và/hoặc coordinates; phải suy ra được cả from và to).
  */
 export class FavoriteRouteCreateRequestDto {
+    @ApiProperty({
+        description:
+            'Tên hiển thị cho lộ trình yêu thích (do client đặt hoặc copy từ Route)',
+        example: 'Nhà → Công ty',
+    })
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(500)
+    routeName: string;
+
     @ApiPropertyOptional({ type: StationCodeDto })
     @IsOptional()
     @ValidateNested()
