@@ -149,5 +149,74 @@ export class EnvironmentVariablesDto {
 
     @IsOptional()
     @IsString()
+    VNPAY_RETURN_URL_WEB?: string;
+
+    @IsOptional()
+    @IsString()
+    VNPAY_RETURN_URL_APP?: string;
+
+    @IsOptional()
+    @IsString()
+    VNPAY_REDIRECT_URL_WEB?: string;
+
+    @IsOptional()
+    @IsString()
+    VNPAY_REDIRECT_URL_APP?: string;
+
+    @IsOptional()
+    @IsString()
     VNPAY_LOCALE?: string;
+
+    // MoMo
+    @IsOptional()
+    @IsString()
+    MOMO_PARTNER_CODE?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_ACCESS_KEY?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_SECRET_KEY?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_ENDPOINT?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_RETURN_URL?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_RETURN_URL_WEB?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_RETURN_URL_APP?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_REDIRECT_URL_WEB?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_REDIRECT_URL_APP?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_IPN_URL?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_REQUEST_TYPE?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_AUTO_CAPTURE?: string;
+
+    @IsOptional()
+    @IsString()
+    MOMO_LANG?: string;
 }

@@ -11,7 +11,6 @@ export class VnpayService {
     private readonly tmnCode: string;
     private readonly hashSecret: string;
     private readonly paymentUrl: string;
-    private readonly returnUrl: string;
     private readonly version: string;
     private readonly locale: string;
 
@@ -19,7 +18,6 @@ export class VnpayService {
         this.tmnCode = configService.get<string>('vnpay.tmnCode') ?? '';
         this.hashSecret = configService.get<string>('vnpay.hashSecret') ?? '';
         this.paymentUrl = configService.get<string>('vnpay.paymentUrl') ?? '';
-        this.returnUrl = configService.get<string>('vnpay.returnUrl') ?? '';
         this.version = configService.get<string>('vnpay.version') ?? '2.1.0';
         this.locale = configService.get<string>('vnpay.locale') ?? 'vn';
     }
@@ -38,7 +36,7 @@ export class VnpayService {
             vnp_OrderInfo: params.orderDescription,
             vnp_OrderType: params.orderType,
             vnp_Amount: String(params.amount * 100),
-            vnp_ReturnUrl: this.returnUrl,
+            vnp_ReturnUrl: params.returnUrl,
             vnp_IpAddr: params.ipAddr,
             vnp_CreateDate: createDate,
             vnp_ExpireDate: expireDate,

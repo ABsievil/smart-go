@@ -4,6 +4,7 @@ export interface IMomoCreatePaymentParams {
     orderType: string;
     txnRef: string;
     ipAddr: string;
+    returnUrl: string;
 }
 
 /** Query/body callback MoMo — các field số thường là string từ URL. */

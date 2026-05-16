@@ -4,17 +4,21 @@ import {
     Get,
     HttpCode,
     HttpStatus,
+    Param,
+    ParseEnumPipe,
     Post,
     Query,
     Req,
+    Res,
 } from '@nestjs/common';
 import {
     ApiBearerAuth,
     ApiOperation,
+    ApiParam,
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { CurrentUser, Public } from '@modules/auth/decorators/auth.decorator';
 import { PaymentService } from '@modules/payment/services/payment.service';
 import { PaymentTransactionService } from '@modules/payment-transactions/services/payment-transaction.service';
@@ -23,9 +27,9 @@ import {
     PaymentUrlCreateResponse,
     PaymentUrlResponseDto,
 } from '@modules/payment/dtos/response/payment-url.response.dto';
-import { PaymentResultResponseDto } from '@modules/payment/dtos/response/payment-result.response.dto';
 import { IMomoCallbackParams } from '@modules/payment/interfaces/momo-params.interface';
 import { IVnpayCallbackParams } from '@modules/payment/interfaces/vnpay-params.interface';
+import { PaymentClientPlatform } from '@modules/payment/enums/payment.enum';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 
 @ApiTags('Payments')
@@ -102,22 +106,36 @@ export class PaymentController {
     }
 
     @Public()
-    @Get('vnpay/return')
-    @HttpCode(HttpStatus.OK)
-    @LanguageResponse({ module: 'payment', successKey: 'return' })
+    @Get('vnpay/return/:platform')
     @ApiOperation({
         summary:
-            '[Demo] VNPAY return — verify signature only; persist state via payment-transactions API',
+            'VNPAY return — verify signature, then redirect to web or app URL',
+    })
+    @ApiParam({
+        name: 'platform',
+        enum: Object.values(PaymentClientPlatform),
+        enumName: 'PaymentClientPlatform',
     })
     @ApiResponse({
-        status: HttpStatus.OK,
-        description: 'Payment result',
-        type: PaymentResultResponseDto,
+        status: HttpStatus.FOUND,
+        description: 'Redirect to client payment result page',
     })
     handleReturn(
+        @Param(
+            'platform',
+            new ParseEnumPipe(PaymentClientPlatform),
+        )
+        platform: PaymentClientPlatform,
         @Query() params: IVnpayCallbackParams,
-    ): PaymentResultResponseDto {
-        return this.paymentService.handleReturn(params);
+        @Res() response: Response,
+    ): void {
+        const result = this.paymentService.handleReturn(params);
+        const redirectUrl = this.paymentService.buildClientRedirectUrl(
+            'vnpay',
+            platform,
+            result,
+        );
+        response.redirect(redirectUrl);
     }
 
     @Public()
@@ -145,22 +163,36 @@ export class PaymentController {
     }
 
     @Public()
-    @Get('momo/return')
-    @HttpCode(HttpStatus.OK)
-    @LanguageResponse({ module: 'payment', successKey: 'return' })
+    @Get('momo/return/:platform')
     @ApiOperation({
         summary:
-            '[Demo] MoMo return — verify signature only; persist state via payment-transactions API',
+            'MoMo return — verify signature, then redirect to web or app URL',
+    })
+    @ApiParam({
+        name: 'platform',
+        enum: Object.values(PaymentClientPlatform),
+        enumName: 'PaymentClientPlatform',
     })
     @ApiResponse({
-        status: HttpStatus.OK,
-        description: 'Payment result',
-        type: PaymentResultResponseDto,
+        status: HttpStatus.FOUND,
+        description: 'Redirect to client payment result page',
     })
     handleMomoReturn(
+        @Param(
+            'platform',
+            new ParseEnumPipe(PaymentClientPlatform),
+        )
+        platform: PaymentClientPlatform,
         @Query() params: IMomoCallbackParams,
-    ): PaymentResultResponseDto {
-        return this.paymentService.handleMomoReturn(params);
+        @Res() response: Response,
+    ): void {
+        const result = this.paymentService.handleMomoReturn(params);
+        const redirectUrl = this.paymentService.buildClientRedirectUrl(
+            'momo',
+            platform,
+            result,
+        );
+        response.redirect(redirectUrl);
     }
 
     @Public()

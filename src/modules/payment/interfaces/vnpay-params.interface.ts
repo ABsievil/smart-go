@@ -4,6 +4,7 @@ export interface IVnpayCreatePaymentParams {
     orderType: string;
     txnRef: string;
     ipAddr: string;
+    returnUrl: string;
     bankCode?: string;
     locale?: string;
 }

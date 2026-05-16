@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { MomoService } from '@modules/payment/services/momo.service';
+import { PaymentRedirectService } from '@modules/payment/services/payment-redirect.service';
 import { VnpayService } from '@modules/payment/services/vnpay.service';
 import { PaymentCreateRequestDto } from '@modules/payment/dtos/request/payment-create.request.dto';
+import { PaymentClientPlatform } from '@modules/payment/enums/payment.enum';
 import { PaymentUrlResponseDto } from '@modules/payment/dtos/response/payment-url.response.dto';
 import { PaymentResultResponseDto } from '@modules/payment/dtos/response/payment-result.response.dto';
 import { IMomoCallbackParams } from '@modules/payment/interfaces/momo-params.interface';
@@ -16,6 +18,7 @@ export class PaymentService {
     constructor(
         private readonly vnpayService: VnpayService,
         private readonly momoService: MomoService,
+        private readonly paymentRedirectService: PaymentRedirectService,
     ) {}
 
     createPaymentUrl(
@@ -24,12 +27,18 @@ export class PaymentService {
     ): PaymentUrlResponseDto {
         const txnRef = this.generateTxnRef();
 
+        const returnUrl = this.paymentRedirectService.getGatewayReturnUrl(
+            'vnpay',
+            dto.platform,
+        );
+
         const paymentUrl = this.vnpayService.createPaymentUrl({
             amount: dto.amount,
             orderDescription: dto.orderDescription,
             orderType: dto.orderType,
             txnRef,
             ipAddr,
+            returnUrl,
             bankCode: dto.bankCode,
             locale: dto.locale,
         });
@@ -42,15 +51,33 @@ export class PaymentService {
         ipAddr: string,
     ): Promise<PaymentUrlResponseDto> {
         const txnRef = this.generateTxnRef();
+        const returnUrl = this.paymentRedirectService.getGatewayReturnUrl(
+            'momo',
+            dto.platform,
+        );
+
         const paymentUrl = await this.momoService.createPaymentUrl({
             amount: dto.amount,
             orderDescription: dto.orderDescription,
             orderType: dto.orderType,
             txnRef,
             ipAddr,
+            returnUrl,
         });
 
         return { paymentUrl, txnRef };
+    }
+
+    buildClientRedirectUrl(
+        gateway: 'vnpay' | 'momo',
+        platform: PaymentClientPlatform,
+        result: PaymentResultResponseDto,
+    ): string {
+        return this.paymentRedirectService.buildClientRedirectUrl(
+            gateway,
+            platform,
+            result,
+        );
     }
 
     handleReturn(params: IVnpayCallbackParams): PaymentResultResponseDto {
