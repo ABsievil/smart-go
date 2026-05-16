@@ -1,3 +1,8 @@
+export enum PaymentClientPlatform {
+    WEB = 'web',
+    APP = 'app',
+}
+
 export enum PaymentOrderType {
     TOPUP = 'topup',
     BILLPAYMENT = 'billpayment',

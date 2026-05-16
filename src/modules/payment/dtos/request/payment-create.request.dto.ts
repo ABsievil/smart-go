@@ -7,9 +7,21 @@ import {
     IsString,
     Min,
 } from 'class-validator';
-import { PaymentOrderType } from '@modules/payment/enums/payment.enum';
+import {
+    PaymentClientPlatform,
+    PaymentOrderType,
+} from '@modules/payment/enums/payment.enum';
 
 export class PaymentCreateRequestDto {
+    @ApiProperty({
+        description: 'Client platform — selects gateway return URL and post-payment redirect',
+        enum: Object.values(PaymentClientPlatform),
+        enumName: 'PaymentClientPlatform',
+        example: PaymentClientPlatform.WEB,
+    })
+    @IsEnum(PaymentClientPlatform)
+    platform: PaymentClientPlatform;
+
     @ApiProperty({
         description: 'Amount in VND (minimum 5,000)',
         example: 100000,
@@ -28,7 +40,8 @@ export class PaymentCreateRequestDto {
 
     @ApiProperty({
         description: 'Order type category',
-        enum: PaymentOrderType,
+        enum: Object.values(PaymentOrderType),
+        enumName: 'PaymentOrderType',
         example: PaymentOrderType.OTHER,
     })
     @IsEnum(PaymentOrderType)

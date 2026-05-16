@@ -18,7 +18,6 @@ export class MomoService {
     private readonly accessKey: string;
     private readonly secretKey: string;
     private readonly endpoint: string;
-    private readonly returnUrl: string;
     private readonly ipnUrl: string;
     private readonly requestType: string;
     private readonly lang: string;
@@ -29,7 +28,6 @@ export class MomoService {
         this.accessKey = configService.get<string>('momo.accessKey') ?? '';
         this.secretKey = configService.get<string>('momo.secretKey') ?? '';
         this.endpoint = configService.get<string>('momo.endpoint') ?? '';
-        this.returnUrl = configService.get<string>('momo.returnUrl') ?? '';
         this.ipnUrl = configService.get<string>('momo.ipnUrl') ?? '';
         this.requestType =
             configService.get<string>('momo.requestType') ?? 'captureWallet';
@@ -53,7 +51,7 @@ export class MomoService {
             orderId,
             orderInfo,
             partnerCode: this.partnerCode,
-            redirectUrl: this.returnUrl,
+            redirectUrl: params.returnUrl,
             requestId,
             requestType: this.requestType,
         });
@@ -72,7 +70,7 @@ export class MomoService {
                 amount,
                 orderId,
                 orderInfo,
-                redirectUrl: this.returnUrl,
+                redirectUrl: params.returnUrl,
                 ipnUrl: this.ipnUrl,
                 lang: this.lang,
                 requestType: this.requestType,
