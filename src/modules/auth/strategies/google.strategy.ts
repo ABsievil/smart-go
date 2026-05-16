@@ -1,22 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import {
-    Profile,
-    Strategy,
-    VerifyCallback,
-} from 'passport-google-oauth20';
+import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { AUTH_STRATEGY } from '@modules/auth/constants/auth.constants';
-import { IAuthUser } from '@modules/auth/interfaces/auth-user.interface';
 import { AuthService } from '@modules/auth/services/auth.service';
 
 @Injectable()
-export class GoogleStrategy extends PassportStrategy(
+export class GoogleWebStrategy extends PassportStrategy(
     Strategy,
-    AUTH_STRATEGY.GOOGLE,
+    AUTH_STRATEGY.GOOGLE_WEB,
 ) {
     constructor(
-        private readonly configService: ConfigService,
+        configService: ConfigService,
         private readonly authService: AuthService,
     ) {
         super({
@@ -25,7 +20,7 @@ export class GoogleStrategy extends PassportStrategy(
                 'auth.oauth.google.clientSecret',
             ),
             callbackURL: configService.get<string>(
-                'auth.oauth.google.callbackUrl',
+                'auth.oauth.google.callbackUrlWeb',
             ),
             scope: ['email', 'profile'],
         });
@@ -37,12 +32,37 @@ export class GoogleStrategy extends PassportStrategy(
         profile: Profile,
         done: VerifyCallback,
     ): Promise<void> {
-        const user: IAuthUser = await this.authService.validateGoogleUser({
-            providerId: profile.id,
-            email: profile.emails?.[0]?.value ?? '',
-            name: profile.displayName ?? '',
-            avatar: profile.photos?.[0]?.value,
+        await this.authService.authenticateGooglePassport(profile, done);
+    }
+}
+
+@Injectable()
+export class GoogleAppStrategy extends PassportStrategy(
+    Strategy,
+    AUTH_STRATEGY.GOOGLE_APP,
+) {
+    constructor(
+        configService: ConfigService,
+        private readonly authService: AuthService,
+    ) {
+        super({
+            clientID: configService.get<string>('auth.oauth.google.clientId'),
+            clientSecret: configService.get<string>(
+                'auth.oauth.google.clientSecret',
+            ),
+            callbackURL: configService.get<string>(
+                'auth.oauth.google.callbackUrlApp',
+            ),
+            scope: ['email', 'profile'],
         });
-        done(null, user);
+    }
+
+    async validate(
+        _accessToken: string,
+        _refreshToken: string,
+        profile: Profile,
+        done: VerifyCallback,
+    ): Promise<void> {
+        await this.authService.authenticateGooglePassport(profile, done);
     }
 }

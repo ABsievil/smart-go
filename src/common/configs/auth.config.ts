@@ -14,10 +14,18 @@ export default registerAs(
             google: {
                 clientId: process.env.GOOGLE_OAUTH_CLIENT_ID ?? '',
                 clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET ?? '',
-                callbackUrl:
+                callbackUrlWeb:
+                    process.env.GOOGLE_OAUTH_CALLBACK_URL_WEB ??
                     process.env.GOOGLE_OAUTH_CALLBACK_URL ??
-                    'http://localhost:8000/api/v1/auth/google/callback',
-                mobileRedirectUrl:
+                    `http://localhost:8000/api/v1/auth/google/callback/web`,
+                callbackUrlApp:
+                    process.env.GOOGLE_OAUTH_CALLBACK_URL_APP ??
+                    `http://localhost:8000/api/v1/auth/google/callback/app`,
+                redirectUrlWeb:
+                    process.env.GOOGLE_OAUTH_REDIRECT_URL_WEB ??
+                    'http://localhost:3000/auth/callback',
+                redirectUrlApp:
+                    process.env.GOOGLE_OAUTH_REDIRECT_URL_APP ??
                     process.env.GOOGLE_OAUTH_MOBILE_REDIRECT_URL ??
                     'myapp://auth/callback',
                 authCodeTtlSeconds: Number(
