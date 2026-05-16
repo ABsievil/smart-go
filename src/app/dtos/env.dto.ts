@@ -72,6 +72,43 @@ export class EnvironmentVariablesDto {
     @IsString()
     JWT_REFRESH_EXPIRES_IN?: string;
 
+    // Google OAuth
+    @IsOptional()
+    @IsString()
+    GOOGLE_OAUTH_CLIENT_ID?: string;
+
+    @IsOptional()
+    @IsString()
+    GOOGLE_OAUTH_CLIENT_SECRET?: string;
+
+    @IsOptional()
+    @IsString()
+    GOOGLE_OAUTH_CALLBACK_URL?: string;
+
+    @IsOptional()
+    @IsString()
+    GOOGLE_OAUTH_CALLBACK_URL_WEB?: string;
+
+    @IsOptional()
+    @IsString()
+    GOOGLE_OAUTH_CALLBACK_URL_APP?: string;
+
+    @IsOptional()
+    @IsString()
+    GOOGLE_OAUTH_REDIRECT_URL_WEB?: string;
+
+    @IsOptional()
+    @IsString()
+    GOOGLE_OAUTH_REDIRECT_URL_APP?: string;
+
+    @IsOptional()
+    @IsString()
+    GOOGLE_OAUTH_MOBILE_REDIRECT_URL?: string;
+
+    @IsOptional()
+    @IsNumberString()
+    GOOGLE_OAUTH_AUTH_CODE_TTL_SECONDS?: string;
+
     @IsOptional()
     @IsString()
     DASHSCOPE_API_KEY?: string;

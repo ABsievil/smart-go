@@ -3,6 +3,8 @@ export const AUTH_STRATEGY = {
     JWT_REFRESH: 'jwt-refresh',
     LOCAL: 'local',
     GOOGLE: 'google',
+    GOOGLE_WEB: 'google-web',
+    GOOGLE_APP: 'google-app',
 } as const;
 
 export const AUTH_METADATA = {

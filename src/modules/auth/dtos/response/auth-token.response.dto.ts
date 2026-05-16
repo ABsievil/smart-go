@@ -12,7 +12,10 @@ export class AuthUserResponseDto extends BaseResponseDto {
     @Expose()
     name: string;
 
-    @ApiProperty({ enum: UserRole })
+    @ApiProperty({
+        enum: Object.values(UserRole),
+        enumName: 'UserRole',
+    })
     @Expose()
     role: UserRole;
 }

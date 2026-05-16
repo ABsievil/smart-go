@@ -5,6 +5,8 @@ import {
     Get,
     HttpCode,
     HttpStatus,
+    Param,
+    ParseEnumPipe,
     Query,
     Req,
     Res,
@@ -15,6 +17,8 @@ import {
     ApiBearerAuth,
     ApiBody,
     ApiOperation,
+    ApiParam,
+    ApiQuery,
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
@@ -34,55 +38,69 @@ import {
     AuthTokenResponseDto,
     AuthUserResponseDto,
 } from '@modules/auth/dtos/response/auth-token.response.dto';
-import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
+import { AuthOAuthRedirectService } from '@modules/auth/services/auth-oauth-redirect.service';
+import { OAuthClientPlatform } from '@modules/auth/enums/oauth-client-platform.enum';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
     constructor(
         private readonly authService: AuthService,
-        private readonly configService: ConfigService,
+        private readonly authOAuthRedirectService: AuthOAuthRedirectService,
     ) {}
 
     @Public()
-    @Get('google')
+    @Get('google/:platform')
     @UseGuards(GoogleAuthGuard)
-    @ApiOperation({ summary: 'Login with Google OAuth2' })
+    @ApiOperation({
+        summary: 'Login with Google OAuth2 (web or app)',
+    })
+    @ApiParam({
+        name: 'platform',
+        enum: Object.values(OAuthClientPlatform),
+        enumName: 'OAuthClientPlatform',
+    })
+    @ApiQuery({
+        name: 'state',
+        required: true,
+        description: 'Client-generated CSRF state',
+    })
     @ApiResponse({
         status: HttpStatus.FOUND,
         description: 'Redirect to Google consent page',
     })
-    googleAuth(): void {}
+    googleAuth(
+        @Param(
+            'platform',
+            new ParseEnumPipe(OAuthClientPlatform),
+        )
+        _platform: OAuthClientPlatform,
+    ): void {}
 
     @Public()
-    @Get('google/mobile/callback')
-    @HttpCode(HttpStatus.OK)
-    @ApiOperation({
-        summary:
-            'Google OAuth mobile callback (debug only for testing in dev environment)',
-    })
-    @ApiResponse({
-        status: HttpStatus.FOUND,
-        description:
-            'Redirect to mobile app with short-lived auth_code and state',
-    })
-    googleMobileCallback(): string {
-        return 'Login by mobile with google success';
-    }
-
-    @Public()
-    @Get('google/callback')
+    @Get('google/callback/:platform')
     @UseGuards(GoogleAuthGuard)
     @ApiOperation({
-        summary: 'Google OAuth callback (redirect with auth code)',
+        summary:
+            'Google OAuth callback — issue auth code, redirect to web or app URL',
+    })
+    @ApiParam({
+        name: 'platform',
+        enum: Object.values(OAuthClientPlatform),
+        enumName: 'OAuthClientPlatform',
     })
     @ApiResponse({
         status: HttpStatus.FOUND,
         description:
-            'Redirect to mobile app with short-lived auth_code and state',
+            'Redirect to client with short-lived auth_code and state',
     })
     async googleAuthCallback(
+        @Param(
+            'platform',
+            new ParseEnumPipe(OAuthClientPlatform),
+        )
+        platform: OAuthClientPlatform,
         @Req() request: { user: IAuthUser; query?: { state?: string } },
         @Res() response: Response,
     ): Promise<void> {
@@ -97,14 +115,12 @@ export class AuthController {
             request.user,
             state,
         );
-        const mobileRedirectUrl = this.configService.get<string>(
-            'auth.oauth.google.mobileRedirectUrl',
+        const redirectUrl = this.authOAuthRedirectService.buildGoogleRedirectUrl(
+            platform,
+            authCode,
+            state,
         );
-
-        const url = new URL(mobileRedirectUrl);
-        url.searchParams.set('auth_code', authCode);
-        url.searchParams.set('state', state);
-        response.redirect(url.toString());
+        response.redirect(redirectUrl);
     }
 
     @Public()

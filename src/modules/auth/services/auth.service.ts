@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import type { StringValue } from 'ms';
 import { randomBytes } from 'crypto';
+import { Profile, VerifyCallback } from 'passport-google-oauth20';
 import { UserService } from '@modules/users/services/user.service';
 import { IJwtPayload } from '@modules/auth/interfaces/jwt-payload.interface';
 import { IAuthUser } from '@modules/auth/interfaces/auth-user.interface';
@@ -94,6 +95,19 @@ export class AuthService {
         });
 
         return this.toAuthUser(newUser);
+    }
+
+    async authenticateGooglePassport(
+        profile: Profile,
+        done: VerifyCallback,
+    ): Promise<void> {
+        const user = await this.validateGoogleUser({
+            providerId: profile.id,
+            email: profile.emails?.[0]?.value ?? '',
+            name: profile.displayName ?? '',
+            avatar: profile.photos?.[0]?.value,
+        });
+        done(null, user);
     }
 
     async refreshToken(user: IAuthUser): Promise<AccessTokenResponseDto> {
