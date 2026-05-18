@@ -8,10 +8,12 @@ import { DashScopeService } from '@modules/chatbot/services/dashscope.service';
 import { ZillizService } from '@modules/chatbot/services/zilliz.service';
 import { ChatbotCacheService } from '@modules/chatbot/services/chatbot-cache.service';
 import { IChatMessage } from '@modules/chatbot/interfaces/chat-message.interface';
+import { IRagPrepareResult } from '@modules/chatbot/interfaces/rag-prepare-result.interface';
 import { IVectorSearchResult } from '@modules/chatbot/interfaces/vector-search-result.interface';
 import {
     ChatbotEmbedType,
     ChatMessageRole,
+    RagPrepareKind,
 } from '@modules/chatbot/enums/chatbot.enum';
 import { ChatHistoryItemDto } from '@modules/chatbot/dtos/request/chat-history-item.request.dto';
 import { EmbedRequestDto } from '@modules/chatbot/dtos/request/embed.request.dto';
@@ -57,6 +59,39 @@ export class ChatbotService {
     }
 
     /**
+     * @description Chuẩn bị RAG song song:
+     * - Pipeline embed → Zilliz khởi chạy ngay (không chờ history Mongo/Redis).
+     * - History resolve song song; reply-cache chỉ khi hội thoại mới.
+     * - Cache hit reply → trả sớm (pipeline embed/Zilliz có thể chạy nền, bỏ qua).
+     */
+    private async prepareRagForChat(
+        message: string,
+        historyInput: ChatHistoryItemDto[] | Promise<ChatHistoryItemDto[]>,
+    ): Promise<IRagPrepareResult> {
+        const historyPromise = Promise.resolve(historyInput);
+        const contextDocsPromise = this.embedWithCache(message).then(
+            (embedding) =>
+                this.zillizService.search(embedding, this.contextLimit),
+        );
+
+        const history = await historyPromise;
+
+        if (history.length === 0) {
+            const cachedReply = await this.cacheService.getReply(message);
+            if (cachedReply) {
+                return {
+                    kind: RagPrepareKind.REPLY_CACHE,
+                    history,
+                    cached: cachedReply,
+                };
+            }
+        }
+
+        const contextDocs = await contextDocsPromise;
+        return { kind: RagPrepareKind.RAG, history, contextDocs };
+    }
+
+    /**
      * @description Xử lý tin nhắn chat: tìm context liên quan từ vector DB,
      * sau đó gọi LLM Model để sinh câu trả lời.
      *
@@ -73,26 +108,16 @@ export class ChatbotService {
         message: string,
         historyInput: ChatHistoryItemDto[] | Promise<ChatHistoryItemDto[]> = [],
     ): Promise<Omit<ChatResponseDto, 'conversationId'>> {
-        const [embedding, history] = await Promise.all([
-            this.embedWithCache(message),
-            Promise.resolve(historyInput),
-        ]);
+        const prepared = await this.prepareRagForChat(message, historyInput);
 
-        if (history.length === 0) {
-            const cachedReply = await this.cacheService.getReply(message);
-            if (cachedReply) {
-                return {
-                    reply: cachedReply.reply,
-                    contextCount: cachedReply.contextCount,
-                };
-            }
+        if (prepared.kind === RagPrepareKind.REPLY_CACHE) {
+            return {
+                reply: prepared.cached.reply,
+                contextCount: prepared.cached.contextCount,
+            };
         }
 
-        const contextDocs = await this.zillizService.search(
-            embedding,
-            this.contextLimit,
-        );
-
+        const { history, contextDocs } = prepared;
         // this.logger.debug(
         //     `RAG ${contextDocs.length} hit(s)\n${JSON.stringify(contextDocs, null, 2)}`,
         // );
@@ -119,11 +144,9 @@ export class ChatbotService {
 
     /**
      * @description Phiên bản streaming của `chat` — yield từng event:
-     *  1. Embed message (có cache) + resolve history song song.
-     *  2. Nếu history rỗng và reply có trong cache → emit 1 `meta` +
-     *     1 `token` với toàn bộ reply + kết thúc. UX gần như tức thời.
-     *  3. Ngược lại: search Zilliz → emit `meta` → stream token từ LLM,
-     *     đồng thời gom full reply để controller lưu DB + cache.
+     *  1. Pipeline embed → Zilliz chạy ngay; history (Redis/Mongo) song song.
+     *  2. Hội thoại mới + reply cache hit → `meta` + một `token`, kết thúc.
+     *  3. Ngược lại: emit `meta` sau RAG → stream token LLM; gom reply để persist.
      *
      * `signal` cho phép controller huỷ stream khi client đóng kết nối.
      */
@@ -132,28 +155,19 @@ export class ChatbotService {
         historyInput: ChatHistoryItemDto[] | Promise<ChatHistoryItemDto[]> = [],
         signal?: AbortSignal,
     ): AsyncGenerator<ChatStreamEvent, { fullReply: string }, void> {
-        const [embedding, history] = await Promise.all([
-            this.embedWithCache(message),
-            Promise.resolve(historyInput),
-        ]);
+        const prepared = await this.prepareRagForChat(message, historyInput);
 
-        if (history.length === 0) {
-            const cachedReply = await this.cacheService.getReply(message);
-            if (cachedReply) {
-                yield {
-                    type: 'meta',
-                    contextCount: cachedReply.contextCount,
-                    cached: true,
-                };
-                yield { type: 'token', content: cachedReply.reply };
-                return { fullReply: cachedReply.reply };
-            }
+        if (prepared.kind === RagPrepareKind.REPLY_CACHE) {
+            yield {
+                type: 'meta',
+                contextCount: prepared.cached.contextCount,
+                cached: true,
+            };
+            yield { type: 'token', content: prepared.cached.reply };
+            return { fullReply: prepared.cached.reply };
         }
 
-        const contextDocs = await this.zillizService.search(
-            embedding,
-            this.contextLimit,
-        );
+        const { history, contextDocs } = prepared;
 
         yield {
             type: 'meta',

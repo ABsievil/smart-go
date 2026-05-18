@@ -12,11 +12,7 @@ import {
     CACHE_KEY_REPLY_PREFIX,
     CHAT_HISTORY_MESSAGE_LIMIT,
 } from '@modules/chatbot/constants/chatbot.constants';
-
-export interface CachedReply {
-    reply: string;
-    contextCount: number;
-}
+import { ICachedReply } from '@modules/chatbot/interfaces/cached-reply.interface';
 
 /**
  * Lớp bọc Redis dành riêng cho chatbot — đảm nhiệm:
@@ -90,13 +86,13 @@ export class ChatbotCacheService {
 
     // ─── Reply ──────────────────────────────────────────────────────────────
 
-    async getReply(message: string): Promise<CachedReply | null> {
+    async getReply(message: string): Promise<ICachedReply | null> {
         if (!this.enabled) return null;
         const key = this.replyKey(message);
         try {
             const raw = await this.redisService.get(key);
             if (!raw) return null;
-            const parsed = JSON.parse(raw) as Partial<CachedReply>;
+            const parsed = JSON.parse(raw) as Partial<ICachedReply>;
             if (typeof parsed?.reply !== 'string') return null;
             return {
                 reply: parsed.reply,
@@ -108,7 +104,7 @@ export class ChatbotCacheService {
         }
     }
 
-    async setReply(message: string, payload: CachedReply): Promise<void> {
+    async setReply(message: string, payload: ICachedReply): Promise<void> {
         if (!this.enabled) return;
         const key = this.replyKey(message);
         try {
