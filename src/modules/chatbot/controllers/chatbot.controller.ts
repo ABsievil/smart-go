@@ -5,6 +5,7 @@ import {
     HttpCode,
     HttpStatus,
     BadRequestException,
+    Header,
     Logger,
     Query,
     MessageEvent,
@@ -148,6 +149,9 @@ Gửi tin nhắn và nhận câu trả lời từ AI Assistant với hỗ trợ 
     }
 
     @Sse('chat/stream')
+    @Header('Cache-Control', 'no-cache, no-transform')
+    @Header('Connection', 'keep-alive')
+    @Header('X-Accel-Buffering', 'no')
     @ApiBearerAuth()
     @ApiProduces('text/event-stream')
     @ApiOperation({

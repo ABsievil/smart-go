@@ -10,3 +10,8 @@ export enum ChatbotEmbedType {
     FAQ = 'faq',
     GENERAL = 'general',
 }
+
+export enum RagPrepareKind {
+    REPLY_CACHE = 'reply_cache',
+    RAG = 'rag',
+}
