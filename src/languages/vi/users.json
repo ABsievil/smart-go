@@ -4,6 +4,7 @@
         "findAll": "Lấy danh sách người dùng thành công",
         "findOne": "Lấy thông tin người dùng thành công",
         "update": "Cập nhật người dùng thành công",
+        "updateAvatar": "Cập nhật ảnh đại diện thành công",
         "remove": "Xóa người dùng thành công"
     },
     "error": {
@@ -11,6 +12,7 @@
         "findAll": "Không thể lấy danh sách người dùng",
         "findOne": "Không tìm thấy người dùng",
         "update": "Không thể cập nhật người dùng",
+        "updateAvatar": "Không thể cập nhật ảnh đại diện",
         "remove": "Không thể xóa người dùng"
     }
 }

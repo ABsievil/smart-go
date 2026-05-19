@@ -4,6 +4,7 @@
         "findAll": "Users retrieved successfully",
         "findOne": "User retrieved successfully",
         "update": "User updated successfully",
+        "updateAvatar": "User avatar updated successfully",
         "remove": "User deleted successfully"
     },
     "error": {
@@ -11,6 +12,7 @@
         "findAll": "Failed to retrieve users",
         "findOne": "User not found",
         "update": "Failed to update user",
+        "updateAvatar": "Failed to update user avatar",
         "remove": "Failed to delete user"
     }
 }
