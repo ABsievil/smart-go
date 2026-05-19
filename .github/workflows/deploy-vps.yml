@@ -77,7 +77,7 @@ jobs:
                       cd "$APP_DIR"
                       git fetch origin "$BRANCH"
                       git checkout "$BRANCH"
-                      git pull origin "$BRANCH"
+                      git reset --hard "origin/$BRANCH"
 
                       if [ ! -f ./deploy.sh ]; then
                         echo "deploy.sh not found in $APP_DIR on branch $BRANCH"

@@ -20,9 +20,10 @@ if [[ -n "${REGISTRY_HOST:-}" && -n "${REGISTRY_USERNAME:-}" && -n "${REGISTRY_T
   echo "$REGISTRY_TOKEN" | docker login "$REGISTRY_HOST" -u "$REGISTRY_USERNAME" --password-stdin
 fi
 
+# VPS deploy dir must match remote; discard local edits to tracked files.
 git fetch "$REMOTE" "$BRANCH"
 git checkout "$BRANCH"
-git pull "$REMOTE" "$BRANCH"
+git reset --hard "$REMOTE/$BRANCH"
 
 export API_IMAGE="${IMAGE_NAME}:${IMAGE_TAG}"
 
