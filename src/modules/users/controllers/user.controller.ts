@@ -35,6 +35,7 @@ import { UserCreateRequestDto } from '../dtos/request/user-create.request.dto';
 import { UserRole } from '../enums/user-role.enum';
 import { Roles } from '@modules/auth/decorators/auth.decorator';
 import { USER_CONSTANTS } from '../constants/user.constant';
+import { UserUpdateBodyRequestDto } from '../dtos/request/user-update-body.request.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -139,6 +140,38 @@ export class UserController {
         return this.userService.mapGet(updatedUser);
     }
 
+    @Put(':id/avatar')
+    @ApiBearerAuth()
+    @LanguageResponse({
+        module: 'users',
+        successKey: 'updateAvatar',
+    })
+    @ApiOperation({ summary: 'Update user avatar by ID' })
+    @ApiResponse({
+        status: 200,
+        description: 'User avatar updated successfully',
+        type: UserGetResponseDto,
+    })
+    @ApiResponse({ status: 404, description: 'User not found' })
+    @UploadSingleFile({ fieldName: 'avatar' })
+    async updateAvatar(
+        @Param('id') id: string,
+        @UploadedFile({
+            allowedMimeTypes: [...UPLOAD_ALLOWED_MIME_TYPES.IMAGE],
+            skipMagicNumbersValidation: false,
+        })
+        file: Express.Multer.File,
+    ): Promise<UserGetResponseDto> {
+        const uploaded = await this.uploadService.uploadBuffer(file, {
+            folder: `${USER_CONSTANTS.UPLOAD_FOLDER}/${id}/${USER_CONSTANTS.AVATAR}`,
+            allowedMimeTypes: [...UPLOAD_ALLOWED_MIME_TYPES.IMAGE],
+        });
+        const user = await this.userService.update(id, {
+            avatar: uploaded.secureUrl,
+        });
+        return this.userService.mapGet(user);
+    }
+
     @Put(':id')
     @ApiBearerAuth()
     @LanguageResponse({
@@ -152,24 +185,11 @@ export class UserController {
         type: UserGetResponseDto,
     })
     @ApiResponse({ status: 404, description: 'User not found' })
-    @UploadSingleFile({ fieldName: 'avatar' })
     async update(
         @Param('id') id: string,
-        @Body() updateDto: UserUpdateRequestDto,
-        @UploadedFile({
-            allowedMimeTypes: [...UPLOAD_ALLOWED_MIME_TYPES.IMAGE],
-            skipMagicNumbersValidation: false,
-        })
-        file: Express.Multer.File,
+        @Body() updateDto: UserUpdateBodyRequestDto,
     ): Promise<UserGetResponseDto> {
-        const uploaded = await this.uploadService.uploadBuffer(file, {
-            folder: `${USER_CONSTANTS.UPLOAD_FOLDER}/${id}/${USER_CONSTANTS.AVATAR}`,
-            allowedMimeTypes: [...UPLOAD_ALLOWED_MIME_TYPES.IMAGE],
-        });
-        const user = await this.userService.update(id, {
-            ...updateDto,
-            avatar: uploaded.secureUrl,
-        });
+        const user = await this.userService.update(id, updateDto);
         return this.userService.mapGet(user);
     }
 
