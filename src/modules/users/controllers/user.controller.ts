@@ -19,6 +19,7 @@ import {
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
+import { Encryption } from '@common/encryption/decorators/encryption.decorator';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import {
     UploadSingleFile,
@@ -44,6 +45,7 @@ export class UserController {
     ) {}
 
     @Get()
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'users',
@@ -78,6 +80,7 @@ export class UserController {
     }
 
     @Get(':id')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'users',

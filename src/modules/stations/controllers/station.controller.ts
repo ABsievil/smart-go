@@ -20,6 +20,7 @@ import {
     ApiBearerAuth,
 } from '@nestjs/swagger';
 import { StationService } from '@modules/stations/services/station.service';
+import { Encryption } from '@common/encryption/decorators/encryption.decorator';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { StationCreateRequestDto } from '@modules/stations/dtos/request/station-create.request.dto';
 import { StationUpdateRequestDto } from '@modules/stations/dtos/request/station-update.request.dto';
@@ -34,6 +35,7 @@ export class StationController {
     constructor(private readonly stationService: StationService) {}
 
     @Get()
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'stations',
@@ -95,6 +97,7 @@ export class StationController {
     }
 
     @Get(':id')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'stations',

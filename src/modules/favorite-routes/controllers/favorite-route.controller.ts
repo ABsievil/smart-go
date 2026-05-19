@@ -19,6 +19,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { OrderDirection } from '@common/database/enums/order-direction.enum';
+import { Encryption } from '@common/encryption/decorators/encryption.decorator';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { CurrentUser } from '@modules/auth/decorators/auth.decorator';
 import { FavoriteRouteService } from '@modules/favorite-routes/services/favorite-route.service';
@@ -32,6 +33,7 @@ export class FavoriteRouteController {
     constructor(private readonly favoriteRouteService: FavoriteRouteService) {}
 
     @Get()
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'favorite-routes',
@@ -91,6 +93,7 @@ export class FavoriteRouteController {
     }
 
     @Get(':id')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'favorite-routes',

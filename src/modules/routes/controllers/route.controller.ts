@@ -21,6 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { RouteService } from '@modules/routes/services/route.service';
 import { StationService } from '@modules/stations/services/station.service';
+import { Encryption } from '@common/encryption/decorators/encryption.decorator';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { RouteCreateRequestDto } from '@modules/routes/dtos/request/route-create.request.dto';
 import { RouteUpdateRequestDto } from '@modules/routes/dtos/request/route-update.request.dto';
@@ -43,6 +44,7 @@ export class RouteController {
     ) {}
 
     @Get()
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'routes',
@@ -156,6 +158,7 @@ export class RouteController {
     }
 
     @Get('summary')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'routes',
@@ -181,6 +184,7 @@ export class RouteController {
     }
 
     @Get(':id')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'routes',

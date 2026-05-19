@@ -18,6 +18,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
+import { Encryption } from '@common/encryption/decorators/encryption.decorator';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { BusSimulationService } from '@modules/bus-simulations/services/bus-simulation.service';
 import { BusTripResponseDto } from '@modules/bus-simulations/dtos/response/bus-trip.response.dto';
@@ -31,6 +32,7 @@ export class BusSimulationController {
     constructor(private readonly busSimulationService: BusSimulationService) {}
 
     @Get('routes/:routeId/trips')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'bus-simulations',
@@ -63,6 +65,7 @@ export class BusSimulationController {
     }
 
     @Get('routes/:routeId/positions')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'bus-simulations',
@@ -97,6 +100,7 @@ export class BusSimulationController {
     }
 
     @Get('trips/:tripId/position')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'bus-simulations',
@@ -135,6 +139,7 @@ export class BusSimulationController {
     }
 
     @Get('stations/:stationId/eta')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'bus-simulations',

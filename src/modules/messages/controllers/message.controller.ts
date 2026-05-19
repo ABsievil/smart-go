@@ -21,6 +21,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { OrderDirection } from '@common/database/enums/order-direction.enum';
+import { Encryption } from '@common/encryption/decorators/encryption.decorator';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { CurrentUser } from '@modules/auth/decorators/auth.decorator';
 import { MessageService } from '@modules/messages/services/message.service';
@@ -35,6 +36,7 @@ export class MessageController {
     constructor(private readonly messageService: MessageService) {}
 
     @Get()
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'messages',
@@ -124,6 +126,7 @@ export class MessageController {
     }
 
     @Get(':id')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'messages',

@@ -28,6 +28,7 @@ import { JwtRefreshGuard } from '@modules/auth/guards/jwt-refresh.guard';
 import { GoogleAuthGuard } from '@modules/auth/guards/google-auth.guard';
 import { CurrentUser, Public } from '@modules/auth/decorators/auth.decorator';
 import { IAuthUser } from '@modules/auth/interfaces/auth-user.interface';
+import { Encryption } from '@common/encryption/decorators/encryption.decorator';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { LoginRequestDto } from '@modules/auth/dtos/request/login.request.dto';
 import { RegisterRequestDto } from '@modules/auth/dtos/request/register.request.dto';
@@ -209,6 +210,7 @@ export class AuthController {
     }
 
     @Get('me')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({ module: 'auth', successKey: 'me' })
     @ApiOperation({ summary: 'Get current authenticated user profile' })
