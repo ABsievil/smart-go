@@ -126,7 +126,7 @@ export class PaymentService {
 
     handleMomoReturn(params: IMomoCallbackParams): PaymentResultResponseDto {
         const isValid = this.momoService.verifySignature(params);
-        const success = isValid && params.resultCode === 0;
+        const success = isValid && Number(params.resultCode) === 0;
 
         return {
             success,
