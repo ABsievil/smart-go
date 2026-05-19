@@ -2,26 +2,29 @@
  * Constants cho routing module
  * Request
  * ↓
- * Redis routing result cache (TTL 5 phút)
+ * Redis routing result cache (TTL 1 giờ, theo traffic bucket)
  * ↓ miss
- * In-memory graph cache (TTL 5 phút, per-instance)
+ * In-memory graph cache (TTL 1 giờ, per-instance)
  * ↓ miss
- * Redis raw data cache (TTL 10 phút, shared giữa instances)
+ * Redis raw data cache (TTL 24 giờ, shared giữa instances)
  * ↓ miss
- * MongoDB (query thực sự — tối thiểu 1 lần / 10 phút)
+ * MongoDB
  */
+
+const HOUR_MS = 60 * 60 * 1000;
+const HOUR_SECONDS = 60 * 60;
+const DAY_SECONDS = 24 * HOUR_SECONDS;
 
 // ─── Cache (in-memory) ────────────────────────────────────────────────────────
 // TTL cho graph đã build lưu trong bộ nhớ process (ms)
-export const GRAPH_CACHE_TTL = 5 * 60 * 1000; // 5 phút
+export const GRAPH_CACHE_TTL = 1 * HOUR_MS;
 
 // ─── Cache (Redis) ────────────────────────────────────────────────────────────
 // TTL cho raw DB data (routes + stations) dùng để build graph
 // Phải ≥ GRAPH_CACHE_TTL để in-memory cache không rebuild liên tục từ DB
-export const GRAPH_DATA_REDIS_TTL_SECONDS = 10 * 60; // 10 phút
-
-// TTL cho kết quả routing đã tính — ổn định trong cùng traffic bucket
-export const ROUTING_RESULT_CACHE_TTL_SECONDS = 5 * 60; // 5 phút
+export const GRAPH_DATA_REDIS_TTL_SECONDS = 1 * DAY_SECONDS;
+// TTL cho kết quả MOA* routing đã tính — ổn định trong cùng traffic bucket
+export const ROUTING_RESULT_CACHE_TTL_SECONDS = 1 * HOUR_SECONDS;
 
 // ─── Redis keys ───────────────────────────────────────────────────────────────
 export const REDIS_KEY_GRAPH_ROUTES = 'routing:graph:routes';

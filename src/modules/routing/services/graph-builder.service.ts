@@ -40,7 +40,7 @@ import {
  *    thay vì toàn bộ Mongoose entity — giảm ~70-80% memory cho mỗi node/edge.
  *
  * Tối ưu hiệu năng:
- *  - Raw DB data (routes + stations) được cache trong Redis (TTL 10 phút).
+ *  - Raw DB data (routes + stations) được cache trong Redis (TTL 24 giờ).
  *  - Khi buildGraph: kiểm tra Redis trước, chỉ query MongoDB nếu cache miss.
  *  - Khi service restart, graph rebuild từ Redis (~ms) thay vì MongoDB (~s).
  */
