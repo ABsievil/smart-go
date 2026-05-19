@@ -18,6 +18,7 @@ import {
     ApiTags,
 } from '@nestjs/swagger';
 import { OrderDirection } from '@common/database/enums/order-direction.enum';
+import { Encryption } from '@common/encryption/decorators/encryption.decorator';
 import { LanguageResponse } from '@common/language/decorators/language-response.decorator';
 import { CurrentUser } from '@modules/auth/decorators/auth.decorator';
 import { PaymentTransactionService } from '@modules/payment-transactions/services/payment-transaction.service';
@@ -37,6 +38,7 @@ export class PaymentTransactionController {
     ) {}
 
     @Get()
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'payment-transactions',
@@ -155,6 +157,7 @@ export class PaymentTransactionController {
     }
 
     @Get(':id')
+    @Encryption()
     @ApiBearerAuth()
     @LanguageResponse({
         module: 'payment-transactions',
